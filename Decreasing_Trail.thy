@@ -463,69 +463,69 @@ next
 qed(*>*)
 
 (*<*)lemma incTrail_append:
-  assumes "incTrail G w xs" and "length xs \<ge> 1 \<longrightarrow> w (last xs) < w (v1,v2) \<and> v1 = snd (last xs)" 
-  and "(v1,v2) \<in> arcs G" 
-  shows "incTrail G w (xs@[(v1,v2)])"
+  assumes "incTrail G w es" and "length es \<ge> 1 \<longrightarrow> w (last es) < w (v\<^sub>1,v\<^sub>2) \<and> v\<^sub>1 = snd (last es)" 
+  and "(v\<^sub>1,v\<^sub>2) \<in> arcs G" 
+  shows "incTrail G w (es@[(v\<^sub>1,v\<^sub>2)])"
 proof-
-  have "\<forall> xs v1 v2. length xs = k \<longrightarrow> (incTrail G w xs \<and> (length xs \<ge> 1 \<longrightarrow> w (last xs) < w (v1,v2) \<and> v1 = snd (last xs)) \<and> (v1,v2) \<in> parcs G) \<longrightarrow> incTrail G w (xs@[(v1,v2)])" for k
+  have "\<forall> es v\<^sub>1 v\<^sub>2. length es = k \<longrightarrow> (incTrail G w es \<and> (length es \<ge> 1 \<longrightarrow> w (last es) < w (v\<^sub>1,v\<^sub>2) \<and> v\<^sub>1 = snd (last es)) \<and> (v\<^sub>1,v\<^sub>2) \<in> parcs G) \<longrightarrow> incTrail G w (es@[(v\<^sub>1,v\<^sub>2)])" for k
 proof(induction k)
-  show "\<forall> xs v1 v2. length xs = 0 \<longrightarrow> (incTrail G w xs \<and> (length xs \<ge> 1 \<longrightarrow> w (last xs) < w (v1,v2) \<and> v1 = snd (last xs)) \<and> (v1,v2) \<in> parcs G) \<longrightarrow> incTrail G w (xs@[(v1,v2)])"
+  show "\<forall> es v\<^sub>1 v\<^sub>2. length es = 0 \<longrightarrow> (incTrail G w es \<and> (length es \<ge> 1 \<longrightarrow> w (last es) < w (v\<^sub>1,v\<^sub>2) \<and> v\<^sub>1 = snd (last es)) \<and> (v\<^sub>1,v\<^sub>2) \<in> parcs G) \<longrightarrow> incTrail G w (es@[(v\<^sub>1,v\<^sub>2)])"
     by auto
 next
   fix k
-  assume IH: "\<forall> xs v1 v2. length xs = k \<longrightarrow> (incTrail G w xs \<and> (length xs \<ge> 1 \<longrightarrow> w (last xs) < w (v1,v2) \<and> v1 = snd (last xs)) \<and> (v1,v2) \<in> parcs G) \<longrightarrow> incTrail G w (xs@[(v1,v2)])"
-  show "\<forall> xs v1 v2. length xs = (Suc k) \<longrightarrow> (incTrail G w xs \<and> (length xs \<ge> 1 \<longrightarrow> w (last xs) < w (v1,v2) \<and> v1 = snd (last xs)) \<and> (v1,v2) \<in> parcs G) \<longrightarrow> incTrail G w (xs@[(v1,v2)])"
+  assume IH: "\<forall> es v\<^sub>1 v\<^sub>2. length es = k \<longrightarrow> (incTrail G w es \<and> (length es \<ge> 1 \<longrightarrow> w (last es) < w (v\<^sub>1,v\<^sub>2) \<and> v\<^sub>1 = snd (last es)) \<and> (v\<^sub>1,v\<^sub>2) \<in> parcs G) \<longrightarrow> incTrail G w (es@[(v\<^sub>1,v\<^sub>2)])"
+  show "\<forall> es v\<^sub>1 v\<^sub>2. length es = (Suc k) \<longrightarrow> (incTrail G w es \<and> (length es \<ge> 1 \<longrightarrow> w (last es) < w (v\<^sub>1,v\<^sub>2) \<and> v\<^sub>1 = snd (last es)) \<and> (v\<^sub>1,v\<^sub>2) \<in> parcs G) \<longrightarrow> incTrail G w (es@[(v\<^sub>1,v\<^sub>2)])"
   proof(intro allI, intro impI)
-    fix xs :: "('a\<times>'a) list"
-    and v1 v2 :: "'a"
-    assume a0: "length xs = (Suc k)" and a1: "(incTrail G w xs \<and> (length xs \<ge> 1 \<longrightarrow> w (last xs) < w (v1,v2) \<and> v1 = snd (last xs)) \<and> (v1,v2) \<in> parcs G)"
-    then have f0: "(incTrail G w (tl xs) \<and> (length (tl xs) \<ge> 1 \<longrightarrow> w (last (tl xs)) < w (v1,v2) \<and> v1 = snd (last (tl xs))) \<and> (v1,v2) \<in> parcs G) \<longrightarrow> incTrail G w ((tl xs)@[(v1,v2)])"
+    fix es :: "('a\<times>'a) list"
+    and v\<^sub>1 v\<^sub>2 :: "'a"
+    assume a0: "length es = (Suc k)" and a1: "(incTrail G w es \<and> (length es \<ge> 1 \<longrightarrow> w (last es) < w (v\<^sub>1,v\<^sub>2) \<and> v\<^sub>1 = snd (last es)) \<and> (v\<^sub>1,v\<^sub>2) \<in> parcs G)"
+    then have f0: "(incTrail G w (tl es) \<and> (length (tl es) \<ge> 1 \<longrightarrow> w (last (tl es)) < w (v\<^sub>1,v\<^sub>2) \<and> v\<^sub>1 = snd (last (tl es))) \<and> (v\<^sub>1,v\<^sub>2) \<in> parcs G) \<longrightarrow> incTrail G w ((tl es)@[(v\<^sub>1,v\<^sub>2)])"
       using IH by auto
-    show "incTrail G w (xs@[(v1,v2)])"
+    show "incTrail G w (es@[(v\<^sub>1,v\<^sub>2)])"
     proof(rule disjE)
-      show "length (tl xs) = 0 \<or> length (tl xs) \<ge> 1" by auto
+      show "length (tl es) = 0 \<or> length (tl es) \<ge> 1" by auto
     next
-      assume a2: "length (tl xs) = 0"
-      then have "hd xs \<in> parcs G" 
+      assume a2: "length (tl es) = 0"
+      then have "hd es \<in> parcs G" 
         using a0 a1 
         by (metis hd_Cons_tl incTrail.simps(2) length_0_conv nat.simps(3))
-      moreover have "w (hd xs) < w (v1,v2)" 
+      moreover have "w (hd es) < w (v\<^sub>1,v\<^sub>2)" 
         using a0 a1 a2 
         by (metis One_nat_def Suc_le_lessD hd_Cons_tl last_ConsL le_add1 length_0_conv length_greater_0_conv plus_1_eq_Suc)
-      moreover have "snd (hd xs) = v1" 
+      moreover have "snd (hd es) = v\<^sub>1" 
         using a0 a1 a2 
         by (metis hd_Cons_tl last_ConsL le_add1 length_0_conv nat.simps(3) plus_1_eq_Suc)
-      ultimately show "incTrail G w (xs@[(v1,v2)])" 
+      ultimately show "incTrail G w (es@[(v\<^sub>1,v\<^sub>2)])" 
         using a0 a1 a2 f0
         by (metis (no_types, hide_lams) append_Cons append_Nil fst_conv hd_Cons_tl incTrail.simps(1,3) 
            le_numeral_extra(2) length_0_conv list.size(3) nat.simps(3))
     next
-      assume a2: "length (tl xs) \<ge> 1"
-      then have f1: "w (last (tl xs)) < w (v1,v2) \<and> v1 = snd (last (tl xs)) \<and> (v1,v2) \<in> parcs G" 
+      assume a2: "length (tl es) \<ge> 1"
+      then have f1: "w (last (tl es)) < w (v\<^sub>1,v\<^sub>2) \<and> v\<^sub>1 = snd (last (tl es)) \<and> (v\<^sub>1,v\<^sub>2) \<in> parcs G" 
         using a0 a1
         by (metis last_tl le_add1 le_numeral_extra(2) list.size(3) plus_1_eq_Suc)
-      moreover have "w (hd (xs@[(v1,v2)])) < w (hd (tl (xs@[(v1,v2)])))"
+      moreover have "w (hd (es@[(v\<^sub>1,v\<^sub>2)])) < w (hd (tl (es@[(v\<^sub>1,v\<^sub>2)])))"
         using a1 a2
         by (metis hd_Cons_tl hd_append2 incTrail.simps(3) le_numeral_extra(2) list.sel(2) list.size(3) tl_append2)
-      moreover have "(hd (xs@[(v1,v2)])) \<in> parcs G" 
+      moreover have "(hd (es@[(v\<^sub>1,v\<^sub>2)])) \<in> parcs G" 
         using a1 a2
         by (metis hd_Cons_tl hd_append2 incTrail.simps(3) le_numeral_extra(2) length_0_conv list.sel(2))
-      moreover have "snd (hd (xs@[(v1,v2)])) = fst (hd (tl (xs@[(v1,v2)])))"
+      moreover have "snd (hd (es@[(v\<^sub>1,v\<^sub>2)])) = fst (hd (tl (es@[(v\<^sub>1,v\<^sub>2)])))"
         using a0 a1 a2
         by (metis One_nat_def hd_append2 incTrail.simps(3) le_numeral_extra(2) length_Cons length_tl list.collapse list.size(3) nat.simps(3) tl_append2)
-      moreover have "(xs@[(v1,v2)]) = (hd (xs@[(v1,v2)])) # hd(tl (xs@[(v1,v2)])) # tl (tl (xs@[(v1,v2)]))" 
+      moreover have "(es@[(v\<^sub>1,v\<^sub>2)]) = (hd (es@[(v\<^sub>1,v\<^sub>2)])) # hd(tl (es@[(v\<^sub>1,v\<^sub>2)])) # tl (tl (es@[(v\<^sub>1,v\<^sub>2)]))" 
         using a0 a2
         by (metis append_is_Nil_conv hd_Cons_tl le_add1 le_numeral_extra(2) list.size(3) plus_1_eq_Suc tl_append2) 
-      moreover have "(incTrail G w (tl xs) \<and> (length (tl xs) \<ge> 1 \<longrightarrow> w (last (tl xs)) < w (v1,v2) \<and> v1 = snd (last (tl xs))) \<and> (v1,v2) \<in> parcs G) \<longrightarrow> incTrail G w ((tl xs)@[(v1,v2)])"
+      moreover have "(incTrail G w (tl es) \<and> (length (tl es) \<ge> 1 \<longrightarrow> w (last (tl es)) < w (v\<^sub>1,v\<^sub>2) \<and> v\<^sub>1 = snd (last (tl es))) \<and> (v\<^sub>1,v\<^sub>2) \<in> parcs G) \<longrightarrow> incTrail G w ((tl es)@[(v\<^sub>1,v\<^sub>2)])"
           using IH f0 by blast
-      moreover have "(length (tl xs) \<ge> 1 \<longrightarrow> w (last (tl xs)) < w (v1,v2) \<and> v1 = snd (last (tl xs)))" 
+      moreover have "(length (tl es) \<ge> 1 \<longrightarrow> w (last (tl es)) < w (v\<^sub>1,v\<^sub>2) \<and> v\<^sub>1 = snd (last (tl es)))" 
           using f1 by blast
-      moreover have "incTrail G w (tl xs)"
+      moreover have "incTrail G w (tl es)"
       proof-
-        have "drop 1 xs = tl xs" by (simp add: drop_Suc)
+        have "drop 1 es = tl es" by (simp add: drop_Suc)
         then show ?thesis using a1 incTrail_subtrail by metis
       qed
-      ultimately show "incTrail G w (xs@[(v1,v2)])" 
+      ultimately show "incTrail G w (es@[(v\<^sub>1,v\<^sub>2)])" 
         by (smt a0 incTrail.simps(3) le_add1 le_numeral_extra(2) list.sel(3) list.size(3) plus_1_eq_Suc tl_append2)
     qed
   qed
@@ -534,66 +534,66 @@ qed
 qed(*>*)
 
 (*<*)lemma decTrail_append: (*ultimately replace this by revised proof of incTrail_append *)
-  assumes "decTrail G w xs" and "length xs \<ge> 1 \<longrightarrow> w (last xs) > w (v1,v2) \<and> v1 = snd (last xs)" 
-  and "(v1,v2) \<in> parcs G" 
-  shows "decTrail G w (xs@[(v1,v2)])"
+  assumes "decTrail G w xs" and "length xs \<ge> 1 \<longrightarrow> w (last xs) > w (v\<^sub>1,v\<^sub>2) \<and> v\<^sub>1 = snd (last xs)" 
+  and "(v\<^sub>1,v\<^sub>2) \<in> parcs G" 
+  shows "decTrail G w (xs@[(v\<^sub>1,v\<^sub>2)])"
 proof-
-  have "\<forall> xs v1 v2. length xs = k \<longrightarrow> (decTrail G w xs \<and> (length xs \<ge> 1 \<longrightarrow> w (last xs) > w (v1,v2) \<and> v1 = snd (last xs)) \<and> (v1,v2) \<in> parcs G) \<longrightarrow> decTrail G w (xs@[(v1,v2)])" for k
+  have "\<forall> xs v\<^sub>1 v\<^sub>2. length xs = k \<longrightarrow> (decTrail G w xs \<and> (length xs \<ge> 1 \<longrightarrow> w (last xs) > w (v\<^sub>1,v\<^sub>2) \<and> v\<^sub>1 = snd (last xs)) \<and> (v\<^sub>1,v\<^sub>2) \<in> parcs G) \<longrightarrow> decTrail G w (xs@[(v\<^sub>1,v\<^sub>2)])" for k
 proof(induction k)
-  show "\<forall> xs v1 v2. length xs = 0 \<longrightarrow> (decTrail G w xs \<and> (length xs \<ge> 1 \<longrightarrow> w (last xs) > w (v1,v2) \<and> v1 = snd (last xs)) \<and> (v1,v2) \<in> parcs G) \<longrightarrow> decTrail G w (xs@[(v1,v2)])"
+  show "\<forall> xs v\<^sub>1 v\<^sub>2. length xs = 0 \<longrightarrow> (decTrail G w xs \<and> (length xs \<ge> 1 \<longrightarrow> w (last xs) > w (v\<^sub>1,v\<^sub>2) \<and> v\<^sub>1 = snd (last xs)) \<and> (v\<^sub>1,v\<^sub>2) \<in> parcs G) \<longrightarrow> decTrail G w (xs@[(v\<^sub>1,v\<^sub>2)])"
   proof(intro allI, intro impI)
     fix xs :: "('a\<times>'a) list"
-    and v1 v2 :: "'a" 
-    assume "length xs = 0" and "(decTrail G w xs \<and> (length xs \<ge> 1 \<longrightarrow> w (last xs) > w (v1,v2) \<and> v1 = snd (last xs)) \<and> (v1,v2) \<in> parcs G)"
-    then show "decTrail G w (xs@[(v1,v2)])" by auto
+    and v\<^sub>1 v\<^sub>2 :: "'a" 
+    assume "length xs = 0" and "(decTrail G w xs \<and> (length xs \<ge> 1 \<longrightarrow> w (last xs) > w (v\<^sub>1,v\<^sub>2) \<and> v\<^sub>1 = snd (last xs)) \<and> (v\<^sub>1,v\<^sub>2) \<in> parcs G)"
+    then show "decTrail G w (xs@[(v\<^sub>1,v\<^sub>2)])" by auto
   qed
 next
   fix k
-  assume IH: "\<forall> xs v1 v2. length xs = k \<longrightarrow> (decTrail G w xs \<and> (length xs \<ge> 1 \<longrightarrow> w (last xs) > w (v1,v2) \<and> v1 = snd (last xs)) \<and> (v1,v2) \<in> parcs G) \<longrightarrow> decTrail G w (xs@[(v1,v2)])"
-  show "\<forall> xs v1 v2. length xs = (Suc k) \<longrightarrow> (decTrail G w xs \<and> (length xs \<ge> 1 \<longrightarrow> w (last xs) > w (v1,v2) \<and> v1 = snd (last xs)) \<and> (v1,v2) \<in> parcs G) \<longrightarrow> decTrail G w (xs@[(v1,v2)])"
+  assume IH: "\<forall> xs v\<^sub>1 v\<^sub>2. length xs = k \<longrightarrow> (decTrail G w xs \<and> (length xs \<ge> 1 \<longrightarrow> w (last xs) > w (v\<^sub>1,v\<^sub>2) \<and> v\<^sub>1 = snd (last xs)) \<and> (v\<^sub>1,v\<^sub>2) \<in> parcs G) \<longrightarrow> decTrail G w (xs@[(v\<^sub>1,v\<^sub>2)])"
+  show "\<forall> xs v\<^sub>1 v\<^sub>2. length xs = (Suc k) \<longrightarrow> (decTrail G w xs \<and> (length xs \<ge> 1 \<longrightarrow> w (last xs) > w (v\<^sub>1,v\<^sub>2) \<and> v\<^sub>1 = snd (last xs)) \<and> (v\<^sub>1,v\<^sub>2) \<in> parcs G) \<longrightarrow> decTrail G w (xs@[(v\<^sub>1,v\<^sub>2)])"
   proof(intro allI, intro impI)
     fix xs :: "('a\<times>'a) list"
-    and v1 v2 :: "'a" 
-    assume a0: "length xs = (Suc k)" and a1: "(decTrail G w xs \<and> (length xs \<ge> 1 \<longrightarrow> w (last xs) > w (v1,v2) \<and> v1 = snd (last xs)) \<and> (v1,v2) \<in> parcs G)"
-    then have f0: "(decTrail G w (tl xs) \<and> (length (tl xs) \<ge> 1 \<longrightarrow> w (last (tl xs)) > w (v1,v2) \<and> v1 = snd (last (tl xs))) \<and> (v1,v2) \<in> parcs G) \<longrightarrow> decTrail G w ((tl xs)@[(v1,v2)])"
+    and v\<^sub>1 v\<^sub>2 :: "'a" 
+    assume a0: "length xs = (Suc k)" and a1: "(decTrail G w xs \<and> (length xs \<ge> 1 \<longrightarrow> w (last xs) > w (v\<^sub>1,v\<^sub>2) \<and> v\<^sub>1 = snd (last xs)) \<and> (v\<^sub>1,v\<^sub>2) \<in> parcs G)"
+    then have f0: "(decTrail G w (tl xs) \<and> (length (tl xs) \<ge> 1 \<longrightarrow> w (last (tl xs)) > w (v\<^sub>1,v\<^sub>2) \<and> v\<^sub>1 = snd (last (tl xs))) \<and> (v\<^sub>1,v\<^sub>2) \<in> parcs G) \<longrightarrow> decTrail G w ((tl xs)@[(v\<^sub>1,v\<^sub>2)])"
       using IH by auto
-    show "decTrail G w (xs@[(v1,v2)])"
+    show "decTrail G w (xs@[(v\<^sub>1,v\<^sub>2)])"
     proof(rule disjE)
       show "length (tl xs) = 0 \<or> length (tl xs) \<ge> 1" by auto
     next
       assume a2: "length (tl xs) = 0"
       then have "hd xs \<in> parcs G" using a1 
         by (metis (full_types) Zero_neq_Suc a0 decTrail.simps(2) length_0_conv list.collapse list.size(3))
-      moreover have "w (hd xs) > w (v1,v2)" using a1 
+      moreover have "w (hd xs) > w (v\<^sub>1,v\<^sub>2)" using a1 
         by (metis One_nat_def Suc_le_lessD a2 a0 hd_Cons_tl last_ConsL le_add1 length_0_conv length_greater_0_conv plus_1_eq_Suc)
-      moreover have "snd (hd xs) = v1" 
+      moreover have "snd (hd xs) = v\<^sub>1" 
         by (metis a0 a1 a2 hd_Cons_tl last_ConsL le_add1 length_0_conv nat.simps(3) plus_1_eq_Suc)
-      ultimately show "decTrail G w (xs@[(v1,v2)])" 
+      ultimately show "decTrail G w (xs@[(v\<^sub>1,v\<^sub>2)])" 
         using a0 a1 a2 append_Cons append_Nil card_atLeastAtMost f0 fst_conv hd_Cons_tl le_numeral_extra(2) length_0_conv length_tl list.size(3) nat.simps(3)
-        by (metis (no_types, hide_lams) Cons_eq_append_conv One_nat_def append_self_conv2 decTrail.simps(1)
+        by (metis (no_types, hide_lams) Cons_eq_append_conv One_nat_def append_self_conv\<^sub>2 decTrail.simps(1)
  decTrail.simps(3) diff_Suc_1 diff_self_eq_0 fst_eqD last_ConsL less_Suc_eq_le less_one list.sel(1) not_less_eq tl_Nil)
     next
       assume a2: "length (tl xs) \<ge> 1"
-      then have f1: "w (last (tl xs)) > w (v1,v2) \<and> v1 = snd (last (tl xs)) \<and> (v1,v2) \<in> parcs G" 
+      then have f1: "w (last (tl xs)) > w (v\<^sub>1,v\<^sub>2) \<and> v\<^sub>1 = snd (last (tl xs)) \<and> (v\<^sub>1,v\<^sub>2) \<in> parcs G" 
         using  a0 a1 last_tl le_add1 le_numeral_extra(2) list.size(3) plus_1_eq_Suc by metis
-      moreover have "w (hd (xs@[(v1,v2)])) > w (hd (tl (xs@[(v1,v2)])))" 
+      moreover have "w (hd (xs@[(v\<^sub>1,v\<^sub>2)])) > w (hd (tl (xs@[(v\<^sub>1,v\<^sub>2)])))" 
         by (metis a1 a2 hd_Cons_tl hd_append2 decTrail.simps(3) le_numeral_extra(2) list.sel(2) list.size(3) tl_append2)
-      moreover have "(hd (xs@[(v1,v2)])) \<in> parcs G" 
+      moreover have "(hd (xs@[(v\<^sub>1,v\<^sub>2)])) \<in> parcs G" 
         by (metis a1 a2 hd_Cons_tl hd_append2 decTrail.simps(3) le_numeral_extra(2) length_0_conv list.sel(2))
-      moreover have "snd (hd (xs@[(v1,v2)])) = fst (hd (tl (xs@[(v1,v2)])))"
+      moreover have "snd (hd (xs@[(v\<^sub>1,v\<^sub>2)])) = fst (hd (tl (xs@[(v\<^sub>1,v\<^sub>2)])))"
         by (metis One_nat_def a0 a1 a2 hd_Cons_tl hd_append2 decTrail.simps(3) le_numeral_extra(2) length_Cons length_tl list.collapse list.size(3) nat.simps(3) tl_append2)
-      moreover have "(xs@[(v1,v2)]) = (hd (xs@[(v1,v2)])) # hd(tl (xs@[(v1,v2)])) # tl (tl (xs@[(v1,v2)]))" 
+      moreover have "(xs@[(v\<^sub>1,v\<^sub>2)]) = (hd (xs@[(v\<^sub>1,v\<^sub>2)])) # hd(tl (xs@[(v\<^sub>1,v\<^sub>2)])) # tl (tl (xs@[(v\<^sub>1,v\<^sub>2)]))" 
         by (metis a0 a2 append_is_Nil_conv hd_Cons_tl le_add1 le_numeral_extra(2) list.size(3) plus_1_eq_Suc tl_append2) 
-      moreover have "(decTrail G w (tl xs) \<and> (length (tl xs) \<ge> 1 \<longrightarrow> w (last (tl xs)) > w (v1,v2) \<and> v1 = snd (last (tl xs))) \<and> (v1,v2) \<in> parcs G) \<longrightarrow> decTrail G w ((tl xs)@[(v1,v2)])"
+      moreover have "(decTrail G w (tl xs) \<and> (length (tl xs) \<ge> 1 \<longrightarrow> w (last (tl xs)) > w (v\<^sub>1,v\<^sub>2) \<and> v\<^sub>1 = snd (last (tl xs))) \<and> (v\<^sub>1,v\<^sub>2) \<in> parcs G) \<longrightarrow> decTrail G w ((tl xs)@[(v\<^sub>1,v\<^sub>2)])"
           using IH f0 by blast
-      moreover have "(length (tl xs) \<ge> 1 \<longrightarrow> w (last (tl xs)) > w (v1,v2) \<and> v1 = snd (last (tl xs)))" 
+      moreover have "(length (tl xs) \<ge> 1 \<longrightarrow> w (last (tl xs)) > w (v\<^sub>1,v\<^sub>2) \<and> v\<^sub>1 = snd (last (tl xs)))" 
           using f1 by blast
       moreover have "decTrail G w (tl xs)"
       proof-
         have "drop 1 xs = tl xs" by (simp add: drop_Suc)
         then show ?thesis using a1 decTrail_subtrail by metis
       qed
-      ultimately show "decTrail G w (xs@[(v1,v2)])" 
+      ultimately show "decTrail G w (xs@[(v\<^sub>1,v\<^sub>2)])" 
         by (smt a0 decTrail.simps(3) le_add1 le_numeral_extra(2) list.sel(3) list.size(3) plus_1_eq_Suc tl_append2)
     qed
   qed
@@ -1137,51 +1137,51 @@ the number $q$ of edges is always even. \<close>
 lemma (in weighted_pair_graph) max_arcs: 
   shows "card (parcs G) \<le> n*(n-1)"
 (*<*)proof-
-  have "parcs G \<subseteq> {(v1,v2). v1 \<in> pverts G \<and> v2 \<in> pverts G \<and> v1 \<noteq> v2}" 
+  have "parcs G \<subseteq> {(v\<^sub>1,v\<^sub>2). v\<^sub>1 \<in> pverts G \<and> v\<^sub>2 \<in> pverts G \<and> v\<^sub>1 \<noteq> v\<^sub>2}" 
     by (simp add: pair_no_loops prod.case_eq_if subsetI)
-  moreover have "card {(v1,v2). v1 \<in> pverts G \<and> v2 \<in> pverts G \<and> v1 \<noteq> v2} = n*(n-1)" 
+  moreover have "card {(v\<^sub>1,v\<^sub>2). v\<^sub>1 \<in> pverts G \<and> v\<^sub>2 \<in> pverts G \<and> v\<^sub>1 \<noteq> v\<^sub>2} = n*(n-1)" 
   proof-
-    have "{(v1,v2). v1 \<in> pverts G \<and> v2 \<in> pverts G \<and> v1 \<noteq> v2} = {v1. v1 \<in> pverts G} \<times> {v2. v2 \<in> pverts G} - {(v1,v2). v1 \<in> pverts G \<and> v2 \<in> pverts G \<and> v1 = v2}"
+    have "{(v\<^sub>1,v\<^sub>2). v\<^sub>1 \<in> pverts G \<and> v\<^sub>2 \<in> pverts G \<and> v\<^sub>1 \<noteq> v\<^sub>2} = {v\<^sub>1. v\<^sub>1 \<in> pverts G} \<times> {v\<^sub>2. v\<^sub>2 \<in> pverts G} - {(v\<^sub>1,v\<^sub>2). v\<^sub>1 \<in> pverts G \<and> v\<^sub>2 \<in> pverts G \<and> v\<^sub>1 = v\<^sub>2}"
     proof
-      show "{(v1,v2). v1 \<in> pverts G \<and> v2 \<in> pverts G \<and> v1 \<noteq> v2} \<subseteq> {v1. v1 \<in> pverts G} \<times> {v2. v2 \<in> pverts G} - {(v1,v2). v1 \<in> pverts G \<and> v2 \<in> pverts G \<and> v1 = v2}"
+      show "{(v\<^sub>1,v\<^sub>2). v\<^sub>1 \<in> pverts G \<and> v\<^sub>2 \<in> pverts G \<and> v\<^sub>1 \<noteq> v\<^sub>2} \<subseteq> {v\<^sub>1. v\<^sub>1 \<in> pverts G} \<times> {v\<^sub>2. v\<^sub>2 \<in> pverts G} - {(v\<^sub>1,v\<^sub>2). v\<^sub>1 \<in> pverts G \<and> v\<^sub>2 \<in> pverts G \<and> v\<^sub>1 = v\<^sub>2}"
       proof
         fix x 
-        assume a0: "x \<in> {(v1,v2). v1 \<in> pverts G \<and> v2 \<in> pverts G \<and> v1 \<noteq> v2}"
-        then have "x \<in> {v1. v1 \<in> pverts G} \<times> {v2. v2 \<in> pverts G}" by blast
-        moreover have "x \<notin> {(v1,v2). v1 \<in> pverts G \<and> v2 \<in> pverts G \<and> v1 = v2}" using a0 by blast
-        ultimately show "x \<in> {v1. v1 \<in> pverts G} \<times> {v2. v2 \<in> pverts G} - {(v1,v2). v1 \<in> pverts G \<and> v2 \<in> pverts G \<and> v1 = v2}"
+        assume a0: "x \<in> {(v\<^sub>1,v\<^sub>2). v\<^sub>1 \<in> pverts G \<and> v\<^sub>2 \<in> pverts G \<and> v\<^sub>1 \<noteq> v\<^sub>2}"
+        then have "x \<in> {v\<^sub>1. v\<^sub>1 \<in> pverts G} \<times> {v\<^sub>2. v\<^sub>2 \<in> pverts G}" by blast
+        moreover have "x \<notin> {(v\<^sub>1,v\<^sub>2). v\<^sub>1 \<in> pverts G \<and> v\<^sub>2 \<in> pverts G \<and> v\<^sub>1 = v\<^sub>2}" using a0 by blast
+        ultimately show "x \<in> {v\<^sub>1. v\<^sub>1 \<in> pverts G} \<times> {v\<^sub>2. v\<^sub>2 \<in> pverts G} - {(v\<^sub>1,v\<^sub>2). v\<^sub>1 \<in> pverts G \<and> v\<^sub>2 \<in> pverts G \<and> v\<^sub>1 = v\<^sub>2}"
           by blast
       qed
     next
-      show "{v1. v1 \<in> pverts G} \<times> {v2. v2 \<in> pverts G} - {(v1,v2). v1 \<in> pverts G \<and> v2 \<in> pverts G \<and> v1 = v2}
-                \<subseteq> {(v1,v2). v1 \<in> pverts G \<and> v2 \<in> pverts G \<and> v1 \<noteq> v2}"
+      show "{v\<^sub>1. v\<^sub>1 \<in> pverts G} \<times> {v\<^sub>2. v\<^sub>2 \<in> pverts G} - {(v\<^sub>1,v\<^sub>2). v\<^sub>1 \<in> pverts G \<and> v\<^sub>2 \<in> pverts G \<and> v\<^sub>1 = v\<^sub>2}
+                \<subseteq> {(v\<^sub>1,v\<^sub>2). v\<^sub>1 \<in> pverts G \<and> v\<^sub>2 \<in> pverts G \<and> v\<^sub>1 \<noteq> v\<^sub>2}"
         by blast
     qed
-    moreover have "{(v1,v2). v1 \<in> pverts G \<and> v2 \<in> pverts G \<and> v1 = v2} \<subseteq> {v1. v1 \<in> pverts G} \<times> {v2. v2 \<in> pverts G}" by blast
-    moreover have "finite {(v1,v2). v1 \<in> pverts G \<and> v2 \<in> pverts G \<and> v1 = v2}" 
+    moreover have "{(v\<^sub>1,v\<^sub>2). v\<^sub>1 \<in> pverts G \<and> v\<^sub>2 \<in> pverts G \<and> v\<^sub>1 = v\<^sub>2} \<subseteq> {v\<^sub>1. v\<^sub>1 \<in> pverts G} \<times> {v\<^sub>2. v\<^sub>2 \<in> pverts G}" by blast
+    moreover have "finite {(v\<^sub>1,v\<^sub>2). v\<^sub>1 \<in> pverts G \<and> v\<^sub>2 \<in> pverts G \<and> v\<^sub>1 = v\<^sub>2}" 
       using calculation(2) finite_subset by fastforce
-    ultimately have "card {(v1,v2). v1 \<in> pverts G \<and> v2 \<in> pverts G \<and> v1 \<noteq> v2} 
-                   = card ({v1. v1 \<in> pverts G} \<times> {v2. v2 \<in> pverts G}) - card {(v1,v2). v1 \<in> pverts G \<and> v2 \<in> pverts G \<and> v1 = v2}"
+    ultimately have "card {(v\<^sub>1,v\<^sub>2). v\<^sub>1 \<in> pverts G \<and> v\<^sub>2 \<in> pverts G \<and> v\<^sub>1 \<noteq> v\<^sub>2} 
+                   = card ({v\<^sub>1. v\<^sub>1 \<in> pverts G} \<times> {v\<^sub>2. v\<^sub>2 \<in> pverts G}) - card {(v\<^sub>1,v\<^sub>2). v\<^sub>1 \<in> pverts G \<and> v\<^sub>2 \<in> pverts G \<and> v\<^sub>1 = v\<^sub>2}"
       by (simp add: card_Diff_subset)
-    moreover have "card {v1. v1 \<in> pverts G} = n" by auto
-    moreover have "card {(v1,v2). v1 \<in> pverts G \<and> v2 \<in> pverts G \<and> v1 = v2} = card {v1. v1 \<in> pverts G}" 
+    moreover have "card {v\<^sub>1. v\<^sub>1 \<in> pverts G} = n" by auto
+    moreover have "card {(v\<^sub>1,v\<^sub>2). v\<^sub>1 \<in> pverts G \<and> v\<^sub>2 \<in> pverts G \<and> v\<^sub>1 = v\<^sub>2} = card {v\<^sub>1. v\<^sub>1 \<in> pverts G}" 
     proof-
-      have "inj_on (\<lambda>(v1,v2). v1) {(v1,v2). v1 \<in> pverts G \<and> v2 \<in> pverts G \<and> v1 = v2}" 
+      have "inj_on (\<lambda>(v\<^sub>1,v\<^sub>2). v\<^sub>1) {(v\<^sub>1,v\<^sub>2). v\<^sub>1 \<in> pverts G \<and> v\<^sub>2 \<in> pverts G \<and> v\<^sub>1 = v\<^sub>2}" 
         by (smt Product_Type.Collect_case_prodD inj_onI prod.case_eq_if prod.collapse)
-      moreover have "(\<lambda>(v1,v2). v1) ` {(v1,v2). v1 \<in> pverts G \<and> v2 \<in> pverts G \<and> v1 = v2} = {v1. v1 \<in> pverts G}" by auto
-      ultimately have "bij_betw (\<lambda>(v1,v2). v1) {(v1,v2). v1 \<in> pverts G \<and> v2 \<in> pverts G \<and> v1 = v2} {v1. v1 \<in> pverts G}" 
+      moreover have "(\<lambda>(v\<^sub>1,v\<^sub>2). v\<^sub>1) ` {(v\<^sub>1,v\<^sub>2). v\<^sub>1 \<in> pverts G \<and> v\<^sub>2 \<in> pverts G \<and> v\<^sub>1 = v\<^sub>2} = {v\<^sub>1. v\<^sub>1 \<in> pverts G}" by auto
+      ultimately have "bij_betw (\<lambda>(v\<^sub>1,v\<^sub>2). v\<^sub>1) {(v\<^sub>1,v\<^sub>2). v\<^sub>1 \<in> pverts G \<and> v\<^sub>2 \<in> pverts G \<and> v\<^sub>1 = v\<^sub>2} {v\<^sub>1. v\<^sub>1 \<in> pverts G}" 
         by (simp add: bij_betw_def)
       then show ?thesis 
         using bij_betw_same_card by auto
     qed
-    ultimately have "card {(v1,v2). v1 \<in> pverts G \<and> v2 \<in> pverts G \<and> v1 \<noteq> v2} = n*n - n" by auto
+    ultimately have "card {(v\<^sub>1,v\<^sub>2). v\<^sub>1 \<in> pverts G \<and> v\<^sub>2 \<in> pverts G \<and> v\<^sub>1 \<noteq> v\<^sub>2} = n*n - n" by auto
     then show ?thesis 
       by (simp add: diff_mult_distrib2)
   qed
-  moreover have "finite {(v1,v2). v1 \<in> pverts G \<and> v2 \<in> pverts G \<and> v1 \<noteq> v2}" 
+  moreover have "finite {(v\<^sub>1,v\<^sub>2). v\<^sub>1 \<in> pverts G \<and> v\<^sub>2 \<in> pverts G \<and> v\<^sub>1 \<noteq> v\<^sub>2}" 
   proof-
-    have "{(v1,v2). v1 \<in> pverts G \<and> v2 \<in> pverts G \<and> v1 \<noteq> v2} \<subseteq> {v1. v1 \<in> pverts G} \<times> {v1. v1 \<in> pverts G}" by auto
-    moreover have "finite {v1. v1 \<in> pverts G}" by auto
+    have "{(v\<^sub>1,v\<^sub>2). v\<^sub>1 \<in> pverts G \<and> v\<^sub>2 \<in> pverts G \<and> v\<^sub>1 \<noteq> v\<^sub>2} \<subseteq> {v\<^sub>1. v\<^sub>1 \<in> pverts G} \<times> {v\<^sub>1. v\<^sub>1 \<in> pverts G}" by auto
+    moreover have "finite {v\<^sub>1. v\<^sub>1 \<in> pverts G}" by auto
     ultimately show ?thesis by (simp add: finite_subset)
   qed
   ultimately show ?thesis using card_mono by fastforce
@@ -1279,9 +1279,9 @@ distinctiveness is not wished for. On the other hand, 0 might not be available a
 \<close>
 
 locale distinct_weighted_pair_graph = weighted_pair_graph + (*TODO: RENAME*)
-  assumes zero: "\<forall> v1 v2. (v1,v2) \<notin> parcs G \<longleftrightarrow> w (v1,v2) = 0"
-      and distinct: "\<forall> (v1,v2) \<in> parcs G. \<forall> (u1,u2) \<in> parcs G. 
-      ((v1 = u2 \<and> v2 = u1) \<or> (v1 = u1 \<and> v2 = u2)) \<longleftrightarrow> w (v1,v2) = w (u1,u2)" 
+  assumes zero: "\<forall> v\<^sub>1 v\<^sub>2. (v\<^sub>1,v\<^sub>2) \<notin> parcs G \<longleftrightarrow> w (v\<^sub>1,v\<^sub>2) = 0"
+      and distinct: "\<forall> (v\<^sub>1,v\<^sub>2) \<in> parcs G. \<forall> (u1,u2) \<in> parcs G. 
+      ((v\<^sub>1 = u2 \<and> v\<^sub>2 = u1) \<or> (v\<^sub>1 = u1 \<and> v\<^sub>2 = u2)) \<longleftrightarrow> w (v\<^sub>1,v\<^sub>2) = w (u1,u2)" 
 
 (*<*)context distinct_weighted_pair_graph
 begin
@@ -1294,31 +1294,31 @@ abbreviation(in weighted_pair_graph) distinct where
                 ((x = a \<and> y = z) \<or> (x = z \<and> y = a)) \<longleftrightarrow> w (x,y) = w (z,a)" 
 
 lemma undirected:
-  assumes "v1 \<in> (pverts G)" and "v2 \<in> (pverts G)" and "distinct"
-  shows "w (v1,v2) = w (v2,v1)"
+  assumes "v\<^sub>1 \<in> (pverts G)" and "v\<^sub>2 \<in> (pverts G)" and "distinct"
+  shows "w (v\<^sub>1,v\<^sub>2) = w (v\<^sub>2,v\<^sub>1)"
   using distinct assms 
   by (smt graph_symmetric old.prod.case zero)
 
 lemma weight_zero [simp]:
-  assumes "v1 \<notin> (pverts G) \<or> v2 \<notin> (pverts G)"
-  shows "w (v1,v2) = 0"
+  assumes "v\<^sub>1 \<notin> (pverts G) \<or> v\<^sub>2 \<notin> (pverts G)"
+  shows "w (v\<^sub>1,v\<^sub>2) = 0"
   using assms zero in_arcsD1 in_arcsD2 by blast
 
 lemma weight_not_zero [simp]:
-  assumes "v1 \<in> (pverts G)" and "v2 \<in> (pverts G)" and "(v1,v2) \<in> parcs G"
-  shows "w (v1,v2) \<noteq> 0" 
+  assumes "v\<^sub>1 \<in> (pverts G)" and "v\<^sub>2 \<in> (pverts G)" and "(v\<^sub>1,v\<^sub>2) \<in> parcs G"
+  shows "w (v\<^sub>1,v\<^sub>2) \<noteq> 0" 
   using assms atLeast0LessThan zero distinct by auto
 
 lemma weight_not_zero_implies_arc [simp]: 
-  assumes "w (v1,v2) = k" and "k \<noteq> 0" 
-  shows "(v1, v2) \<in> parcs G" 
+  assumes "w (v\<^sub>1,v\<^sub>2) = k" and "k \<noteq> 0" 
+  shows "(v\<^sub>1, v\<^sub>2) \<in> parcs G" 
   using assms dom zero by blast
 
 lemma weight_unique:
-  assumes "w (v1,v2) = k" and "(v1,v2) \<noteq> (u1,u2)" and "(v1,v2) \<noteq> (u2,u1)" and "k \<noteq> 0" and "distinct"
+  assumes "w (v\<^sub>1,v\<^sub>2) = k" and "(v\<^sub>1,v\<^sub>2) \<noteq> (u1,u2)" and "(v\<^sub>1,v\<^sub>2) \<noteq> (u2,u1)" and "k \<noteq> 0" and "distinct"
   shows "w (u1,u2) \<noteq> k" 
 proof-
-  have "(v1, v2) \<in> parcs G" using assms weight_not_zero_implies_arc by auto
+  have "(v\<^sub>1, v\<^sub>2) \<in> parcs G" using assms weight_not_zero_implies_arc by auto
   then show ?thesis 
     by (smt assms(1-5) case_prodE distinct fst_conv snd_conv weight_not_zero_implies_arc)
 qed
@@ -1426,7 +1426,7 @@ next
     qed
     ultimately have "card {(p1,p2). (p1,p2) \<in> A \<and> p2 < p1} = i div 2 - 1 + 1" by simp
     then have "card {(p1,p2). (p1,p2) \<in> A \<and> p2 < p1} = i div 2" 
-      by (metis (no_types, lifting) Suc_diff_Suc \<open>card {(p1, p2). (p1, p2) \<in> A - {(x1, x2), (x2, x1)} \<and> p2 < p1} = (i - 2) div 2\<close> a0b a2 add.commute aux_even_arcs div2_Suc_Suc f1 le_add_diff_inverse le_eq_less_or_eq odd_one one_add_one plus_1_eq_Suc)
+      by (metis (no_types, lifting) Suc_diff_Suc \<open>card {(p1, p2). (p1, p2) \<in> A - {(x1, x2), (x2, x1)} \<and> p2 < p1} = (i - 2) div 2\<close> a0b a2 add.commute aux_even_arcs div\<^sub>2_Suc_Suc f1 le_add_diff_inverse le_eq_less_or_eq odd_one one_add_one plus_1_eq_Suc)
     then show "card {(p1,p2). (p1,p2) \<in> A \<and> p2 < p1} = i div 2" 
       using \<open>finite A \<and> card A = i \<and> (\<forall>x. (x, x) \<notin> A) \<and> (\<forall>x y. (x, y) \<in> A \<longrightarrow> (y, x) \<in> A)\<close> a2 by linarith
   qed
@@ -1461,7 +1461,7 @@ distinctiveness is the more natural assumption that is more likely to appear in 
 of ordered trails. \<close>
 
 lemma(in distinct_weighted_pair_graph) restricted_weight_fun_surjective:  
-  shows "(\<forall>k \<in> W. \<exists>(v1,v2) \<in> (parcs G). w (v1,v2) = k)"
+  shows "(\<forall>k \<in> W. \<exists>(v\<^sub>1,v\<^sub>2) \<in> (parcs G). w (v\<^sub>1,v\<^sub>2) = k)"
 (*<*)proof(rule disjE)
   show "n = 1 \<or> n \<ge> 2" using vert_ge by auto
 next
@@ -1514,7 +1514,7 @@ qed(*>*)
 
 
 lemma(in distinct_weighted_pair_graph) weight_fun_surjective:
-  shows "(\<forall>k \<in> W. \<exists>(v1,v2) \<in> (parcs G). w (v1,v2) = k)"
+  shows "(\<forall>k \<in> W. \<exists>(v\<^sub>1,v\<^sub>2) \<in> (parcs G). w (v\<^sub>1,v\<^sub>2) = k)"
 (*<*)proof-
   have "{(p1,p2). (p1,p2) \<in> (parcs G) \<and> p2 < p1} \<subseteq> (parcs G)" 
   by blast
@@ -1647,17 +1647,17 @@ lemma findEdge_bound:
   shows "fst (findEdge w (set_to_list (parcs G)) k) \<in> (pverts G)" 
     and "snd (findEdge w (set_to_list (parcs G)) k) \<in> (pverts G)"
 proof-
-  obtain v1 v2::'a where a0: "w (v1,v2) = k" using weight_fun_surjective assms by blast
-  then have "v1 \<noteq> v2" 
+  obtain v\<^sub>1 v\<^sub>2::'a where a0: "w (v\<^sub>1,v\<^sub>2) = k" using weight_fun_surjective assms by blast
+  then have "v\<^sub>1 \<noteq> v\<^sub>2" 
     using assms pair_no_loops 
     by (metis adj_not_same atLeastAtMost_iff le_numeral_extra(2) of_nat_0 of_nat_eq_iff weight_not_zero_implies_arc)
-  moreover have "(v1, v2) \<in> parcs G" using weight_not_zero_implies_arc assms by (simp add: a0)
-  ultimately have f0: "(findEdge w (set_to_list (parcs G)) k) = (v1,v2) \<or> (findEdge w (set_to_list (parcs G)) k) = (v2,v1)" 
+  moreover have "(v\<^sub>1, v\<^sub>2) \<in> parcs G" using weight_not_zero_implies_arc assms by (simp add: a0)
+  ultimately have f0: "(findEdge w (set_to_list (parcs G)) k) = (v\<^sub>1,v\<^sub>2) \<or> (findEdge w (set_to_list (parcs G)) k) = (v\<^sub>2,v\<^sub>1)" 
     using findEdge_success assms a0 by fastforce
   then show "fst (findEdge w (set_to_list (parcs G)) k) \<in> (pverts G)"
         and "snd (findEdge w (set_to_list (parcs G)) k) \<in> (pverts G)" 
     using a0 assms apply auto[1] 
-    by (metis \<open>(v1, v2) \<in> parcs G\<close> f0 head_in_verts in_arcsD1 snd_conv)
+    by (metis \<open>(v\<^sub>1, v\<^sub>2) \<in> parcs G\<close> f0 head_in_verts in_arcsD1 snd_conv)
 qed 
 
 lemma findEdge_surjective:
@@ -1665,19 +1665,19 @@ lemma findEdge_surjective:
   shows "w (fst (findEdge w (set_to_list (parcs G)) (Suc i)), snd(findEdge w (set_to_list (parcs G)) (Suc i))) = (Suc i)"
     and "w (snd (findEdge w (set_to_list (parcs G)) (Suc i)), fst(findEdge w (set_to_list (parcs G)) (Suc i))) = (Suc i)"
 proof- 
-  obtain v1 v2 where f0: "w (v1,v2) = (Suc i)" using weight_fun_surjective assms by blast
-  then have "v1 \<noteq> v2" 
+  obtain v\<^sub>1 v\<^sub>2 where f0: "w (v\<^sub>1,v\<^sub>2) = (Suc i)" using weight_fun_surjective assms by blast
+  then have "v\<^sub>1 \<noteq> v\<^sub>2" 
     using pair_no_loops of_nat_neq_0 weight_not_zero_implies_arc adj_not_same by blast
-  moreover have "v1 \<in> pverts G \<and> v2 \<in> pverts G" using f0 of_nat_neq_0 of_nat_0_eq_iff assms 
+  moreover have "v\<^sub>1 \<in> pverts G \<and> v\<^sub>2 \<in> pverts G" using f0 of_nat_neq_0 of_nat_0_eq_iff assms 
     by (metis Zero_not_Suc of_nat_eq_0_iff distinct_weighted_pair_graph.weight_zero distinct_weighted_pair_graph_axioms with_proj_simps(1))
   moreover have "parcs G \<noteq> {}" using f0 calculation weight_not_zero_implies_arc by fastforce
-  moreover have "(v1, v2) \<in> parcs G" using weight_not_zero_implies_arc assms by (simp add: f0)
-  ultimately have f1: "(findEdge w (set_to_list (parcs G)) (Suc i)) = (v1,v2) \<or> (findEdge w (set_to_list (parcs G)) (Suc i)) = (v2,v1)" 
-    using findEdge_success[of "Suc i" v1 v2] assms f0 by auto
+  moreover have "(v\<^sub>1, v\<^sub>2) \<in> parcs G" using weight_not_zero_implies_arc assms by (simp add: f0)
+  ultimately have f1: "(findEdge w (set_to_list (parcs G)) (Suc i)) = (v\<^sub>1,v\<^sub>2) \<or> (findEdge w (set_to_list (parcs G)) (Suc i)) = (v\<^sub>2,v\<^sub>1)" 
+    using findEdge_success[of "Suc i" v\<^sub>1 v\<^sub>2] assms f0 by auto
   then show "w (fst (findEdge w (set_to_list (parcs G)) (Suc i)), snd(findEdge w (set_to_list (parcs G)) (Suc i))) = (Suc i)"
         and "w (snd (findEdge w (set_to_list (parcs G)) (Suc i)), fst(findEdge w (set_to_list (parcs G)) (Suc i))) = (Suc i)"
-    using \<open>v1 \<in> pverts G \<and> v2 \<in> pverts G\<close> distinct f0 undirected apply auto[1] 
-    using \<open>v1 \<in> pverts G \<and> v2 \<in> pverts G\<close> distinct f0 f1 undirected by auto
+    using \<open>v\<^sub>1 \<in> pverts G \<and> v\<^sub>2 \<in> pverts G\<close> distinct f0 undirected apply auto[1] 
+    using \<open>v\<^sub>1 \<in> pverts G \<and> v\<^sub>2 \<in> pverts G\<close> distinct f0 f1 undirected by auto
 qed
  
 end(*>*)
@@ -1717,9 +1717,9 @@ lemma aux_getL:
   assumes "v \<noteq> fst (findEdge w (set_to_list (parcs G)) (Suc i))" and "v \<noteq> snd (findEdge w (set_to_list (parcs G)) (Suc i))"
   shows "getL G w (i+1) v = getL G w i v"
 proof-
-  have "\<exists>v1 v2. (findEdge w (set_to_list (parcs G)) (Suc i)) = (v1,v2)" by simp
-  then obtain v1 v2 where f0: "(findEdge w (set_to_list (parcs G)) (Suc i)) = (v1,v2)" by blast
-  then have "v \<noteq> v1 \<and> v \<noteq> v2" 
+  have "\<exists>v\<^sub>1 v\<^sub>2. (findEdge w (set_to_list (parcs G)) (Suc i)) = (v\<^sub>1,v\<^sub>2)" by simp
+  then obtain v\<^sub>1 v\<^sub>2 where f0: "(findEdge w (set_to_list (parcs G)) (Suc i)) = (v\<^sub>1,v\<^sub>2)" by blast
+  then have "v \<noteq> v\<^sub>1 \<and> v \<noteq> v\<^sub>2" 
     using assms by auto 
   then show ?thesis using f0 getL.simps(2) 
     by (smt Suc_eq_plus1 old.prod.case with_proj_simps(2))
@@ -1727,104 +1727,104 @@ qed
 
 lemma aux_correctness_case_endpoint1:
   assumes a0: "(Suc k) \<le> q div 2"
-      and a1: "getL G w (Suc k) v1 = a"
-      and a2: "(findEdge w (set_to_list (parcs G)) (Suc k)) = (v1,v2)"
+      and a1: "getL G w (Suc k) v\<^sub>1 = a"
+      and a2: "(findEdge w (set_to_list (parcs G)) (Suc k)) = (v\<^sub>1,v\<^sub>2)"
       and IH: "\<forall>a v. k \<le> q div 2 \<longrightarrow> getL G w k v = a \<longrightarrow> (\<exists> xs. decTrail G w xs \<and> length xs = a 
             \<and> (length xs \<ge> 1 \<longrightarrow> w (hd xs) \<le> real k \<and> fst (hd xs) = v))" 
-    shows "(\<exists> xs. decTrail G w xs \<and> length xs = a \<and> (length xs \<ge> 1 \<longrightarrow> w (hd xs) \<le> real (Suc k) \<and> fst (hd xs) = v1))" 
+    shows "(\<exists> xs. decTrail G w xs \<and> length xs = a \<and> (length xs \<ge> 1 \<longrightarrow> w (hd xs) \<le> real (Suc k) \<and> fst (hd xs) = v\<^sub>1))" 
 proof(rule disjE)
-  have "getL G w (Suc k) v1 = max (getL G w k v2 + 1) (getL G w k v1)"
+  have "getL G w (Suc k) v\<^sub>1 = max (getL G w k v\<^sub>2 + 1) (getL G w k v\<^sub>1)"
     using a2 by auto
-  then show "getL G w (Suc k) v1 = getL G w k v2 + 1 \<or> getL G w (Suc k) v1 = getL G w k v1" using a2 by linarith
+  then show "getL G w (Suc k) v\<^sub>1 = getL G w k v\<^sub>2 + 1 \<or> getL G w (Suc k) v\<^sub>1 = getL G w k v\<^sub>1" using a2 by linarith
 next
-  assume "getL G w (Suc k) v1 = getL G w k v1"
+  assume "getL G w (Suc k) v\<^sub>1 = getL G w k v\<^sub>1"
   moreover have "w (hd xs) \<le> real k \<longrightarrow> w (hd xs) \<le> real (Suc k)" for xs by simp
-  ultimately show "(\<exists> xs. decTrail G w xs \<and> length xs = a \<and> (length xs \<ge> 1 \<longrightarrow> w (hd xs) \<le> real (Suc k) \<and> fst (hd xs) = v1))" 
+  ultimately show "(\<exists> xs. decTrail G w xs \<and> length xs = a \<and> (length xs \<ge> 1 \<longrightarrow> w (hd xs) \<le> real (Suc k) \<and> fst (hd xs) = v\<^sub>1))" 
     using a0 IH a1 Suc_leD by metis
 next
-  assume a3: "getL G w (Suc k) v1 = getL G w k v2 + 1"
-  then have "getL G w k v2 = a - 1" using a1 a3 le_diff_conv by auto
-  then have "(\<exists> xs. decTrail G w xs \<and> length xs = a - 1 \<and> (length xs \<ge> 1 \<longrightarrow> w (hd xs) \<le> real k \<and> fst (hd xs) = v2))" 
+  assume a3: "getL G w (Suc k) v\<^sub>1 = getL G w k v\<^sub>2 + 1"
+  then have "getL G w k v\<^sub>2 = a - 1" using a1 a3 le_diff_conv by auto
+  then have "(\<exists> xs. decTrail G w xs \<and> length xs = a - 1 \<and> (length xs \<ge> 1 \<longrightarrow> w (hd xs) \<le> real k \<and> fst (hd xs) = v\<^sub>2))" 
     using IH a0 Suc_leD by blast
-  then obtain xs where f1: "decTrail G w xs \<and> length xs = a - 1 \<and> (length xs \<ge> 1 \<longrightarrow> w (hd xs) \<le> real k \<and> fst (hd xs) = v2)" by blast
-  moreover have "decTrail G w ((v1,v2)#xs)" 
+  then obtain xs where f1: "decTrail G w xs \<and> length xs = a - 1 \<and> (length xs \<ge> 1 \<longrightarrow> w (hd xs) \<le> real k \<and> fst (hd xs) = v\<^sub>2)" by blast
+  moreover have "decTrail G w ((v\<^sub>1,v\<^sub>2)#xs)" 
   proof(rule disjE)
     show "length xs \<ge> 1 \<or> length xs = 0" by linarith
   next
     assume a3: "length xs = 0"
-    have "w (v1,v2) = Suc k" using a0 a2 findEdge_surjective by fastforce
-    then have "(v1,v2) \<in> parcs G" by (metis of_nat_neq_0 zero)
-    then show "decTrail G w ((v1,v2)#xs)"
+    have "w (v\<^sub>1,v\<^sub>2) = Suc k" using a0 a2 findEdge_surjective by fastforce
+    then have "(v\<^sub>1,v\<^sub>2) \<in> parcs G" by (metis of_nat_neq_0 zero)
+    then show "decTrail G w ((v\<^sub>1,v\<^sub>2)#xs)"
       using a3 using decTrail.simps(2) by blast
   next
     assume a3: "length xs \<ge> 1" 
-    moreover have a4: "w (v1,v2) = Suc k" using a0 a2 findEdge_surjective  
+    moreover have a4: "w (v\<^sub>1,v\<^sub>2) = Suc k" using a0 a2 findEdge_surjective  
       by (metis atLeastAtMost_iff fst_conv le_add1 plus_1_eq_Suc snd_conv)
-    moreover have "w (v1,v2) > w (hd xs)"
+    moreover have "w (v\<^sub>1,v\<^sub>2) > w (hd xs)"
       using a3 a4 f1 by linarith
-    moreover have "(v1,v2) \<in> parcs G" 
+    moreover have "(v\<^sub>1,v\<^sub>2) \<in> parcs G" 
       by (simp add: a4)
-    moreover have "snd (v1,v2) = fst (hd xs)" using a3 f1 by auto
-    ultimately show "decTrail G w ((v1,v2)#xs)" 
+    moreover have "snd (v\<^sub>1,v\<^sub>2) = fst (hd xs)" using a3 f1 by auto
+    ultimately show "decTrail G w ((v\<^sub>1,v\<^sub>2)#xs)" 
       using decTrail.elims(3) f1 by fastforce
   qed
-  moreover have "length ((v1,v2)#xs) = a" 
+  moreover have "length ((v\<^sub>1,v\<^sub>2)#xs) = a" 
     using f1 a1 a3 by force
-  moreover have "w (hd ((v1,v2)#xs)) \<le> real (Suc k) \<and> fst (hd ((v1,v2)#xs)) = v1" 
+  moreover have "w (hd ((v\<^sub>1,v\<^sub>2)#xs)) \<le> real (Suc k) \<and> fst (hd ((v\<^sub>1,v\<^sub>2)#xs)) = v\<^sub>1" 
     using a0 a2 distinct_weighted_pair_graph.findEdge_surjective(1) distinct_weighted_pair_graph_axioms by fastforce
-  ultimately show "(\<exists> xs. decTrail G w xs \<and> length xs = a \<and> (length xs \<ge> 1 \<longrightarrow> w (hd xs) \<le> real (Suc k) \<and> fst (hd xs) = v1))" 
+  ultimately show "(\<exists> xs. decTrail G w xs \<and> length xs = a \<and> (length xs \<ge> 1 \<longrightarrow> w (hd xs) \<le> real (Suc k) \<and> fst (hd xs) = v\<^sub>1))" 
     by blast
 qed
 
 lemma aux_correctness_case_endpoint2:
   assumes a0: "(Suc k) \<le> q div 2"
-      and a1: "getL G w (Suc k) v1 = a"
-      and a2: "(findEdge w (set_to_list (parcs G)) (Suc k)) = (v2,v1)"
+      and a1: "getL G w (Suc k) v\<^sub>1 = a"
+      and a2: "(findEdge w (set_to_list (parcs G)) (Suc k)) = (v\<^sub>2,v\<^sub>1)"
       and IH: "\<forall>a v. k \<le> q div 2 \<longrightarrow> getL G w k v = a \<longrightarrow> (\<exists> xs. decTrail G w xs \<and> length xs = a 
             \<and> (length xs \<ge> 1 \<longrightarrow> w (hd xs) \<le> real k \<and> fst (hd xs) = v))" 
-    shows "(\<exists> xs. decTrail G w xs \<and> length xs = a \<and> (length xs \<ge> 1 \<longrightarrow> w (hd xs) \<le> real (Suc k) \<and> fst (hd xs) = v1))" 
+    shows "(\<exists> xs. decTrail G w xs \<and> length xs = a \<and> (length xs \<ge> 1 \<longrightarrow> w (hd xs) \<le> real (Suc k) \<and> fst (hd xs) = v\<^sub>1))" 
 proof(rule disjE)
-  have "getL G w (Suc k) v1 = max (getL G w k v2 + 1) (getL G w k v1)"
+  have "getL G w (Suc k) v\<^sub>1 = max (getL G w k v\<^sub>2 + 1) (getL G w k v\<^sub>1)"
     using a2 by auto
-  then show "getL G w (Suc k) v1 = getL G w k v2 + 1 \<or> getL G w (Suc k) v1 = getL G w k v1" using a2 by linarith
+  then show "getL G w (Suc k) v\<^sub>1 = getL G w k v\<^sub>2 + 1 \<or> getL G w (Suc k) v\<^sub>1 = getL G w k v\<^sub>1" using a2 by linarith
 next
-  assume "getL G w (Suc k) v1 = getL G w k v1"
+  assume "getL G w (Suc k) v\<^sub>1 = getL G w k v\<^sub>1"
   moreover have "w (hd xs) \<le> real k \<longrightarrow> w (hd xs) \<le> real (Suc k)" for xs by simp
-  ultimately show "(\<exists> xs. decTrail G w xs \<and> length xs = a \<and> (length xs \<ge> 1 \<longrightarrow> w (hd xs) \<le> real (Suc k) \<and> fst (hd xs) = v1))" 
+  ultimately show "(\<exists> xs. decTrail G w xs \<and> length xs = a \<and> (length xs \<ge> 1 \<longrightarrow> w (hd xs) \<le> real (Suc k) \<and> fst (hd xs) = v\<^sub>1))" 
     using a0 IH a1 Suc_leD by metis
 next
-  assume a3: "getL G w (Suc k) v1 = getL G w k v2 + 1"
-  then have "getL G w k v2 = a - 1" using a1 a3 le_diff_conv by auto
-  then have "(\<exists> xs. decTrail G w xs \<and> length xs = a - 1 \<and> (length xs \<ge> 1 \<longrightarrow> w (hd xs) \<le> real k \<and> fst (hd xs) = v2))" 
+  assume a3: "getL G w (Suc k) v\<^sub>1 = getL G w k v\<^sub>2 + 1"
+  then have "getL G w k v\<^sub>2 = a - 1" using a1 a3 le_diff_conv by auto
+  then have "(\<exists> xs. decTrail G w xs \<and> length xs = a - 1 \<and> (length xs \<ge> 1 \<longrightarrow> w (hd xs) \<le> real k \<and> fst (hd xs) = v\<^sub>2))" 
     using IH a0 Suc_leD by blast
-  then obtain xs where f1: "decTrail G w xs \<and> length xs = a - 1 \<and> (length xs \<ge> 1 \<longrightarrow> w (hd xs) \<le> real k \<and> fst (hd xs) = v2)" by blast
-  moreover have "decTrail G w ((v1,v2)#xs)" 
+  then obtain xs where f1: "decTrail G w xs \<and> length xs = a - 1 \<and> (length xs \<ge> 1 \<longrightarrow> w (hd xs) \<le> real k \<and> fst (hd xs) = v\<^sub>2)" by blast
+  moreover have "decTrail G w ((v\<^sub>1,v\<^sub>2)#xs)" 
   proof(rule disjE)
     show "length xs \<ge> 1 \<or> length xs = 0" by linarith
   next
     assume a3: "length xs = 0"
-    have "w (v1,v2) = Suc k" using a0 a2 findEdge_surjective by fastforce
-    then have "(v1,v2) \<in> parcs G" by (metis of_nat_neq_0 zero)
-    then show "decTrail G w ((v1,v2)#xs)"
+    have "w (v\<^sub>1,v\<^sub>2) = Suc k" using a0 a2 findEdge_surjective by fastforce
+    then have "(v\<^sub>1,v\<^sub>2) \<in> parcs G" by (metis of_nat_neq_0 zero)
+    then show "decTrail G w ((v\<^sub>1,v\<^sub>2)#xs)"
       using a3 using decTrail.simps(2) by blast
   next
     assume a3: "length xs \<ge> 1" 
-    moreover have a4: "w (v1,v2) = Suc k" using a0 a2 findEdge_surjective  
+    moreover have a4: "w (v\<^sub>1,v\<^sub>2) = Suc k" using a0 a2 findEdge_surjective  
       by (metis atLeastAtMost_iff fst_conv image_eqI le_add1 plus_1_eq_Suc snd_conv)
-    moreover have "w (v1,v2) > w (hd xs)"
+    moreover have "w (v\<^sub>1,v\<^sub>2) > w (hd xs)"
       using a3 a4 f1 by linarith
-    moreover have "(v1,v2) \<in> parcs G" 
+    moreover have "(v\<^sub>1,v\<^sub>2) \<in> parcs G" 
       by (simp add: a4)
-    moreover have "snd (v1,v2) = fst (hd xs)" using a3 f1 by auto
-    ultimately show "decTrail G w ((v1,v2)#xs)" 
+    moreover have "snd (v\<^sub>1,v\<^sub>2) = fst (hd xs)" using a3 f1 by auto
+    ultimately show "decTrail G w ((v\<^sub>1,v\<^sub>2)#xs)" 
       using decTrail.elims(3) f1 by fastforce
   qed
-  moreover have "length ((v1,v2)#xs) = a" 
+  moreover have "length ((v\<^sub>1,v\<^sub>2)#xs) = a" 
     using f1 a1 a3 by force
-  moreover have "w (hd ((v1,v2)#xs)) \<le> real (Suc k) \<and> fst (hd ((v1,v2)#xs)) = v1" 
+  moreover have "w (hd ((v\<^sub>1,v\<^sub>2)#xs)) \<le> real (Suc k) \<and> fst (hd ((v\<^sub>1,v\<^sub>2)#xs)) = v\<^sub>1" 
     using a0 a2 distinct_weighted_pair_graph.findEdge_surjective(1) distinct_weighted_pair_graph_axioms 
      atLeastAtMost_iff findEdge_surjective(2) by fastforce
-  ultimately show "(\<exists> xs. decTrail G w xs \<and> length xs = a \<and> (length xs \<ge> 1 \<longrightarrow> w (hd xs) \<le> real (Suc k) \<and> fst (hd xs) = v1))" 
+  ultimately show "(\<exists> xs. decTrail G w xs \<and> length xs = a \<and> (length xs \<ge> 1 \<longrightarrow> w (hd xs) \<le> real (Suc k) \<and> fst (hd xs) = v\<^sub>1))" 
     by blast
 qed
 
@@ -1848,22 +1848,22 @@ next
     fix a v
     assume a0: "(Suc k) \<le> (q div 2)"
     assume a1: "getL G w (Suc k) v = a"
-    define v1 where "v1 = fst (findEdge w (set_to_list (arcs G)) (Suc k))"
-    define v2 where "v2 = snd (findEdge w (set_to_list (arcs G)) (Suc k))"
+    define v\<^sub>1 where "v\<^sub>1 = fst (findEdge w (set_to_list (arcs G)) (Suc k))"
+    define v\<^sub>2 where "v\<^sub>2 = snd (findEdge w (set_to_list (arcs G)) (Suc k))"
     show "(\<exists> xs. decTrail G w xs \<and> length xs = a \<and> (length xs \<ge> 1 \<longrightarrow> w (hd xs) \<le> real (Suc k) \<and> fst (hd xs) = v))"
     proof(rule disjE)
-      show "(v1 = v \<or> v2 = v) \<or> \<not>(v1 = v \<or> v2 = v)" by auto
+      show "(v\<^sub>1 = v \<or> v\<^sub>2 = v) \<or> \<not>(v\<^sub>1 = v \<or> v\<^sub>2 = v)" by auto
     next
-      assume "(v1 = v \<or> v2 = v)"
-      then have "(\<exists> v2. (findEdge w (set_to_list (arcs G)) (Suc k)) = (v,v2)) 
-               \<or> (\<exists> v2. (findEdge w (set_to_list (arcs G)) (Suc k)) = (v2,v))" 
-        using v2_def v1_def by (simp add: prod_eq_iff)
+      assume "(v\<^sub>1 = v \<or> v\<^sub>2 = v)"
+      then have "(\<exists> v\<^sub>2. (findEdge w (set_to_list (arcs G)) (Suc k)) = (v,v\<^sub>2)) 
+               \<or> (\<exists> v\<^sub>2. (findEdge w (set_to_list (arcs G)) (Suc k)) = (v\<^sub>2,v))" 
+        using v\<^sub>2_def v\<^sub>1_def by (simp add: prod_eq_iff)
       then show "(\<exists> xs. decTrail G w xs \<and> length xs = a \<and> (length xs \<ge> 1 \<longrightarrow> w (hd xs) \<le> real (Suc k) \<and> fst (hd xs) = v))"
-        using aux_correctness_case_endpoint1 aux_correctness_case_endpoint2 a0 a1 IH v1_def v2_def by auto
+        using aux_correctness_case_endpoint1 aux_correctness_case_endpoint2 a0 a1 IH v\<^sub>1_def v\<^sub>2_def by auto
     next
-      assume "\<not>(v1 = v \<or> v2 = v)"
+      assume "\<not>(v\<^sub>1 = v \<or> v\<^sub>2 = v)"
       then have "getL G w (Suc k) v = getL G w k v" 
-        using v1_def v2_def getL.simps(2) by (smt old.prod.case prod.collapse)
+        using v\<^sub>1_def v\<^sub>2_def getL.simps(2) by (smt old.prod.case prod.collapse)
       then show "(\<exists> xs. decTrail G w xs \<and> length xs = a \<and> (length xs \<ge> 1 \<longrightarrow> w (hd xs) \<le> real (Suc k) \<and> fst (hd xs) = v))"
         using IH Suc_leD a0 a1 le_SucI Suc_n_not_le_n of_nat_le_iff by fastforce
     qed
@@ -1892,59 +1892,59 @@ subsection \<open> Minimum Length of Ordered Trails \<close>
        \<ge> getL G w i (fst (findEdge w (set_to_list (arcs G)) (i+1))) + getL G w i (snd (findEdge w (set_to_list (arcs G)) (i+1))) + 2"
 proof-
   define v where "v \<equiv> (findEdge w (set_to_list (arcs G)) (i+1))"
-  define v1 where "v1 \<equiv> fst v"
-  define v2 where "v2 \<equiv> snd v"
-  have "getL G w (i+1) v1 + getL G w (i+1) v2  \<ge> getL G w i v1 + getL G w i v2 + 2"
+  define v\<^sub>1 where "v\<^sub>1 \<equiv> fst v"
+  define v\<^sub>2 where "v\<^sub>2 \<equiv> snd v"
+  have "getL G w (i+1) v\<^sub>1 + getL G w (i+1) v\<^sub>2  \<ge> getL G w i v\<^sub>1 + getL G w i v\<^sub>2 + 2"
   proof(rule disjE)
-    show "(getL G w i v1 = getL G w i v2) \<or> (getL G w i v1 < getL G w i v2) \<or> (getL G w i v1 > getL G w i v2)" 
+    show "(getL G w i v\<^sub>1 = getL G w i v\<^sub>2) \<or> (getL G w i v\<^sub>1 < getL G w i v\<^sub>2) \<or> (getL G w i v\<^sub>1 > getL G w i v\<^sub>2)" 
       by auto
   next
-    assume a0: "(getL G w i v1 = getL G w i v2)"
-    have "getL G w (i+1) v1 = (getL G w i v1) + 1" 
+    assume a0: "(getL G w i v\<^sub>1 = getL G w i v\<^sub>2)"
+    have "getL G w (i+1) v\<^sub>1 = (getL G w i v\<^sub>1) + 1" 
     proof-
-      have "getL G w (i+1) v1 = max ((getL G w i v2)+1) (getL G w i v1)"
-        using v1_def Suc_eq_plus1 getL.simps(2) v2_def v_def 
+      have "getL G w (i+1) v\<^sub>1 = max ((getL G w i v\<^sub>2)+1) (getL G w i v\<^sub>1)"
+        using v\<^sub>1_def Suc_eq_plus1 getL.simps(2) v\<^sub>2_def v_def 
         by (smt old.prod.case prod.collapse)
       then show ?thesis
         using a0 by linarith
     qed
-    moreover have "getL G w (i+1) v2 = (getL G w i v2) + 1" 
+    moreover have "getL G w (i+1) v\<^sub>2 = (getL G w i v\<^sub>2) + 1" 
     proof-
-      have "getL G w (i+1) v2 = max ((getL G w i v1)+1) (getL G w i v2)"
-        using v1_def Suc_eq_plus1 getL.simps(2) v2_def v_def 
+      have "getL G w (i+1) v\<^sub>2 = max ((getL G w i v\<^sub>1)+1) (getL G w i v\<^sub>2)"
+        using v\<^sub>1_def Suc_eq_plus1 getL.simps(2) v\<^sub>2_def v_def 
         by (smt old.prod.case prod.collapse)
       then show ?thesis using a0 by linarith
     qed
-    ultimately show "getL G w (i+1) v1 + getL G w (i+1) v2  \<ge> getL G w i v1 + getL G w i v2 + 2"
+    ultimately show "getL G w (i+1) v\<^sub>1 + getL G w (i+1) v\<^sub>2  \<ge> getL G w i v\<^sub>1 + getL G w i v\<^sub>2 + 2"
       by simp
   next
-    assume a0: "(getL G w i v1 < getL G w i v2) \<or> (getL G w i v1 > getL G w i v2)" 
-    show "getL G w (i+1) v1 + getL G w (i+1) v2  \<ge> getL G w i v1 + getL G w i v2 + 2"
+    assume a0: "(getL G w i v\<^sub>1 < getL G w i v\<^sub>2) \<or> (getL G w i v\<^sub>1 > getL G w i v\<^sub>2)" 
+    show "getL G w (i+1) v\<^sub>1 + getL G w (i+1) v\<^sub>2  \<ge> getL G w i v\<^sub>1 + getL G w i v\<^sub>2 + 2"
     proof(rule disjE) 
-      show "(getL G w i v1 > getL G w i v2) \<or> (getL G w i v1 < getL G w i v2)" using a0 by blast
+      show "(getL G w i v\<^sub>1 > getL G w i v\<^sub>2) \<or> (getL G w i v\<^sub>1 < getL G w i v\<^sub>2)" using a0 by blast
     next
-      assume a1: "(getL G w i v1 < getL G w i v2)"
-      then have "getL G w (i+1) v1 + getL G w (i+1) v2 = max ((getL G w i v2)+1) (getL G w i v1) + max ((getL G w i v1)+1) (getL G w i v2)"
-        using v1_def v2_def Suc_eq_plus1 getL.simps(2) v_def 
+      assume a1: "(getL G w i v\<^sub>1 < getL G w i v\<^sub>2)"
+      then have "getL G w (i+1) v\<^sub>1 + getL G w (i+1) v\<^sub>2 = max ((getL G w i v\<^sub>2)+1) (getL G w i v\<^sub>1) + max ((getL G w i v\<^sub>1)+1) (getL G w i v\<^sub>2)"
+        using v\<^sub>1_def v\<^sub>2_def Suc_eq_plus1 getL.simps(2) v_def 
         by (smt old.prod.case prod.collapse)
-      then have "getL G w (i+1) v1 + getL G w (i+1) v2 = ((getL G w i v2)+1) + (getL G w i v2)"
+      then have "getL G w (i+1) v\<^sub>1 + getL G w (i+1) v\<^sub>2 = ((getL G w i v\<^sub>2)+1) + (getL G w i v\<^sub>2)"
         using a1 by linarith
-      moreover have "getL G w i v1 + 1 \<le> getL G w i v2" using a1 by simp
-      ultimately show "getL G w (i+1) v1 + getL G w (i+1) v2  \<ge> getL G w i v1 + getL G w i v2 + 2"
+      moreover have "getL G w i v\<^sub>1 + 1 \<le> getL G w i v\<^sub>2" using a1 by simp
+      ultimately show "getL G w (i+1) v\<^sub>1 + getL G w (i+1) v\<^sub>2  \<ge> getL G w i v\<^sub>1 + getL G w i v\<^sub>2 + 2"
         by linarith
     next
-      assume a1: "(getL G w i v1 > getL G w i v2)"
-      then have "getL G w (i+1) v1 + getL G w (i+1) v2 = max ((getL G w i v2)+1) (getL G w i v1) + max ((getL G w i v1)+1) (getL G w i v2)"
-        using v1_def v2_def using Suc_eq_plus1 getL.simps(2) v_def 
+      assume a1: "(getL G w i v\<^sub>1 > getL G w i v\<^sub>2)"
+      then have "getL G w (i+1) v\<^sub>1 + getL G w (i+1) v\<^sub>2 = max ((getL G w i v\<^sub>2)+1) (getL G w i v\<^sub>1) + max ((getL G w i v\<^sub>1)+1) (getL G w i v\<^sub>2)"
+        using v\<^sub>1_def v\<^sub>2_def using Suc_eq_plus1 getL.simps(2) v_def 
         by (smt old.prod.case prod.collapse)
-      then have "getL G w (i+1) v1 + getL G w (i+1) v2 = ((getL G w i v1)+1) + (getL G w i v1)"
+      then have "getL G w (i+1) v\<^sub>1 + getL G w (i+1) v\<^sub>2 = ((getL G w i v\<^sub>1)+1) + (getL G w i v\<^sub>1)"
         using a1 by linarith
-      moreover have "getL G w i v2 + 1 \<le> getL G w i v1" using a1 by simp
-      ultimately show "getL G w (i+1) v1 + getL G w (i+1) v2  \<ge> getL G w i v1 + getL G w i v2 + 2"
+      moreover have "getL G w i v\<^sub>2 + 1 \<le> getL G w i v\<^sub>1" using a1 by simp
+      ultimately show "getL G w (i+1) v\<^sub>1 + getL G w (i+1) v\<^sub>2  \<ge> getL G w i v\<^sub>1 + getL G w i v\<^sub>2 + 2"
         by linarith
     qed
   qed
-  then show ?thesis using v2_def v1_def v_def by simp
+  then show ?thesis using v\<^sub>2_def v\<^sub>1_def v_def by simp
 qed(*>*)
 
 text \<open>\label{minLength}
@@ -1962,37 +1962,37 @@ lemma(in distinct_weighted_pair_graph) minimal_increase_one_step:
     "(\<Sum> v \<in> pverts G. getL G w (k+1) v) \<ge> (\<Sum> v \<in> pverts G. getL G w k v) + 2" 
 (*<*)proof-
   define u where "u \<equiv> (findEdge w (set_to_list (parcs G)) (k+1))" 
-  define v1 where "v1 \<equiv> (fst u)" 
-  define v2 where "v2 \<equiv> (snd u)" 
-  have f0: "v1 \<in> (pverts G)" using findEdge_bound assms 
+  define v\<^sub>1 where "v\<^sub>1 \<equiv> (fst u)" 
+  define v\<^sub>2 where "v\<^sub>2 \<equiv> (snd u)" 
+  have f0: "v\<^sub>1 \<in> (pverts G)" using findEdge_bound assms 
     by (metis (full_types) Suc_eq_plus1 distinct_weighted_pair_graph.findEdge_surjective(2) 
-distinct_weighted_pair_graph_axioms of_nat_neq_0 u_def v1_def weight_zero)
-  have f1: "v2 \<in> (pverts G)" 
+distinct_weighted_pair_graph_axioms of_nat_neq_0 u_def v\<^sub>1_def weight_zero)
+  have f1: "v\<^sub>2 \<in> (pverts G)" 
     using findEdge_bound assms 
-    by (metis (full_types) Suc_eq_plus1 findEdge_surjective(2) of_nat_0_neq u_def v1_def v2_def weight_zero)
+    by (metis (full_types) Suc_eq_plus1 findEdge_surjective(2) of_nat_0_neq u_def v\<^sub>1_def v\<^sub>2_def weight_zero)
   have f2: "finite (pverts G)" by simp
-  have "v1 \<in> pverts G" by (simp add: f0)
-  have f3: "v1 \<noteq> v2" using u_def v1_def v2_def 
+  have "v\<^sub>1 \<in> pverts G" by (simp add: f0)
+  have f3: "v\<^sub>1 \<noteq> v\<^sub>2" using u_def v\<^sub>1_def v\<^sub>2_def 
     by (metis (mono_tags, lifting) Suc_eq_plus1 assms distinct_weighted_pair_graph.findEdge_surjective(2) distinct_weighted_pair_graph_axioms of_nat_0_eq_iff pair_no_loops prod.collapse weight_not_zero_implies_arc zero_eq_add_iff_both_eq_0 zero_neq_one)
   then have "(\<Sum> v \<in> pverts G. getL G w (k+1) v) = (\<Sum> v \<in> (pverts G). getL G w (k+1) v)" by blast
-  also have "... = (\<Sum> v \<in> (pverts G) - {v1}. getL G w (k+1) v) + getL G w (k+1) v1" 
+  also have "... = (\<Sum> v \<in> (pverts G) - {v\<^sub>1}. getL G w (k+1) v) + getL G w (k+1) v\<^sub>1" 
     using f0 f2 sum.remove by (metis add.commute)
-  also have "... = (\<Sum> v \<in> (pverts G) - {v1,v2}. getL G w (k+1) v) + getL G w (k+1) v2 + getL G w (k+1) v1" 
+  also have "... = (\<Sum> v \<in> (pverts G) - {v\<^sub>1,v\<^sub>2}. getL G w (k+1) v) + getL G w (k+1) v\<^sub>2 + getL G w (k+1) v\<^sub>1" 
     by (smt Diff_insert add.commute add.left_commute f0 f1 f2 f3 finite_Diff insertE insert_Diff sum.remove)
-  also have "... \<ge> (\<Sum> v \<in> (pverts G) - {v1,v2}. getL G w (k+1) v) + getL G w k v2 + getL G w k v1 + 2" 
-    using aux_minimal_increase_one_step u_def v1_def v2_def 
+  also have "... \<ge> (\<Sum> v \<in> (pverts G) - {v\<^sub>1,v\<^sub>2}. getL G w (k+1) v) + getL G w k v\<^sub>2 + getL G w k v\<^sub>1 + 2" 
+    using aux_minimal_increase_one_step u_def v\<^sub>1_def v\<^sub>2_def 
     by (smt add.assoc add.commute le_add2 le_trans nat_add_left_cancel_le with_proj_simps(2))
-  finally have "(\<Sum> v \<in> pverts G. getL G w (k+1) v) \<ge> (\<Sum> v \<in> (pverts G) - {v1,v2}. getL G w (k+1) v) + 2" 
-    using \<open>sum (getL G w (k + 1)) ((pverts G) - {v1, v2}) + getL G w k v2 + getL G w k v1 + 2 \<le> sum (getL G w (k + 1)) ((pverts G) - {v1, v2}) + getL G w (k + 1) v2 + getL G w (k + 1) v1\<close> 
-\<open>sum (getL G w (k + 1)) ((pverts G) - {v1}) + getL G w (k + 1) v1 = sum (getL G w (k + 1)) ((pverts G) - {v1, v2}) + getL G w (k + 1) v2 + getL G w (k + 1) v1\<close> \<open>sum (getL G w (k + 1)) (pverts G) = sum (getL G w (k + 1)) ((pverts G) - {v1}) + getL G w (k + 1) v1\<close> by linarith
-  moreover have "\<forall>v \<in> (pverts G) - {v1,v2}. getL G w (k+1) v = getL G w k v"
-    using aux_getL u_def v1_def v2_def by auto
-  ultimately have "(\<Sum> v \<in> pverts G. getL G w (k+1) v) \<ge> (\<Sum> v \<in> (pverts G) - {v1,v2}. getL G w k v) + getL G w k v2 + getL G w k v1 + 2" 
-    using \<open>sum (getL G w (k + 1)) (pverts G - {v1, v2}) + getL G w k v2 + getL G w k v1 + 2 \<le> sum (getL G w (k + 1)) (pverts G - {v1, v2}) + getL G w (k + 1) v2 + getL G w (k + 1) v1\<close> 
-\<open>sum (getL G w (k + 1)) (pverts G - {v1}) + getL G w (k + 1) v1 = sum (getL G w (k + 1)) (pverts G - {v1, v2}) + getL G w (k + 1) v2 + getL G w (k + 1) v1\<close> 
-\<open>sum (getL G w (k + 1)) (pverts G) = sum (getL G w (k + 1)) (pverts G - {v1}) + getL G w (k + 1) v1\<close> by auto
+  finally have "(\<Sum> v \<in> pverts G. getL G w (k+1) v) \<ge> (\<Sum> v \<in> (pverts G) - {v\<^sub>1,v\<^sub>2}. getL G w (k+1) v) + 2" 
+    using \<open>sum (getL G w (k + 1)) ((pverts G) - {v\<^sub>1, v\<^sub>2}) + getL G w k v\<^sub>2 + getL G w k v\<^sub>1 + 2 \<le> sum (getL G w (k + 1)) ((pverts G) - {v\<^sub>1, v\<^sub>2}) + getL G w (k + 1) v\<^sub>2 + getL G w (k + 1) v\<^sub>1\<close> 
+\<open>sum (getL G w (k + 1)) ((pverts G) - {v\<^sub>1}) + getL G w (k + 1) v\<^sub>1 = sum (getL G w (k + 1)) ((pverts G) - {v\<^sub>1, v\<^sub>2}) + getL G w (k + 1) v\<^sub>2 + getL G w (k + 1) v\<^sub>1\<close> \<open>sum (getL G w (k + 1)) (pverts G) = sum (getL G w (k + 1)) ((pverts G) - {v\<^sub>1}) + getL G w (k + 1) v\<^sub>1\<close> by linarith
+  moreover have "\<forall>v \<in> (pverts G) - {v\<^sub>1,v\<^sub>2}. getL G w (k+1) v = getL G w k v"
+    using aux_getL u_def v\<^sub>1_def v\<^sub>2_def by auto
+  ultimately have "(\<Sum> v \<in> pverts G. getL G w (k+1) v) \<ge> (\<Sum> v \<in> (pverts G) - {v\<^sub>1,v\<^sub>2}. getL G w k v) + getL G w k v\<^sub>2 + getL G w k v\<^sub>1 + 2" 
+    using \<open>sum (getL G w (k + 1)) (pverts G - {v\<^sub>1, v\<^sub>2}) + getL G w k v\<^sub>2 + getL G w k v\<^sub>1 + 2 \<le> sum (getL G w (k + 1)) (pverts G - {v\<^sub>1, v\<^sub>2}) + getL G w (k + 1) v\<^sub>2 + getL G w (k + 1) v\<^sub>1\<close> 
+\<open>sum (getL G w (k + 1)) (pverts G - {v\<^sub>1}) + getL G w (k + 1) v\<^sub>1 = sum (getL G w (k + 1)) (pverts G - {v\<^sub>1, v\<^sub>2}) + getL G w (k + 1) v\<^sub>2 + getL G w (k + 1) v\<^sub>1\<close> 
+\<open>sum (getL G w (k + 1)) (pverts G) = sum (getL G w (k + 1)) (pverts G - {v\<^sub>1}) + getL G w (k + 1) v\<^sub>1\<close> by auto
   then have "(\<Sum> v \<in> pverts G. getL G w (k+1) v) \<ge> (\<Sum> v \<in> (pverts G). getL G w k v) + 2" 
-    by (smt Diff_idemp Diff_insert2 Diff_insert_absorb Nat.le_diff_conv2 add.commute add_leD2 add_le_imp_le_diff f1 f2 finite_Diff insert_Diff sum.insert_remove)
+    by (smt Diff_idemp Diff_insert2 Diff_insert_absorb Nat.le_diff_conv\<^sub>2 add.commute add_leD2 add_le_imp_le_diff f1 f2 finite_Diff insert_Diff sum.insert_remove)
   then show ?thesis by blast
 qed
 
@@ -2105,43 +2105,43 @@ lemma(in distinct_weighted_pair_graph) dec_trail_exists_complete:
 (*<*)proof-
   have "card (arcs G) = (n * (n-1))" 
   proof-
-    have "arcs G = {(v1,v2). v1 \<in> pverts G \<and> v2 \<in> pverts G \<and> v1 \<noteq> v2}" using assms complete_digraph_pair_def by auto
-    moreover have "card {(v1,v2). v1 \<in> pverts G \<and> v2 \<in> pverts G \<and> v1 \<noteq> v2} = n*(n-1)"  (*TODO: Same code as above, make own lemma *)
+    have "arcs G = {(v\<^sub>1,v\<^sub>2). v\<^sub>1 \<in> pverts G \<and> v\<^sub>2 \<in> pverts G \<and> v\<^sub>1 \<noteq> v\<^sub>2}" using assms complete_digraph_pair_def by auto
+    moreover have "card {(v\<^sub>1,v\<^sub>2). v\<^sub>1 \<in> pverts G \<and> v\<^sub>2 \<in> pverts G \<and> v\<^sub>1 \<noteq> v\<^sub>2} = n*(n-1)"  (*TODO: Same code as above, make own lemma *)
   proof-
-    have "{(v1,v2). v1 \<in> pverts G \<and> v2 \<in> pverts G \<and> v1 \<noteq> v2} = {v1. v1 \<in> pverts G} \<times> {v2. v2 \<in> pverts G} - {(v1,v2). v1 \<in> pverts G \<and> v2 \<in> pverts G \<and> v1 = v2}"
+    have "{(v\<^sub>1,v\<^sub>2). v\<^sub>1 \<in> pverts G \<and> v\<^sub>2 \<in> pverts G \<and> v\<^sub>1 \<noteq> v\<^sub>2} = {v\<^sub>1. v\<^sub>1 \<in> pverts G} \<times> {v\<^sub>2. v\<^sub>2 \<in> pverts G} - {(v\<^sub>1,v\<^sub>2). v\<^sub>1 \<in> pverts G \<and> v\<^sub>2 \<in> pverts G \<and> v\<^sub>1 = v\<^sub>2}"
     proof
-      show "{(v1,v2). v1 \<in> pverts G \<and> v2 \<in> pverts G \<and> v1 \<noteq> v2} \<subseteq> {v1. v1 \<in> pverts G} \<times> {v2. v2 \<in> pverts G} - {(v1,v2). v1 \<in> pverts G \<and> v2 \<in> pverts G \<and> v1 = v2}"
+      show "{(v\<^sub>1,v\<^sub>2). v\<^sub>1 \<in> pverts G \<and> v\<^sub>2 \<in> pverts G \<and> v\<^sub>1 \<noteq> v\<^sub>2} \<subseteq> {v\<^sub>1. v\<^sub>1 \<in> pverts G} \<times> {v\<^sub>2. v\<^sub>2 \<in> pverts G} - {(v\<^sub>1,v\<^sub>2). v\<^sub>1 \<in> pverts G \<and> v\<^sub>2 \<in> pverts G \<and> v\<^sub>1 = v\<^sub>2}"
       proof
         fix x 
-        assume a0: "x \<in> {(v1,v2). v1 \<in> pverts G \<and> v2 \<in> pverts G \<and> v1 \<noteq> v2}"
-        then have "x \<in> {v1. v1 \<in> pverts G} \<times> {v2. v2 \<in> pverts G}" by blast
-        moreover have "x \<notin> {(v1,v2). v1 \<in> pverts G \<and> v2 \<in> pverts G \<and> v1 = v2}" using a0 by blast
-        ultimately show "x \<in> {v1. v1 \<in> pverts G} \<times> {v2. v2 \<in> pverts G} - {(v1,v2). v1 \<in> pverts G \<and> v2 \<in> pverts G \<and> v1 = v2}"
+        assume a0: "x \<in> {(v\<^sub>1,v\<^sub>2). v\<^sub>1 \<in> pverts G \<and> v\<^sub>2 \<in> pverts G \<and> v\<^sub>1 \<noteq> v\<^sub>2}"
+        then have "x \<in> {v\<^sub>1. v\<^sub>1 \<in> pverts G} \<times> {v\<^sub>2. v\<^sub>2 \<in> pverts G}" by blast
+        moreover have "x \<notin> {(v\<^sub>1,v\<^sub>2). v\<^sub>1 \<in> pverts G \<and> v\<^sub>2 \<in> pverts G \<and> v\<^sub>1 = v\<^sub>2}" using a0 by blast
+        ultimately show "x \<in> {v\<^sub>1. v\<^sub>1 \<in> pverts G} \<times> {v\<^sub>2. v\<^sub>2 \<in> pverts G} - {(v\<^sub>1,v\<^sub>2). v\<^sub>1 \<in> pverts G \<and> v\<^sub>2 \<in> pverts G \<and> v\<^sub>1 = v\<^sub>2}"
           by blast
       qed
     next
-      show "{v1. v1 \<in> pverts G} \<times> {v2. v2 \<in> pverts G} - {(v1,v2). v1 \<in> pverts G \<and> v2 \<in> pverts G \<and> v1 = v2}
-                \<subseteq> {(v1,v2). v1 \<in> pverts G \<and> v2 \<in> pverts G \<and> v1 \<noteq> v2}"
+      show "{v\<^sub>1. v\<^sub>1 \<in> pverts G} \<times> {v\<^sub>2. v\<^sub>2 \<in> pverts G} - {(v\<^sub>1,v\<^sub>2). v\<^sub>1 \<in> pverts G \<and> v\<^sub>2 \<in> pverts G \<and> v\<^sub>1 = v\<^sub>2}
+                \<subseteq> {(v\<^sub>1,v\<^sub>2). v\<^sub>1 \<in> pverts G \<and> v\<^sub>2 \<in> pverts G \<and> v\<^sub>1 \<noteq> v\<^sub>2}"
         by blast
     qed
-    moreover have "{(v1,v2). v1 \<in> pverts G \<and> v2 \<in> pverts G \<and> v1 = v2} \<subseteq> {v1. v1 \<in> pverts G} \<times> {v2. v2 \<in> pverts G}" by blast
-    moreover have "finite {(v1,v2). v1 \<in> pverts G \<and> v2 \<in> pverts G \<and> v1 = v2}" 
+    moreover have "{(v\<^sub>1,v\<^sub>2). v\<^sub>1 \<in> pverts G \<and> v\<^sub>2 \<in> pverts G \<and> v\<^sub>1 = v\<^sub>2} \<subseteq> {v\<^sub>1. v\<^sub>1 \<in> pverts G} \<times> {v\<^sub>2. v\<^sub>2 \<in> pverts G}" by blast
+    moreover have "finite {(v\<^sub>1,v\<^sub>2). v\<^sub>1 \<in> pverts G \<and> v\<^sub>2 \<in> pverts G \<and> v\<^sub>1 = v\<^sub>2}" 
       using calculation(2) finite_subset by fastforce
-    ultimately have "card {(v1,v2). v1 \<in> pverts G \<and> v2 \<in> pverts G \<and> v1 \<noteq> v2} 
-                   = card ({v1. v1 \<in> pverts G} \<times> {v2. v2 \<in> pverts G}) - card {(v1,v2). v1 \<in> pverts G \<and> v2 \<in> pverts G \<and> v1 = v2}"
+    ultimately have "card {(v\<^sub>1,v\<^sub>2). v\<^sub>1 \<in> pverts G \<and> v\<^sub>2 \<in> pverts G \<and> v\<^sub>1 \<noteq> v\<^sub>2} 
+                   = card ({v\<^sub>1. v\<^sub>1 \<in> pverts G} \<times> {v\<^sub>2. v\<^sub>2 \<in> pverts G}) - card {(v\<^sub>1,v\<^sub>2). v\<^sub>1 \<in> pverts G \<and> v\<^sub>2 \<in> pverts G \<and> v\<^sub>1 = v\<^sub>2}"
       by (simp add: card_Diff_subset)
-    moreover have "card {v1. v1 \<in> pverts G} = n" by auto
-    moreover have "card {(v1,v2). v1 \<in> pverts G \<and> v2 \<in> pverts G \<and> v1 = v2} = card {v1. v1 \<in> pverts G}" 
+    moreover have "card {v\<^sub>1. v\<^sub>1 \<in> pverts G} = n" by auto
+    moreover have "card {(v\<^sub>1,v\<^sub>2). v\<^sub>1 \<in> pverts G \<and> v\<^sub>2 \<in> pverts G \<and> v\<^sub>1 = v\<^sub>2} = card {v\<^sub>1. v\<^sub>1 \<in> pverts G}" 
     proof-
-      have "inj_on (\<lambda>(v1,v2). v1) {(v1,v2). v1 \<in> pverts G \<and> v2 \<in> pverts G \<and> v1 = v2}" 
+      have "inj_on (\<lambda>(v\<^sub>1,v\<^sub>2). v\<^sub>1) {(v\<^sub>1,v\<^sub>2). v\<^sub>1 \<in> pverts G \<and> v\<^sub>2 \<in> pverts G \<and> v\<^sub>1 = v\<^sub>2}" 
         by (smt Product_Type.Collect_case_prodD inj_onI prod.case_eq_if prod.collapse)
-      moreover have "(\<lambda>(v1,v2). v1) ` {(v1,v2). v1 \<in> pverts G \<and> v2 \<in> pverts G \<and> v1 = v2} = {v1. v1 \<in> pverts G}" by auto
-      ultimately have "bij_betw (\<lambda>(v1,v2). v1) {(v1,v2). v1 \<in> pverts G \<and> v2 \<in> pverts G \<and> v1 = v2} {v1. v1 \<in> pverts G}" 
+      moreover have "(\<lambda>(v\<^sub>1,v\<^sub>2). v\<^sub>1) ` {(v\<^sub>1,v\<^sub>2). v\<^sub>1 \<in> pverts G \<and> v\<^sub>2 \<in> pverts G \<and> v\<^sub>1 = v\<^sub>2} = {v\<^sub>1. v\<^sub>1 \<in> pverts G}" by auto
+      ultimately have "bij_betw (\<lambda>(v\<^sub>1,v\<^sub>2). v\<^sub>1) {(v\<^sub>1,v\<^sub>2). v\<^sub>1 \<in> pverts G \<and> v\<^sub>2 \<in> pverts G \<and> v\<^sub>1 = v\<^sub>2} {v\<^sub>1. v\<^sub>1 \<in> pverts G}" 
         by (simp add: bij_betw_def)
       then show ?thesis 
         using bij_betw_same_card by auto
     qed
-    ultimately have "card {(v1,v2). v1 \<in> pverts G \<and> v2 \<in> pverts G \<and> v1 \<noteq> v2} = n*n - n" by auto
+    ultimately have "card {(v\<^sub>1,v\<^sub>2). v\<^sub>1 \<in> pverts G \<and> v\<^sub>2 \<in> pverts G \<and> v\<^sub>1 \<noteq> v\<^sub>2} = n*n - n" by auto
     then show ?thesis 
       by (simp add: diff_mult_distrib2)
   qed
@@ -2157,43 +2157,43 @@ end (* context graph *)
 
 lemma t4:
   assumes "finite A" 
-  shows "card {(v1,v2). v1 \<in> A \<and> v2 \<in> A \<and> v1 \<noteq> v2} = (card A)*(card A-1)"  (*TODO: Same code as above, make own lemma *)
+  shows "card {(v\<^sub>1,v\<^sub>2). v\<^sub>1 \<in> A \<and> v\<^sub>2 \<in> A \<and> v\<^sub>1 \<noteq> v\<^sub>2} = (card A)*(card A-1)"  (*TODO: Same code as above, make own lemma *)
   proof-
-    have "{(v1,v2). v1 \<in> A \<and> v2 \<in> A \<and> v1 \<noteq> v2} = {v1. v1 \<in> A} \<times> {v2. v2 \<in> A} - {(v1,v2). v1 \<in> A \<and> v2 \<in> A \<and> v1 = v2}"
+    have "{(v\<^sub>1,v\<^sub>2). v\<^sub>1 \<in> A \<and> v\<^sub>2 \<in> A \<and> v\<^sub>1 \<noteq> v\<^sub>2} = {v\<^sub>1. v\<^sub>1 \<in> A} \<times> {v\<^sub>2. v\<^sub>2 \<in> A} - {(v\<^sub>1,v\<^sub>2). v\<^sub>1 \<in> A \<and> v\<^sub>2 \<in> A \<and> v\<^sub>1 = v\<^sub>2}"
     proof
-      show "{(v1,v2). v1 \<in> A \<and> v2 \<in> A \<and> v1 \<noteq> v2} \<subseteq> {v1. v1 \<in> A} \<times> {v2. v2 \<in> A} - {(v1,v2). v1 \<in> A \<and> v2 \<in> A \<and> v1 = v2}"
+      show "{(v\<^sub>1,v\<^sub>2). v\<^sub>1 \<in> A \<and> v\<^sub>2 \<in> A \<and> v\<^sub>1 \<noteq> v\<^sub>2} \<subseteq> {v\<^sub>1. v\<^sub>1 \<in> A} \<times> {v\<^sub>2. v\<^sub>2 \<in> A} - {(v\<^sub>1,v\<^sub>2). v\<^sub>1 \<in> A \<and> v\<^sub>2 \<in> A \<and> v\<^sub>1 = v\<^sub>2}"
       proof
         fix x 
-        assume a0: "x \<in> {(v1,v2). v1 \<in> A \<and> v2 \<in> A \<and> v1 \<noteq> v2}"
-        then have "x \<in> {v1. v1 \<in> A} \<times> {v2. v2 \<in> A}" by blast
-        moreover have "x \<notin> {(v1,v2). v1 \<in> A \<and> v2 \<in> A \<and> v1 = v2}" using a0 by blast
-        ultimately show "x \<in> {v1. v1 \<in> A} \<times> {v2. v2 \<in> A} - {(v1,v2). v1 \<in> A \<and> v2 \<in> A \<and> v1 = v2}"
+        assume a0: "x \<in> {(v\<^sub>1,v\<^sub>2). v\<^sub>1 \<in> A \<and> v\<^sub>2 \<in> A \<and> v\<^sub>1 \<noteq> v\<^sub>2}"
+        then have "x \<in> {v\<^sub>1. v\<^sub>1 \<in> A} \<times> {v\<^sub>2. v\<^sub>2 \<in> A}" by blast
+        moreover have "x \<notin> {(v\<^sub>1,v\<^sub>2). v\<^sub>1 \<in> A \<and> v\<^sub>2 \<in> A \<and> v\<^sub>1 = v\<^sub>2}" using a0 by blast
+        ultimately show "x \<in> {v\<^sub>1. v\<^sub>1 \<in> A} \<times> {v\<^sub>2. v\<^sub>2 \<in> A} - {(v\<^sub>1,v\<^sub>2). v\<^sub>1 \<in> A \<and> v\<^sub>2 \<in> A \<and> v\<^sub>1 = v\<^sub>2}"
           by blast
       qed
     next
-      show "{v1. v1 \<in> A} \<times> {v2. v2 \<in> A} - {(v1,v2). v1 \<in> A \<and> v2 \<in> A \<and> v1 = v2}
-                \<subseteq> {(v1,v2). v1 \<in> A \<and> v2 \<in> A \<and> v1 \<noteq> v2}"
+      show "{v\<^sub>1. v\<^sub>1 \<in> A} \<times> {v\<^sub>2. v\<^sub>2 \<in> A} - {(v\<^sub>1,v\<^sub>2). v\<^sub>1 \<in> A \<and> v\<^sub>2 \<in> A \<and> v\<^sub>1 = v\<^sub>2}
+                \<subseteq> {(v\<^sub>1,v\<^sub>2). v\<^sub>1 \<in> A \<and> v\<^sub>2 \<in> A \<and> v\<^sub>1 \<noteq> v\<^sub>2}"
         by blast
     qed
-    moreover have "{(v1,v2). v1 \<in> A \<and> v2 \<in> A \<and> v1 = v2} \<subseteq> {v1. v1 \<in> A} \<times> {v2. v2 \<in> A}" by blast
-    moreover have "finite {(v1,v2). v1 \<in> A \<and> v2 \<in> A \<and> v1 = v2}" 
+    moreover have "{(v\<^sub>1,v\<^sub>2). v\<^sub>1 \<in> A \<and> v\<^sub>2 \<in> A \<and> v\<^sub>1 = v\<^sub>2} \<subseteq> {v\<^sub>1. v\<^sub>1 \<in> A} \<times> {v\<^sub>2. v\<^sub>2 \<in> A}" by blast
+    moreover have "finite {(v\<^sub>1,v\<^sub>2). v\<^sub>1 \<in> A \<and> v\<^sub>2 \<in> A \<and> v\<^sub>1 = v\<^sub>2}" 
       using calculation(2) finite_subset assms by auto
-    ultimately have "card {(v1,v2). v1 \<in> A \<and> v2 \<in> A \<and> v1 \<noteq> v2} 
-                   = card ({v1. v1 \<in> A} \<times> {v2. v2 \<in> A}) - card {(v1,v2). v1 \<in> A \<and> v2 \<in> A \<and> v1 = v2}"
+    ultimately have "card {(v\<^sub>1,v\<^sub>2). v\<^sub>1 \<in> A \<and> v\<^sub>2 \<in> A \<and> v\<^sub>1 \<noteq> v\<^sub>2} 
+                   = card ({v\<^sub>1. v\<^sub>1 \<in> A} \<times> {v\<^sub>2. v\<^sub>2 \<in> A}) - card {(v\<^sub>1,v\<^sub>2). v\<^sub>1 \<in> A \<and> v\<^sub>2 \<in> A \<and> v\<^sub>1 = v\<^sub>2}"
       by (simp add: card_Diff_subset)
-    moreover have "card {v1. v1 \<in> A} = (card A)" by auto
-    moreover have "card {(v1,v2). v1 \<in> A \<and> v2 \<in> A \<and> v1 = v2} = card {v1. v1 \<in> A}" 
+    moreover have "card {v\<^sub>1. v\<^sub>1 \<in> A} = (card A)" by auto
+    moreover have "card {(v\<^sub>1,v\<^sub>2). v\<^sub>1 \<in> A \<and> v\<^sub>2 \<in> A \<and> v\<^sub>1 = v\<^sub>2} = card {v\<^sub>1. v\<^sub>1 \<in> A}" 
     proof-
-      have "inj_on (\<lambda>(v1,v2). v1) {(v1,v2). v1 \<in> A \<and> v2 \<in> A \<and> v1 = v2}" 
+      have "inj_on (\<lambda>(v\<^sub>1,v\<^sub>2). v\<^sub>1) {(v\<^sub>1,v\<^sub>2). v\<^sub>1 \<in> A \<and> v\<^sub>2 \<in> A \<and> v\<^sub>1 = v\<^sub>2}" 
         by (smt Product_Type.Collect_case_prodD inj_onI prod.case_eq_if prod.collapse)
-      moreover have "(\<lambda>(v1,v2). v1) ` {(v1,v2). v1 \<in> A \<and> v2 \<in> A \<and> v1 = v2} = {v1. v1 \<in> A}" by auto
-      ultimately have "bij_betw (\<lambda>(v1,v2). v1) {(v1,v2). v1 \<in> A \<and> v2 \<in> A \<and> v1 = v2} {v1. v1 \<in> A}" 
+      moreover have "(\<lambda>(v\<^sub>1,v\<^sub>2). v\<^sub>1) ` {(v\<^sub>1,v\<^sub>2). v\<^sub>1 \<in> A \<and> v\<^sub>2 \<in> A \<and> v\<^sub>1 = v\<^sub>2} = {v\<^sub>1. v\<^sub>1 \<in> A}" by auto
+      ultimately have "bij_betw (\<lambda>(v\<^sub>1,v\<^sub>2). v\<^sub>1) {(v\<^sub>1,v\<^sub>2). v\<^sub>1 \<in> A \<and> v\<^sub>2 \<in> A \<and> v\<^sub>1 = v\<^sub>2} {v\<^sub>1. v\<^sub>1 \<in> A}" 
         by (simp add: bij_betw_def)
       then show ?thesis 
         using bij_betw_same_card by auto
     qed
-    ultimately have "card {(v1,v2). v1 \<in> A \<and> v2 \<in> A \<and> v1 \<noteq> v2} = (card A)*(card A) - (card A)" 
-      by (simp add: \<open>card {(v1, v2). v1 \<in> A \<and> v2 \<in> A \<and> v1 \<noteq> v2} = card ({v1. v1 \<in> A} \<times> {v2. v2 \<in> A}) - card {(v1, v2). v1 \<in> A \<and> v2 \<in> A \<and> v1 = v2}\<close> card_cartesian_product)
+    ultimately have "card {(v\<^sub>1,v\<^sub>2). v\<^sub>1 \<in> A \<and> v\<^sub>2 \<in> A \<and> v\<^sub>1 \<noteq> v\<^sub>2} = (card A)*(card A) - (card A)" 
+      by (simp add: \<open>card {(v\<^sub>1, v\<^sub>2). v\<^sub>1 \<in> A \<and> v\<^sub>2 \<in> A \<and> v\<^sub>1 \<noteq> v\<^sub>2} = card ({v\<^sub>1. v\<^sub>1 \<in> A} \<times> {v\<^sub>2. v\<^sub>2 \<in> A}) - card {(v\<^sub>1, v\<^sub>2). v\<^sub>1 \<in> A \<and> v\<^sub>2 \<in> A \<and> v\<^sub>1 = v\<^sub>2}\<close> card_cartesian_product)
     then show ?thesis 
       by (simp add: diff_mult_distrib2)
   qed
