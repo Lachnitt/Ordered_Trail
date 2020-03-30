@@ -1,0 +1,90 @@
+\documentclass[runningheads]{llncs}
+\usepackage{isabelle,isabellesym}
+
+% Pseudocode
+\usepackage[ruled,vlined]{algorithm2e}
+
+% Tikz
+\usepackage {tikz}
+\usetikzlibrary {positioning}
+\usetikzlibrary{arrows.meta,positioning,calc}
+\usetikzlibrary{graphs,graphs.standard,quotes}
+
+\usepackage{multicol}
+\usepackage{amsmath}
+\usepackage{amssymb}
+% further packages required for unusual symbols (see also
+% isabellesym.sty), use only when needed
+
+%\usepackage{amssymb}
+  %for \<leadsto>, \<box>, \<diamond>, \<sqsupset>, \<mho>, \<Join>,
+  %\<lhd>, \<lesssim>, \<greatersim>, \<lessapprox>, \<greaterapprox>,
+  %\<triangleq>, \<yen>, \<lozenge>
+
+%\usepackage{eurosym}
+  %for \<euro>
+
+%\usepackage[only,bigsqcap]{stmaryrd}
+  %for \<Sqinter>
+
+%\usepackage{eufrak}
+  %for \<AA> ... \<ZZ>, \<aa> ... \<zz> (also included in amssymb)
+
+%\usepackage{textcomp}
+  %for \<onequarter>, \<onehalf>, \<threequarters>, \<degree>, \<cent>,
+  %\<currency>
+
+% this should be the last package used
+\usepackage{pdfsetup}
+
+% urls in roman style, theory text in math-similar italics
+\urlstyle{rm}
+\isabellestyle{it}
+
+% for uniform font size
+%\renewcommand{\isastyle}{\isastyleminor}
+
+
+\begin{document}
+
+\title{Formalizing Graph Trail Properties in Isabelle/HOL}
+\author{Laura Kov{\'a}cs \and Hanna Lachnitt \and Stefan Szeider}
+\authorrunning{Laura Kov{\'a}cs et al.}
+\institute{TU Wien, Vienna, Austria\\
+	\email{\{laura.kovacs,hanna.lachnitt,stefan.szeider\}@tuwien.ac.at}}
+\maketitle
+
+
+\begin{abstract}
+	We describe a dataset expressing and proving properties of graph trails, using Isabelle/HOL.
+	We formalize the reasoning about strictly increasing and decreasing trails, using weights over edges,
+	and prove lower bounds over the length of trails in weighted graphs. We do so by extending the graph theory library of Isabelle/HOL with an algorithm computing the length of a longest strictly decreasing graph trail starting from a vertex for a given weight distribution, and prove that any decreasing trail is also an increasing one.
+	\keywords{weighted graph \and
+		increasing/decreasing trails \and
+		Isabelle/HOL \and
+		verified theory formalization}
+\end{abstract}
+
+
+% sane default for proof documents
+%\parindent 0pt\parskip 0.5ex
+
+% generated text of all theories
+\input{session}
+
+
+\bigskip\noindent\textbf{Acknowledgements}. We thank Prof.~Byron Cook (AWS) for interesting discussions on reasoning challenges with ordered trails. This work was funded by the ERC Starting Grant 2014 SYMCAR
+639270, the ERC Proof of Concept Grant 2018 SYMELS 842066, the Wallenberg Academy
+Fellowship 2014 TheProSE, the Austrian FWF research project W1255-N23 and P32441,  the Vienna Science and Technology Fund ICT19-065 and the Austrian-Hungarian collaborative project 101\"ou8.
+
+% optional bibliography
+%\bibliographystyle{ieeetr}
+\bibliographystyle{splncs04}
+\bibliography{biblio} 
+
+\end{document}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:
