@@ -570,7 +570,7 @@ next
         by (metis a0 a1 a2 hd_Cons_tl last_ConsL le_add1 length_0_conv nat.simps(3) plus_1_eq_Suc)
       ultimately show "decTrail G w (xs@[(v\<^sub>1,v\<^sub>2)])" 
         using a0 a1 a2 append_Cons append_Nil card_atLeastAtMost f0 fst_conv hd_Cons_tl le_numeral_extra(2) length_0_conv length_tl list.size(3) nat.simps(3)
-        by (metis (no_types, hide_lams) Cons_eq_append_conv One_nat_def append_self_conv\<^sub>2 decTrail.simps(1)
+        by (metis (no_types, hide_lams) Cons_eq_append_conv One_nat_def append_self_conv decTrail.simps(1)
  decTrail.simps(3) diff_Suc_1 diff_self_eq_0 fst_eqD last_ConsL less_Suc_eq_le less_one list.sel(1) not_less_eq tl_Nil)
     next
       assume a2: "length (tl xs) \<ge> 1"
@@ -1426,7 +1426,9 @@ next
     qed
     ultimately have "card {(p1,p2). (p1,p2) \<in> A \<and> p2 < p1} = i div 2 - 1 + 1" by simp
     then have "card {(p1,p2). (p1,p2) \<in> A \<and> p2 < p1} = i div 2" 
-      by (metis (no_types, lifting) Suc_diff_Suc \<open>card {(p1, p2). (p1, p2) \<in> A - {(x1, x2), (x2, x1)} \<and> p2 < p1} = (i - 2) div 2\<close> a0b a2 add.commute aux_even_arcs div\<^sub>2_Suc_Suc f1 le_add_diff_inverse le_eq_less_or_eq odd_one one_add_one plus_1_eq_Suc)
+      using Suc_diff_Suc \<open>card {(p1, p2). (p1, p2) \<in> A - {(x1, x2), (x2, x1)} \<and> p2 < p1} = (i - 2) div 2\<close> 
+          a0b a2 add.commute aux_even_arcs f1 le_add_diff_inverse le_eq_less_or_eq odd_one one_add_one plus_1_eq_Suc 
+      by (metis (no_types, lifting) div2_Suc_Suc ordered_cancel_comm_monoid_diff_class.add_diff_inverse)
     then show "card {(p1,p2). (p1,p2) \<in> A \<and> p2 < p1} = i div 2" 
       using \<open>finite A \<and> card A = i \<and> (\<forall>x. (x, x) \<notin> A) \<and> (\<forall>x y. (x, y) \<in> A \<longrightarrow> (y, x) \<in> A)\<close> a2 by linarith
   qed
@@ -1992,7 +1994,9 @@ distinct_weighted_pair_graph_axioms of_nat_neq_0 u_def v\<^sub>1_def weight_zero
 \<open>sum (getL G w (k + 1)) (pverts G - {v\<^sub>1}) + getL G w (k + 1) v\<^sub>1 = sum (getL G w (k + 1)) (pverts G - {v\<^sub>1, v\<^sub>2}) + getL G w (k + 1) v\<^sub>2 + getL G w (k + 1) v\<^sub>1\<close> 
 \<open>sum (getL G w (k + 1)) (pverts G) = sum (getL G w (k + 1)) (pverts G - {v\<^sub>1}) + getL G w (k + 1) v\<^sub>1\<close> by auto
   then have "(\<Sum> v \<in> pverts G. getL G w (k+1) v) \<ge> (\<Sum> v \<in> (pverts G). getL G w k v) + 2" 
-    by (smt Diff_idemp Diff_insert2 Diff_insert_absorb Nat.le_diff_conv\<^sub>2 add.commute add_leD2 add_le_imp_le_diff f1 f2 finite_Diff insert_Diff sum.insert_remove)
+    using Diff_idemp Diff_insert2 Diff_insert_absorb Nat.le_diff_conv add.commute add_leD2 
+add_le_imp_le_diff f1 f2 finite_Diff insert_Diff sum.insert_remove 
+    by (smt Nat.le_diff_conv2)
   then show ?thesis by blast
 qed
 
