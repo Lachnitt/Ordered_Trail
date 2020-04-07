@@ -4,7 +4,7 @@ sessions
 "HOL-Library"
   "HOL-Algebra"
 theories
-  "Decreasing_Trail"
+  "Ordered_Trail"
 document_files
     "root.tex"
     "biblio.bib"

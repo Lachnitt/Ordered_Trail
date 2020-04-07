@@ -1,4 +1,4 @@
-(*<*)theory Decreasing_Trail (*TODO: RENAME*)
+(*<*)theory Ordered_Trail 
   imports
     Graph_Theory.Bidirected_Digraph
     Graph_Theory.Weighted_Graph
@@ -403,6 +403,9 @@ fun incTrail :: "'a pair_pre_digraph \<Rightarrow> ('a \<times>'a) weight_fun \<
 definition(in pair_pre_digraph) incTrail2 where (*TODO: use trail instead?*)
 "incTrail2 w es u v \<equiv> sorted_wrt (\<lambda> e\<^sub>1 e\<^sub>2. w e\<^sub>1 < w e\<^sub>2) es \<and> (es = [] \<or> awalk u es v)"
 
+(*definition(in pair_pre_digraph) incTrail2b where (*TODO: Use this instead?*)
+"incTrail2b w es u v \<equiv> (\<forall> es\<^sub>1 e\<^sub>1 e\<^sub>2 es\<^sub>2. es = es\<^sub>1 @ [e\<^sub>1,e\<^sub>2] @ es\<^sub>2 \<longrightarrow> w e\<^sub>1 < w e\<^sub>2) \<and> (es = [] \<or> awalk u es v)"*)
+
 fun decTrail :: "'a pair_pre_digraph \<Rightarrow> ('a \<times>'a) weight_fun \<Rightarrow> ('a \<times>'a) list \<Rightarrow> bool" where
 "decTrail g w [] = True" |
 "decTrail g w [e\<^sub>1] = (e\<^sub>1 \<in> parcs g)" |
@@ -538,239 +541,240 @@ qed(*>*)
   and "(v\<^sub>1,v\<^sub>2) \<in> parcs G" 
   shows "decTrail G w (xs@[(v\<^sub>1,v\<^sub>2)])"
 proof-
-  have "\<forall> xs v\<^sub>1 v\<^sub>2. length xs = k \<longrightarrow> (decTrail G w xs \<and> (length xs \<ge> 1 \<longrightarrow> w (last xs) > w (v\<^sub>1,v\<^sub>2) \<and> v\<^sub>1 = snd (last xs)) \<and> (v\<^sub>1,v\<^sub>2) \<in> parcs G) \<longrightarrow> decTrail G w (xs@[(v\<^sub>1,v\<^sub>2)])" for k
-proof(induction k)
-  show "\<forall> xs v\<^sub>1 v\<^sub>2. length xs = 0 \<longrightarrow> (decTrail G w xs \<and> (length xs \<ge> 1 \<longrightarrow> w (last xs) > w (v\<^sub>1,v\<^sub>2) \<and> v\<^sub>1 = snd (last xs)) \<and> (v\<^sub>1,v\<^sub>2) \<in> parcs G) \<longrightarrow> decTrail G w (xs@[(v\<^sub>1,v\<^sub>2)])"
-  proof(intro allI, intro impI)
-    fix xs :: "('a\<times>'a) list"
-    and v\<^sub>1 v\<^sub>2 :: "'a" 
-    assume "length xs = 0" and "(decTrail G w xs \<and> (length xs \<ge> 1 \<longrightarrow> w (last xs) > w (v\<^sub>1,v\<^sub>2) \<and> v\<^sub>1 = snd (last xs)) \<and> (v\<^sub>1,v\<^sub>2) \<in> parcs G)"
-    then show "decTrail G w (xs@[(v\<^sub>1,v\<^sub>2)])" by auto
-  qed
-next
-  fix k
-  assume IH: "\<forall> xs v\<^sub>1 v\<^sub>2. length xs = k \<longrightarrow> (decTrail G w xs \<and> (length xs \<ge> 1 \<longrightarrow> w (last xs) > w (v\<^sub>1,v\<^sub>2) \<and> v\<^sub>1 = snd (last xs)) \<and> (v\<^sub>1,v\<^sub>2) \<in> parcs G) \<longrightarrow> decTrail G w (xs@[(v\<^sub>1,v\<^sub>2)])"
-  show "\<forall> xs v\<^sub>1 v\<^sub>2. length xs = (Suc k) \<longrightarrow> (decTrail G w xs \<and> (length xs \<ge> 1 \<longrightarrow> w (last xs) > w (v\<^sub>1,v\<^sub>2) \<and> v\<^sub>1 = snd (last xs)) \<and> (v\<^sub>1,v\<^sub>2) \<in> parcs G) \<longrightarrow> decTrail G w (xs@[(v\<^sub>1,v\<^sub>2)])"
-  proof(intro allI, intro impI)
-    fix xs :: "('a\<times>'a) list"
-    and v\<^sub>1 v\<^sub>2 :: "'a" 
-    assume a0: "length xs = (Suc k)" and a1: "(decTrail G w xs \<and> (length xs \<ge> 1 \<longrightarrow> w (last xs) > w (v\<^sub>1,v\<^sub>2) \<and> v\<^sub>1 = snd (last xs)) \<and> (v\<^sub>1,v\<^sub>2) \<in> parcs G)"
-    then have f0: "(decTrail G w (tl xs) \<and> (length (tl xs) \<ge> 1 \<longrightarrow> w (last (tl xs)) > w (v\<^sub>1,v\<^sub>2) \<and> v\<^sub>1 = snd (last (tl xs))) \<and> (v\<^sub>1,v\<^sub>2) \<in> parcs G) \<longrightarrow> decTrail G w ((tl xs)@[(v\<^sub>1,v\<^sub>2)])"
-      using IH by auto
-    show "decTrail G w (xs@[(v\<^sub>1,v\<^sub>2)])"
-    proof(rule disjE)
-      show "length (tl xs) = 0 \<or> length (tl xs) \<ge> 1" by auto
-    next
-      assume a2: "length (tl xs) = 0"
-      then have "hd xs \<in> parcs G" using a1 
-        by (metis (full_types) Zero_neq_Suc a0 decTrail.simps(2) length_0_conv list.collapse list.size(3))
-      moreover have "w (hd xs) > w (v\<^sub>1,v\<^sub>2)" using a1 
-        by (metis One_nat_def Suc_le_lessD a2 a0 hd_Cons_tl last_ConsL le_add1 length_0_conv length_greater_0_conv plus_1_eq_Suc)
-      moreover have "snd (hd xs) = v\<^sub>1" 
-        by (metis a0 a1 a2 hd_Cons_tl last_ConsL le_add1 length_0_conv nat.simps(3) plus_1_eq_Suc)
-      ultimately show "decTrail G w (xs@[(v\<^sub>1,v\<^sub>2)])" 
-        using a0 a1 a2 append_Cons append_Nil card_atLeastAtMost f0 fst_conv hd_Cons_tl le_numeral_extra(2) length_0_conv length_tl list.size(3) nat.simps(3)
-        by (metis (no_types, hide_lams) Cons_eq_append_conv One_nat_def append_self_conv decTrail.simps(1)
- decTrail.simps(3) diff_Suc_1 diff_self_eq_0 fst_eqD last_ConsL less_Suc_eq_le less_one list.sel(1) not_less_eq tl_Nil)
-    next
-      assume a2: "length (tl xs) \<ge> 1"
-      then have f1: "w (last (tl xs)) > w (v\<^sub>1,v\<^sub>2) \<and> v\<^sub>1 = snd (last (tl xs)) \<and> (v\<^sub>1,v\<^sub>2) \<in> parcs G" 
-        using  a0 a1 last_tl le_add1 le_numeral_extra(2) list.size(3) plus_1_eq_Suc by metis
-      moreover have "w (hd (xs@[(v\<^sub>1,v\<^sub>2)])) > w (hd (tl (xs@[(v\<^sub>1,v\<^sub>2)])))" 
-        by (metis a1 a2 hd_Cons_tl hd_append2 decTrail.simps(3) le_numeral_extra(2) list.sel(2) list.size(3) tl_append2)
-      moreover have "(hd (xs@[(v\<^sub>1,v\<^sub>2)])) \<in> parcs G" 
-        by (metis a1 a2 hd_Cons_tl hd_append2 decTrail.simps(3) le_numeral_extra(2) length_0_conv list.sel(2))
-      moreover have "snd (hd (xs@[(v\<^sub>1,v\<^sub>2)])) = fst (hd (tl (xs@[(v\<^sub>1,v\<^sub>2)])))"
-        by (metis One_nat_def a0 a1 a2 hd_Cons_tl hd_append2 decTrail.simps(3) le_numeral_extra(2) length_Cons length_tl list.collapse list.size(3) nat.simps(3) tl_append2)
-      moreover have "(xs@[(v\<^sub>1,v\<^sub>2)]) = (hd (xs@[(v\<^sub>1,v\<^sub>2)])) # hd(tl (xs@[(v\<^sub>1,v\<^sub>2)])) # tl (tl (xs@[(v\<^sub>1,v\<^sub>2)]))" 
-        by (metis a0 a2 append_is_Nil_conv hd_Cons_tl le_add1 le_numeral_extra(2) list.size(3) plus_1_eq_Suc tl_append2) 
-      moreover have "(decTrail G w (tl xs) \<and> (length (tl xs) \<ge> 1 \<longrightarrow> w (last (tl xs)) > w (v\<^sub>1,v\<^sub>2) \<and> v\<^sub>1 = snd (last (tl xs))) \<and> (v\<^sub>1,v\<^sub>2) \<in> parcs G) \<longrightarrow> decTrail G w ((tl xs)@[(v\<^sub>1,v\<^sub>2)])"
-          using IH f0 by blast
-      moreover have "(length (tl xs) \<ge> 1 \<longrightarrow> w (last (tl xs)) > w (v\<^sub>1,v\<^sub>2) \<and> v\<^sub>1 = snd (last (tl xs)))" 
+  have "\<forall> es v\<^sub>1 v\<^sub>2. length es = k \<longrightarrow> (decTrail G w es \<and> (length es \<ge> 1 \<longrightarrow> w (last es) > w (v\<^sub>1,v\<^sub>2) \<and> v\<^sub>1 = snd (last es)) \<and> (v\<^sub>1,v\<^sub>2) \<in> parcs G) \<longrightarrow> decTrail G w (es@[(v\<^sub>1,v\<^sub>2)])" for k
+  proof(induction k)
+    show "\<forall> es v\<^sub>1 v\<^sub>2. length es = 0 \<longrightarrow> (decTrail G w es \<and> (length es \<ge> 1 \<longrightarrow> w (last es) > w (v\<^sub>1,v\<^sub>2) \<and> v\<^sub>1 = snd (last es)) \<and> (v\<^sub>1,v\<^sub>2) \<in> parcs G) \<longrightarrow> decTrail G w (es@[(v\<^sub>1,v\<^sub>2)])"
+      by auto
+  next
+    fix k
+    assume IH: "\<forall> es v\<^sub>1 v\<^sub>2. length es = k \<longrightarrow> (decTrail G w es \<and> (length es \<ge> 1 \<longrightarrow> w (last es) > w (v\<^sub>1,v\<^sub>2) \<and> v\<^sub>1 = snd (last es)) \<and> (v\<^sub>1,v\<^sub>2) \<in> parcs G) \<longrightarrow> decTrail G w (es@[(v\<^sub>1,v\<^sub>2)])"
+    show "\<forall> es v\<^sub>1 v\<^sub>2. length es = (Suc k) \<longrightarrow> (decTrail G w es \<and> (length es \<ge> 1 \<longrightarrow> w (last es) > w (v\<^sub>1,v\<^sub>2) \<and> v\<^sub>1 = snd (last es)) \<and> (v\<^sub>1,v\<^sub>2) \<in> parcs G) \<longrightarrow> decTrail G w (es@[(v\<^sub>1,v\<^sub>2)])"
+    proof(intro allI, intro impI)
+      fix es :: "('a\<times>'a) list" and v\<^sub>1 v\<^sub>2 :: "'a"
+      assume a0: "length es = (Suc k)" and a1: "(decTrail G w es \<and> (length es \<ge> 1 \<longrightarrow> w (last es) > w (v\<^sub>1,v\<^sub>2) \<and> v\<^sub>1 = snd (last es)) \<and> (v\<^sub>1,v\<^sub>2) \<in> parcs G)"
+      show "decTrail G w (es@[(v\<^sub>1,v\<^sub>2)])"
+      proof cases
+        assume a2: "length (tl es) = 0"
+        then have "hd es \<in> parcs G" 
+          using a0 a1 
+          by (metis hd_Cons_tl decTrail.simps(2) length_0_conv nat.simps(3))
+        moreover have "w (hd es) > w (v\<^sub>1,v\<^sub>2)" 
+          using a0 a1 a2 
+          by (metis One_nat_def Suc_le_lessD hd_Cons_tl last_ConsL le_add1 length_0_conv length_greater_0_conv plus_1_eq_Suc)
+        moreover have "snd (hd es) = v\<^sub>1" 
+          using a0 a1 a2 
+          by (metis hd_Cons_tl last_ConsL le_add1 length_0_conv nat.simps(3) plus_1_eq_Suc)
+        moreover have "(decTrail G w (tl es) \<and> (length (tl es) \<ge> 1 \<longrightarrow> w (last (tl es)) > w (v\<^sub>1,v\<^sub>2) \<and> v\<^sub>1 = snd (last (tl es))) \<and> (v\<^sub>1,v\<^sub>2) \<in> parcs G) \<longrightarrow> decTrail G w ((tl es)@[(v\<^sub>1,v\<^sub>2)])"
+          using IH a0 by auto
+        ultimately show "decTrail G w (es@[(v\<^sub>1,v\<^sub>2)])" 
+          using a0 a1 a2 
+          by (metis (no_types, hide_lams) append_Cons append_Nil fst_conv hd_Cons_tl decTrail.simps(1,3) 
+              le_numeral_extra(2) length_0_conv list.size(3) nat.simps(3))
+      next
+        assume a2: "length (tl es) \<noteq> 0"
+        moreover have f1: "w (last (tl es)) > w (v\<^sub>1,v\<^sub>2) \<and> v\<^sub>1 = snd (last (tl es)) \<and> (v\<^sub>1,v\<^sub>2) \<in> parcs G" 
+          using a0 a1 a2
+          by (metis last_tl le_add1 list.size(3) plus_1_eq_Suc)
+        moreover have "w (hd (es@[(v\<^sub>1,v\<^sub>2)])) > w (hd (tl (es@[(v\<^sub>1,v\<^sub>2)])))"
+          using a1 a2
+          by (metis hd_Cons_tl hd_append2 decTrail.simps(3) list.sel(2) list.size(3) tl_append2)
+        moreover have "(hd (es@[(v\<^sub>1,v\<^sub>2)])) \<in> parcs G" 
+          using a1 a2 
+          by (metis hd_Cons_tl hd_append2 decTrail.simps(3) list.size(3) neq_Nil_conv tl_Nil)
+        moreover have "snd (hd (es@[(v\<^sub>1,v\<^sub>2)])) = fst (hd (tl (es@[(v\<^sub>1,v\<^sub>2)])))"
+          using a0 a1 a2 
+          by (metis One_nat_def hd_append2 decTrail.simps(3) length_tl list.collapse list.size(3) nat.simps(3) tl_append2)
+        moreover have "(es@[(v\<^sub>1,v\<^sub>2)]) = (hd (es@[(v\<^sub>1,v\<^sub>2)])) # hd(tl (es@[(v\<^sub>1,v\<^sub>2)])) # tl (tl (es@[(v\<^sub>1,v\<^sub>2)]))" 
+          using a0 a2
+          by (metis append_is_Nil_conv hd_Cons_tl le_add1 le_numeral_extra(2) list.size(3) plus_1_eq_Suc tl_append2) 
+        moreover have "(decTrail G w (tl es) \<and> (length (tl es) \<ge> 1 \<longrightarrow> w (last (tl es)) > w (v\<^sub>1,v\<^sub>2) \<and> v\<^sub>1 = snd (last (tl es))) \<and> (v\<^sub>1,v\<^sub>2) \<in> parcs G) \<longrightarrow> decTrail G w ((tl es)@[(v\<^sub>1,v\<^sub>2)])"
+          using IH a0 by auto
+        moreover have "(length (tl es) \<ge> 1 \<longrightarrow> w (last (tl es)) > w (v\<^sub>1,v\<^sub>2) \<and> v\<^sub>1 = snd (last (tl es)))" 
           using f1 by blast
-      moreover have "decTrail G w (tl xs)"
-      proof-
-        have "drop 1 xs = tl xs" by (simp add: drop_Suc)
-        then show ?thesis using a1 decTrail_subtrail by metis
+        moreover have "decTrail G w (tl es)"
+        proof-
+          have "drop 1 es = tl es" by (simp add: drop_Suc)
+          then show ?thesis using a1 decTrail_subtrail by metis
+        qed
+        ultimately show "decTrail G w (es@[(v\<^sub>1,v\<^sub>2)])" 
+          using a0 decTrail.simps(3)[of G w "(hd (es@[(v\<^sub>1,v\<^sub>2)]))" "(hd (tl (es@[(v\<^sub>1,v\<^sub>2)])))"]
+          by (metis le_add1 le_numeral_extra(2) list.sel(3) list.size(3) plus_1_eq_Suc tl_append2)
       qed
-      ultimately show "decTrail G w (xs@[(v\<^sub>1,v\<^sub>2)])" 
-        by (smt a0 decTrail.simps(3) le_add1 le_numeral_extra(2) list.sel(3) list.size(3) plus_1_eq_Suc tl_append2)
     qed
-  qed
-qed
+  qed 
   then show ?thesis using assms by auto
 qed(*>*)
 
 (*<*)lemma aux_incTrail_distinct:
-  shows "incTrail g w xs \<longrightarrow> (\<forall> y \<in> set (tl xs) . w (hd xs) < w y)" 
-proof(induction xs)
-  show "incTrail g w [] \<longrightarrow> (\<forall> y \<in> set (tl []) . w (hd []) < w y)" by simp
+  shows "incTrail g w es \<longrightarrow> (\<forall> e \<in> set (tl es) . w (hd es) < w e)" 
+proof(induction es)
+  show "incTrail g w [] \<longrightarrow> (\<forall> e \<in> set (tl []) . w (hd []) < w e)" by simp
 next
-  fix a xs
-  assume IH: "incTrail g w xs \<longrightarrow> (\<forall> y \<in> set (tl xs) . w (hd xs) < w y)" 
-  show "incTrail g w (a#xs) \<longrightarrow> (\<forall> y \<in> set (tl (a#xs)) . w (hd (a#xs)) < w y)" 
+  fix e\<^sub>1 es
+  assume IH: "incTrail g w es \<longrightarrow> (\<forall> e \<in> set (tl es) . w (hd es) < w e)" 
+  show "incTrail g w (e\<^sub>1#es) \<longrightarrow> (\<forall> e \<in> set (tl (e\<^sub>1#es)) . w (hd (e\<^sub>1#es)) < w e)" 
   proof
-    assume a0: "incTrail g w (a#xs)"
-    moreover have "drop 1 (a#xs) = xs" by simp
-    ultimately have "incTrail g w xs" by (metis incTrail_subtrail)
-    then have "(\<forall> y \<in> set (tl xs) . w (hd xs) < w y)" using IH by auto
-    moreover have "xs \<noteq> [] \<longrightarrow> w a < w (hd xs)" 
+    assume a0: "incTrail g w (e\<^sub>1#es)"
+    moreover have "drop 1 (e\<^sub>1#es) = es" by simp
+    ultimately have "incTrail g w es" by (metis incTrail_subtrail)
+    then have "(\<forall> e \<in> set (tl es) . w (hd es) < w e)" using IH by simp
+    moreover have "es \<noteq> [] \<longrightarrow> w e\<^sub>1 < w (hd es)" 
       using a0 incTrail.elims(2) by fastforce
-    ultimately have "(\<forall> y \<in> set xs . w a < w y)" 
+    ultimately have "\<forall> e \<in> set es . w e\<^sub>1 < w e" 
       by (smt empty_iff hd_Cons_tl list.set(1) set_ConsD)
-    then show "(\<forall> y \<in> set (tl (a#xs)) . w (hd (a#xs)) < w y)" by auto
+    then show "\<forall> e \<in> set (tl (e\<^sub>1#es)) . w (hd (e\<^sub>1#es)) < w e" by simp
   qed
 qed(*>*)
 
 (*<*)lemma aux_decTrail_distinct:
-  shows "decTrail g w xs \<longrightarrow> (\<forall> y \<in> set (tl xs) . w (hd xs) > w y)" 
-proof(induction xs)
-  show "decTrail g w [] \<longrightarrow> (\<forall> y \<in> set (tl []) . w (hd []) > w y)" by simp
+  shows "decTrail g w es \<longrightarrow> (\<forall> e \<in> set (tl es) . w (hd es) > w e)" 
+proof(induction es)
+  show "decTrail g w [] \<longrightarrow> (\<forall> e \<in> set (tl []) . w (hd []) > w e)" by simp
 next
-  fix a xs
-  assume IH: "decTrail g w xs \<longrightarrow> (\<forall> y \<in> set (tl xs) . w (hd xs) > w y)" 
-  show "decTrail g w (a#xs) \<longrightarrow> (\<forall> y \<in> set (tl (a#xs)) . w (hd (a#xs)) > w y)" 
+  fix e\<^sub>1 es
+  assume IH: "decTrail g w es \<longrightarrow> (\<forall> e \<in> set (tl es) . w (hd es) > w e)" 
+  show "decTrail g w (e\<^sub>1#es) \<longrightarrow> (\<forall> e \<in> set (tl (e\<^sub>1#es)) . w (hd (e\<^sub>1#es)) > w e)" 
   proof
-    assume a0: "decTrail g w (a#xs)"
-    moreover have "drop 1 (a#xs) = xs" by simp
-    ultimately have "decTrail g w xs" by (metis decTrail_subtrail)
-    then have "(\<forall> y \<in> set (tl xs) . w (hd xs) > w y)" using IH by auto
-    moreover have "xs \<noteq> [] \<longrightarrow> w a > w (hd xs)" 
+    assume a0: "decTrail g w (e\<^sub>1#es)"
+    moreover have "drop 1 (e\<^sub>1#es) = es" by simp
+    ultimately have "decTrail g w es" by (metis decTrail_subtrail)
+    then have "(\<forall> e \<in> set (tl es) . w (hd es) > w e)" using IH by simp
+    moreover have "es \<noteq> [] \<longrightarrow> w e\<^sub>1 > w (hd es)" 
       using a0 decTrail.elims(2) by fastforce
-    ultimately have "(\<forall> y \<in> set xs . w a > w y)" 
+    ultimately have "\<forall> e \<in> set es . w e\<^sub>1 > w e" 
       by (smt empty_iff hd_Cons_tl list.set(1) set_ConsD)
-    then show "(\<forall> y \<in> set (tl (a#xs)) . w (hd (a#xs)) > w y)" by auto
+    then show "\<forall> e \<in> set (tl (e\<^sub>1#es)) . w (hd (e\<^sub>1#es)) > w e" by simp
   qed
 qed(*>*)
 
 (*<*)lemma(in pair_wf_digraph) incTrail_is_walk:
   assumes "k \<ge> 1"
-  shows "\<forall> xs. length xs = k \<longrightarrow> incTrail G w xs \<longrightarrow> (trail (fst (hd xs)) xs (snd (last xs)))" 
+  shows "\<forall> es. length es = k \<longrightarrow> incTrail G w es \<longrightarrow> (trail (fst (hd es)) es (snd (last es)))" 
 proof(rule Nat.nat_induct_at_least[of 1 k])
   show "k \<ge> 1" using assms by simp
 next
-  show "\<forall> xs. length xs = 1 \<longrightarrow> incTrail G w xs \<longrightarrow> (trail (fst (hd xs)) xs (snd (last xs)))"
+  show "\<forall> es. length es = 1 \<longrightarrow> incTrail G w es \<longrightarrow> (trail (fst (hd es)) es (snd (last es)))"
   proof safe
-    fix xs
-    assume a0: "length xs = 1" and a1: "incTrail G w xs"
-    then obtain x where f0: "xs = [x]" 
+    fix es
+    assume a0: "length es = 1" and a1: "incTrail G w es"
+    then obtain e where f0: "es = [e]" 
       by (metis One_nat_def Suc_le_length_iff add_diff_cancel_left' le_numeral_extra(4) length_0_conv length_tl list.sel(3) plus_1_eq_Suc)
-    then have "awalk (fst x) xs (snd x)" 
+    then have "awalk (fst e) es (snd e)" 
       using a1 arc_implies_awalk by auto 
-    then show "(trail (fst (hd xs)) xs (snd (last xs)))" 
+    then show "(trail (fst (hd es)) es (snd (last es)))" 
       using f0 trail_Cons_iff trail_Nil_iff by auto
   qed
 next
   fix k :: nat
   assume a0: "k \<ge> 1" 
-  assume IH: "\<forall> xs. length xs = k \<longrightarrow> incTrail G w xs \<longrightarrow> (trail (fst (hd xs)) xs (snd (last xs)))" 
-  show "\<forall> xs. length xs = Suc k \<longrightarrow> incTrail G w xs \<longrightarrow> (trail (fst (hd xs)) xs (snd (last xs)))" 
+  assume IH: "\<forall> es. length es = k \<longrightarrow> incTrail G w es \<longrightarrow> (trail (fst (hd es)) es (snd (last es)))" 
+  show "\<forall> es. length es = Suc k \<longrightarrow> incTrail G w es \<longrightarrow> (trail (fst (hd es)) es (snd (last es)))" 
   proof safe
-    fix xs 
-    assume a1: "length xs = Suc k" and a2: "incTrail G w xs" 
-    then obtain a ys where f0: "xs = a # ys" by (meson length_Suc_conv)
-    have f1: "a \<in> parcs G" using a2 f0 incTrail.elims(2) by fastforce 
-    have f2: "awalk (fst (hd ys)) ys (snd (last ys)) \<and> distinct ys"
+    fix es 
+    assume a1: "length es = Suc k" and a2: "incTrail G w es" 
+    then obtain e ess where f0: "es = e # ess" by (meson length_Suc_conv)
+    have f1: "e \<in> parcs G" using a2 f0 incTrail.elims(2) by fastforce 
+    have f2: "awalk (fst (hd ess)) ess (snd (last ess)) \<and> distinct ess"
     proof-
-      have "length ys = k" using a1 f0 by auto
-      moreover have "incTrail G w ys" 
+      have "length ess = k" using a1 f0 by auto
+      moreover have "incTrail G w ess" 
         by (metis a2 drop0 drop_Suc_Cons f0 incTrail_subtrail)
-      ultimately have "(trail (fst (hd ys)) ys (snd (last ys)))" 
+      ultimately have "(trail (fst (hd ess)) ess (snd (last ess)))" 
         using IH by auto
       then show ?thesis 
         by (simp add: trail_def)
     qed
-    have "awalk (fst (hd (a#ys))) (a#ys) (snd (last (a#ys)))" 
+    have "awalk (fst (hd (e#ess))) (e#ess) (snd (last (e#ess)))" 
     proof-
-      have "(fst (hd (a#ys))) \<in> verts G" using f1 by simp
-      moreover have "set (a#ys) \<subseteq> arcs G" using f1 f2 by auto
-      moreover have "cas (fst a) (a#ys) (snd (last ys))" 
+      have "(fst (hd (e#ess))) \<in> verts G" using f1 by simp
+      moreover have "set (e#ess) \<subseteq> arcs G" using f1 f2 by auto
+      moreover have "cas (fst e) (e#ess) (snd (last ess))" 
       proof-
-        have "length ys = k" 
+        have "length ess = k" 
           using a1 f0 by auto
-        then have "(fst (hd ys)) = snd a" 
+        then have "(fst (hd ess)) = snd e" 
           by (metis a0 a2 f0 incTrail.simps(3) le_numeral_extra(2) list.exhaust_sel list.size(3))
-        then have "cas (snd a) ys (snd (last ys))" using f2 
+        then have "cas (snd e) ess (snd (last ess))" using f2 
           by (simp add: awalk_def)
-        moreover have "tail G a = (fst a)" by simp
+        moreover have "tail G e = (fst e)" by simp
         ultimately show ?thesis by auto
       qed
       ultimately show ?thesis 
         by (simp add: awalk_def)
     qed
-    moreover have "distinct (a # ys)" 
+    moreover have "distinct (e # ess)" 
     proof-
-      have "(\<forall> y \<in> set (tl xs) . w (hd xs) < w y)" using a1 aux_incTrail_distinct a2 by blast
+      have "(\<forall> y \<in> set (tl es) . w (hd es) < w y)" using a1 aux_incTrail_distinct a2 by blast
       then show ?thesis 
         using f2 f0 by auto
     qed
-    ultimately show "(trail (fst (hd xs)) xs (snd (last xs)))"
+    ultimately show "(trail (fst (hd es)) es (snd (last es)))"
       using f0 trail_def by simp
   qed
 qed(*>*)
 
 (*<*)lemma(in pair_wf_digraph) decTrail_is_walk:
   assumes "k \<ge> 1"
-  shows "\<forall> xs. length xs = k \<longrightarrow> decTrail G w xs \<longrightarrow> (trail (fst (hd xs)) xs (snd (last xs)))" 
+  shows "\<forall> es. length es = k \<longrightarrow> decTrail G w es \<longrightarrow> (trail (fst (hd es)) es (snd (last es)))" 
 proof(rule Nat.nat_induct_at_least[of 1 k])
   show "k \<ge> 1" using assms by simp
 next
-  show "\<forall> xs. length xs = 1 \<longrightarrow> decTrail G w xs \<longrightarrow> (trail (fst (hd xs)) xs (snd (last xs)))"
+  show "\<forall> es. length es = 1 \<longrightarrow> decTrail G w es \<longrightarrow> (trail (fst (hd es)) es (snd (last es)))"
   proof safe
-    fix xs
-    assume a0: "length xs = 1" and a1: "decTrail G w xs"
-    then obtain x where f0: "xs = [x]" 
+    fix es
+    assume a0: "length es = 1" and a1: "decTrail G w es"
+    then obtain e where f0: "es = [e]" 
       by (metis One_nat_def Suc_le_length_iff add_diff_cancel_left' le_numeral_extra(4) length_0_conv length_tl list.sel(3) plus_1_eq_Suc)
-    then have "awalk (fst x) xs (snd x)" 
+    then have "awalk (fst e) es (snd e)" 
       using a1 arc_implies_awalk by auto 
-    then show "(trail (fst (hd xs)) xs (snd (last xs)))" 
+    then show "(trail (fst (hd es)) es (snd (last es)))" 
       using f0 trail_Cons_iff trail_Nil_iff by auto
   qed
 next
   fix k :: nat
   assume a0: "k \<ge> 1" 
-  assume IH: "\<forall> xs. length xs = k \<longrightarrow> decTrail G w xs \<longrightarrow> (trail (fst (hd xs)) xs (snd (last xs)))" 
-  show "\<forall> xs. length xs = Suc k \<longrightarrow> decTrail G w xs \<longrightarrow> (trail (fst (hd xs)) xs (snd (last xs)))" 
+  assume IH: "\<forall> es. length es = k \<longrightarrow> decTrail G w es \<longrightarrow> (trail (fst (hd es)) es (snd (last es)))" 
+  show "\<forall> es. length es = Suc k \<longrightarrow> decTrail G w es \<longrightarrow> (trail (fst (hd es)) es (snd (last es)))" 
   proof safe
-    fix xs 
-    assume a1: "length xs = Suc k" and a2: "decTrail G w xs" 
-    then obtain a ys where f0: "xs = a # ys" by (meson length_Suc_conv)
-    have f1: "a \<in> parcs G" using a2 f0 decTrail.elims(2) by fastforce 
-    have f2: "awalk (fst (hd ys)) ys (snd (last ys)) \<and> distinct ys"
+    fix es 
+    assume a1: "length es = Suc k" and a2: "decTrail G w es" 
+    then obtain e ess where f0: "es = e # ess" by (meson length_Suc_conv)
+    have f1: "e \<in> parcs G" using a2 f0 decTrail.elims(2) by fastforce 
+    have f2: "awalk (fst (hd ess)) ess (snd (last ess)) \<and> distinct ess"
     proof-
-      have "length ys = k" using a1 f0 by auto
-      moreover have "decTrail G w ys" 
+      have "length ess = k" using a1 f0 by auto
+      moreover have "decTrail G w ess" 
         by (metis a2 drop0 drop_Suc_Cons f0 decTrail_subtrail)
-      ultimately have "(trail (fst (hd ys)) ys (snd (last ys)))" 
+      ultimately have "(trail (fst (hd ess)) ess (snd (last ess)))" 
         using IH by auto
       then show ?thesis 
         by (simp add: trail_def)
     qed
-    have "awalk (fst (hd (a#ys))) (a#ys) (snd (last (a#ys)))" 
+    have "awalk (fst (hd (e#ess))) (e#ess) (snd (last (e#ess)))" 
     proof-
-      have "(fst (hd (a#ys))) \<in> verts G" using f1 by simp
-      moreover have "set (a#ys) \<subseteq> arcs G" using f1 f2 by auto
-      moreover have "cas (fst a) (a#ys) (snd (last ys))" 
+      have "(fst (hd (e#ess))) \<in> verts G" using f1 by simp
+      moreover have "set (e#ess) \<subseteq> arcs G" using f1 f2 by auto
+      moreover have "cas (fst e) (e#ess) (snd (last ess))" 
       proof-
-        have "length ys = k" 
+        have "length ess = k" 
           using a1 f0 by auto
-        then have "(fst (hd ys)) = snd a" 
+        then have "(fst (hd ess)) = snd e" 
           by (metis a0 a2 f0 decTrail.simps(3) le_numeral_extra(2) list.exhaust_sel list.size(3))
-        then have "cas (snd a) ys (snd (last ys))" using f2 
+        then have "cas (snd e) ess (snd (last ess))" using f2 
           by (simp add: awalk_def)
-        moreover have "tail G a = (fst a)" by simp
+        moreover have "tail G e = (fst e)" by simp
         ultimately show ?thesis by auto
       qed
       ultimately show ?thesis 
         by (simp add: awalk_def)
     qed
-    moreover have "distinct (a # ys)" 
+    moreover have "distinct (e # ess)" 
     proof-
-      have "(\<forall> y \<in> set (tl xs) . w (hd xs) > w y)" using a1 aux_decTrail_distinct a2 by blast
+      have "(\<forall> y \<in> set (tl es) . w (hd es) > w y)" using a1 aux_decTrail_distinct a2 by blast
       then show ?thesis 
         using f2 f0 by auto
     qed
-    ultimately show "(trail (fst (hd xs)) xs (snd (last xs)))"
+    ultimately show "(trail (fst (hd es)) es (snd (last es)))"
       using f0 trail_def by simp
   qed
 qed(*>*)
