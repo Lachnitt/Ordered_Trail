@@ -388,12 +388,6 @@ checks if the weight is smaller than the one of all subsequent edges in the sequ
 is sorted. The {\em equivalence
 between the two notions} is shown in the following.\<close>
 
-(*TODO: change this to pre_digraph.*)
-(*fun incTrail :: "('a,'b) pre_digraph \<Rightarrow> 'b weight_fun \<Rightarrow> 'b list \<Rightarrow> bool" where
-"incTrail g w [] = True" |
-"incTrail g w [x] = (x \<in> arcs g)" |
-"incTrail g w (x#y#ys) = (if w x < w y \<and> x \<in> arcs g \<and> tail g x = head g y then incTrail g w (y#ys) else False)"*)
-
 fun incTrail :: "'a pair_pre_digraph \<Rightarrow> ('a \<times>'a) weight_fun \<Rightarrow> ('a \<times>'a) list \<Rightarrow> bool" where
 "incTrail g w [] = True" |
 "incTrail g w [e\<^sub>1] = (e\<^sub>1 \<in> parcs g)" |
@@ -465,9 +459,27 @@ next
     then show ?thesis 
       by (metis IH drop_Suc decTrail.simps(3) list.sel(3) tl_drop)
   qed
-qed(*>*)
+qed
 
-(*<*)lemma incTrail_append:
+lemma incTrail_subtrail_cons[simp]:
+  assumes "incTrail g w (e#es)"
+  shows "incTrail g w es" 
+proof-
+  have "drop 1 (e#es) = es" by simp
+  then show ?thesis 
+    by (metis assms incTrail_subtrail)
+qed
+
+lemma decTrail_subtrail_cons[simp]:
+  assumes "decTrail g w (e#es)"
+  shows "decTrail g w es" 
+proof-
+  have "drop 1 (e#es) = es" by simp
+  then show ?thesis 
+    by (metis assms decTrail_subtrail)
+qed
+
+lemma incTrail_append:
   assumes "incTrail G w es" and "length es \<ge> 1 \<longrightarrow> w (last es) < w (v\<^sub>1,v\<^sub>2) \<and> v\<^sub>1 = snd (last es)" 
   and "(v\<^sub>1,v\<^sub>2) \<in> arcs G" 
   shows "incTrail G w (es@[(v\<^sub>1,v\<^sub>2)])"
@@ -534,9 +546,9 @@ proof-
     qed
   qed 
   then show ?thesis using assms by auto
-qed(*>*)
+qed
 
-(*<*)lemma decTrail_append: (*ultimately replace this by revised proof of incTrail_append *)
+lemma decTrail_append: (*ultimately replace this by revised proof of incTrail_append *)
   assumes "decTrail G w xs" and "length xs \<ge> 1 \<longrightarrow> w (last xs) > w (v\<^sub>1,v\<^sub>2) \<and> v\<^sub>1 = snd (last xs)" 
   and "(v\<^sub>1,v\<^sub>2) \<in> parcs G" 
   shows "decTrail G w (xs@[(v\<^sub>1,v\<^sub>2)])"
@@ -603,9 +615,9 @@ proof-
     qed
   qed 
   then show ?thesis using assms by auto
-qed(*>*)
+qed
 
-(*<*)lemma aux_incTrail_distinct:
+lemma aux_incTrail_distinct:
   shows "incTrail g w es \<longrightarrow> (\<forall> e \<in> set (tl es) . w (hd es) < w e)" 
 proof(induction es)
   show "incTrail g w [] \<longrightarrow> (\<forall> e \<in> set (tl []) . w (hd []) < w e)" by simp
@@ -615,18 +627,16 @@ next
   show "incTrail g w (e\<^sub>1#es) \<longrightarrow> (\<forall> e \<in> set (tl (e\<^sub>1#es)) . w (hd (e\<^sub>1#es)) < w e)" 
   proof
     assume a0: "incTrail g w (e\<^sub>1#es)"
-    moreover have "drop 1 (e\<^sub>1#es) = es" by simp
-    ultimately have "incTrail g w es" by (metis incTrail_subtrail)
-    then have "(\<forall> e \<in> set (tl es) . w (hd es) < w e)" using IH by simp
+    then have "\<forall> e \<in> set (tl es) . w (hd es) < w e" using IH by simp
     moreover have "es \<noteq> [] \<longrightarrow> w e\<^sub>1 < w (hd es)" 
       using a0 incTrail.elims(2) by fastforce
-    ultimately have "\<forall> e \<in> set es . w e\<^sub>1 < w e" 
+    ultimately have "\<forall> e \<in> set es . w e\<^sub>1 < w e"
       by (smt empty_iff hd_Cons_tl list.set(1) set_ConsD)
     then show "\<forall> e \<in> set (tl (e\<^sub>1#es)) . w (hd (e\<^sub>1#es)) < w e" by simp
   qed
-qed(*>*)
+qed
 
-(*<*)lemma aux_decTrail_distinct:
+lemma aux_decTrail_distinct:
   shows "decTrail g w es \<longrightarrow> (\<forall> e \<in> set (tl es) . w (hd es) > w e)" 
 proof(induction es)
   show "decTrail g w [] \<longrightarrow> (\<forall> e \<in> set (tl []) . w (hd []) > w e)" by simp
@@ -635,9 +645,7 @@ next
   assume IH: "decTrail g w es \<longrightarrow> (\<forall> e \<in> set (tl es) . w (hd es) > w e)" 
   show "decTrail g w (e\<^sub>1#es) \<longrightarrow> (\<forall> e \<in> set (tl (e\<^sub>1#es)) . w (hd (e\<^sub>1#es)) > w e)" 
   proof
-    assume a0: "decTrail g w (e\<^sub>1#es)"
-    moreover have "drop 1 (e\<^sub>1#es) = es" by simp
-    ultimately have "decTrail g w es" by (metis decTrail_subtrail)
+    assume a0: "decTrail g w (e\<^sub>1#es)"   
     then have "(\<forall> e \<in> set (tl es) . w (hd es) > w e)" using IH by simp
     moreover have "es \<noteq> [] \<longrightarrow> w e\<^sub>1 > w (hd es)" 
       using a0 decTrail.elims(2) by fastforce
@@ -645,9 +653,9 @@ next
       by (smt empty_iff hd_Cons_tl list.set(1) set_ConsD)
     then show "\<forall> e \<in> set (tl (e\<^sub>1#es)) . w (hd (e\<^sub>1#es)) > w e" by simp
   qed
-qed(*>*)
+qed
 
-(*<*)lemma(in pair_wf_digraph) incTrail_is_walk:
+lemma(in pair_wf_digraph) incTrail_is_walk:
   assumes "k \<ge> 1"
   shows "\<forall> es. length es = k \<longrightarrow> incTrail G w es \<longrightarrow> (trail (fst (hd es)) es (snd (last es)))" 
 proof(rule Nat.nat_induct_at_least[of 1 k])
@@ -711,9 +719,9 @@ next
     ultimately show "(trail (fst (hd es)) es (snd (last es)))"
       using f0 trail_def by simp
   qed
-qed(*>*)
+qed
 
-(*<*)lemma(in pair_wf_digraph) decTrail_is_walk:
+lemma(in pair_wf_digraph) decTrail_is_walk:
   assumes "k \<ge> 1"
   shows "\<forall> es. length es = k \<longrightarrow> decTrail G w es \<longrightarrow> (trail (fst (hd es)) es (snd (last es)))" 
 proof(rule Nat.nat_induct_at_least[of 1 k])
@@ -777,87 +785,87 @@ next
     ultimately show "(trail (fst (hd es)) es (snd (last es)))"
       using f0 trail_def by simp
   qed
-qed(*>*)
+qed
 
-(*<*)lemma(in pair_wf_digraph) incTrail2_is_incTrail:
-  shows "incTrail2 w xs (fst (hd xs)) (snd (last xs)) \<longrightarrow> incTrail G w xs" 
-proof(induction xs)
+lemma(in pair_wf_digraph) incTrail2_is_incTrail:
+  shows "incTrail2 w es (fst (hd es)) (snd (last es)) \<longrightarrow> incTrail G w es" 
+proof(induction es)
   show "incTrail2 w [] (fst (hd [])) (snd (last [])) \<longrightarrow> incTrail G w []" by auto
 next
-  fix x xs 
-  assume IH: "incTrail2 w xs (fst (hd xs)) (snd (last xs)) \<longrightarrow> incTrail G w xs" 
-  show "incTrail2 w (x#xs) (fst (hd (x#xs))) (snd (last (x#xs))) \<longrightarrow> incTrail G w (x#xs)" 
+  fix e es 
+  assume IH: "incTrail2 w es (fst (hd es)) (snd (last es)) \<longrightarrow> incTrail G w es" 
+  show "incTrail2 w (e#es) (fst (hd (e#es))) (snd (last (e#es))) \<longrightarrow> incTrail G w (e#es)" 
   proof(rule disjE)
-    show "(\<exists>y ys. xs = y # ys) \<or> xs = []" 
+    show "(\<exists>y ys. es = y # ys) \<or> es = []" 
       using list.exhaust by blast 
   next
-    assume "xs = []" 
-    then have "incTrail2 w [x] (fst x) (snd x) \<longrightarrow> x \<in> parcs G" 
+    assume "es = []" 
+    then have "incTrail2 w [e] (fst e) (snd e) \<longrightarrow> e \<in> parcs G" 
       by (simp add: awalk_Cons_iff incTrail2_def)                                       
-    then have "incTrail2 w [x] (fst x) (snd x) \<longrightarrow> decTrail G w [x]"
+    then have "incTrail2 w [e] (fst e) (snd e) \<longrightarrow> decTrail G w [e]"
       using decTrail.simps(2) by blast
-    then show "incTrail2 w (x#xs) (fst (hd (x#xs))) (snd (last (x#xs))) \<longrightarrow> incTrail G w (x#xs)" 
-      by (simp add: \<open>xs = []\<close>)
+    then show "incTrail2 w (e#es) (fst (hd (e#es))) (snd (last (e#es))) \<longrightarrow> incTrail G w (e#es)" 
+      by (simp add: \<open>es = []\<close>)
   next
-    assume "\<exists>y ys. xs = y # ys"
-    then obtain y ys where f0: "xs = y # ys" by blast
-    show "incTrail2 w (x#xs) (fst (hd (x#xs))) (snd (last (x#xs))) \<longrightarrow> incTrail G w (x#xs)" 
+    assume "\<exists>y ys. es = y # ys"
+    then obtain y ys where f0: "es = y # ys" by blast
+    show "incTrail2 w (e#es) (fst (hd (e#es))) (snd (last (e#es))) \<longrightarrow> incTrail G w (e#es)" 
     proof
-      assume a0: "incTrail2 w (x#xs) (fst (hd (x#xs))) (snd (last (x#xs)))"
-      then have f1: "incTrail2 w (x#xs) (fst x) (snd (last xs))" by (simp add: f0)
-      have "incTrail2 w (xs) (fst (hd (xs))) (snd (last (xs)))" 
+      assume a0: "incTrail2 w (e#es) (fst (hd (e#es))) (snd (last (e#es)))"
+      then have f1: "incTrail2 w (e#es) (fst e) (snd (last es))" by (simp add: f0)
+      have "incTrail2 w (es) (fst (hd (es))) (snd (last (es)))" 
         using a0 
         by (simp add: awalk_Cons_iff incTrail2_def f0)
-      then have "incTrail G w xs" using IH by auto
-      moreover have "w x < w y" using f0 f1  
+      then have "incTrail G w es" using IH by auto
+      moreover have "w e < w y" using f0 f1  
         by (simp add: incTrail2_def pair_wf_digraph_axioms)
-      moreover have "x \<in> parcs G" using f1 
+      moreover have "e \<in> parcs G" using f1 
         by (simp add: awalk_Cons_iff incTrail2_def)
-      moreover have "snd x = fst y" using f0 f1 decTrail2_def 
+      moreover have "snd e = fst y" using f0 f1 decTrail2_def 
         by (simp add: incTrail2_def awalk_Cons_iff)
-      ultimately show "incTrail G w (x#xs)" 
+      ultimately show "incTrail G w (e#es)" 
         by (simp add: f0)
     qed
   qed
-qed(*>*)
+qed
 
-(*<*)lemma(in pair_wf_digraph) decTrail2_is_decTrail:
-  shows "decTrail2 w xs (fst (hd xs)) (snd (last xs)) \<longrightarrow> decTrail G w xs" 
-proof(induction xs)
+lemma(in pair_wf_digraph) decTrail2_is_decTrail:
+  shows "decTrail2 w es (fst (hd es)) (snd (last es)) \<longrightarrow> decTrail G w es" 
+proof(induction es)
   show "decTrail2 w [] (fst (hd [])) (snd (last [])) \<longrightarrow> decTrail G w []" by auto
 next
-  fix x xs 
-  assume IH: "decTrail2 w xs (fst (hd xs)) (snd (last xs)) \<longrightarrow> decTrail G w xs" 
-  show "decTrail2 w (x#xs) (fst (hd (x#xs))) (snd (last (x#xs))) \<longrightarrow> decTrail G w (x#xs)" 
+  fix e es
+  assume IH: "decTrail2 w es (fst (hd es)) (snd (last es)) \<longrightarrow> decTrail G w es" 
+  show "decTrail2 w (e#es) (fst (hd (e#es))) (snd (last (e#es))) \<longrightarrow> decTrail G w (e#es)" 
   proof(rule disjE)
-    show "(\<exists>y ys. xs = y # ys) \<or> xs = []" 
+    show "(\<exists>y ys. es = y # ys) \<or> es = []" 
       using list.exhaust by blast 
   next
-    assume "xs = []" 
-    then have "decTrail2 w [x] (fst x) (snd x) \<longrightarrow> x \<in> parcs G" 
+    assume "es = []" 
+    then have "decTrail2 w [e] (fst e) (snd e) \<longrightarrow> e \<in> parcs G" 
       by (simp add: awalk_Cons_iff decTrail2_def)
-    then have "decTrail2 w [x] (fst x) (snd x) \<longrightarrow> decTrail G w [x]"
+    then have "decTrail2 w [e] (fst e) (snd e) \<longrightarrow> decTrail G w [e]"
       using decTrail.simps(2) by blast
-    then show "decTrail2 w (x#xs) (fst (hd (x#xs))) (snd (last (x#xs))) \<longrightarrow> decTrail G w (x#xs)" 
-      by (simp add: \<open>xs = []\<close>)
+    then show "decTrail2 w (e#es) (fst (hd (e#es))) (snd (last (e#es))) \<longrightarrow> decTrail G w (e#es)" 
+      by (simp add: \<open>es = []\<close>)
   next
-    assume "\<exists>y ys. xs = y # ys"
-    then obtain y ys where f0: "xs = y # ys" by blast
-    show "decTrail2 w (x#xs) (fst (hd (x#xs))) (snd (last (x#xs))) \<longrightarrow> decTrail G w (x#xs)" 
+    assume "\<exists>y ys. es = y # ys"
+    then obtain y ys where f0: "es = y # ys" by blast
+    show "decTrail2 w (e#es) (fst (hd (e#es))) (snd (last (e#es))) \<longrightarrow> decTrail G w (e#es)" 
     proof
-      assume a0: "decTrail2 w (x#xs) (fst (hd (x#xs))) (snd (last (x#xs)))"
-      then have f1: "decTrail2 w (x#xs) (fst x) (snd (last xs))" by (simp add: f0)
-      have "decTrail2 w (xs) (fst (hd (xs))) (snd (last (xs)))" 
+      assume a0: "decTrail2 w (e#es) (fst (hd (e#es))) (snd (last (e#es)))"
+      then have f1: "decTrail2 w (e#es) (fst e) (snd (last es))" by (simp add: f0)
+      have "decTrail2 w es (fst (hd (es))) (snd (last (es)))" 
         using a0 
         by (simp add: awalk_Cons_iff decTrail2_def f0)
-      then have "decTrail G w xs" using IH by auto
-      moreover have "w x > w y" using f0 f1 decTrail2_def 
+      then have "decTrail G w es" using IH by auto
+      moreover have "w e > w y" using f0 f1 decTrail2_def 
         by (simp add: decTrail2_def pair_wf_digraph_axioms)
-      moreover have "x \<in> parcs G" using f1 
+      moreover have "e \<in> parcs G" using f1 
         by (simp add: awalk_Cons_iff decTrail2_def)
-      moreover have "snd x = fst y" using f0 f1 decTrail2_def 
+      moreover have "snd e = fst y" using f0 f1 decTrail2_def 
         by (simp add: decTrail2_def awalk_Cons_iff)
-      ultimately show "decTrail G w (x#xs)" 
+      ultimately show "decTrail G w (e#es)" 
         by (simp add: f0)
     qed
   qed
@@ -1207,16 +1215,16 @@ qed(*>*)
   by (metis gr0_implies_Suc infinite_descent0 local.base local.step nat_induct)(*>*)
 
 (*<*)lemma aux_even_arcs:
-  shows "\<forall> E:: ('a\<times>'a) set. card E = k \<longrightarrow> (\<forall>e1 e2. (e1,e1) \<notin> E \<and> ((e1,e2) \<in> E \<longrightarrow> (e2,e1) \<in> E)) \<longrightarrow> even k" 
+  shows "\<forall> E:: ('a\<times>'a) set. card E = k \<longrightarrow> (\<forall>e\<^sub>1 e\<^sub>2. (e\<^sub>1,e\<^sub>1) \<notin> E \<and> ((e\<^sub>1,e\<^sub>2) \<in> E \<longrightarrow> (e\<^sub>2,e\<^sub>1) \<in> E)) \<longrightarrow> even k" 
 proof(rule strict_induct)
-  show "\<forall> E:: ('a\<times>'a) set. card E = 0 \<longrightarrow> (\<forall>e1 e2. (e1,e1) \<notin> E \<and> ((e1,e2) \<in> E \<longrightarrow> (e2,e1) \<in> E)) \<longrightarrow> even 0" by auto
+  show "\<forall> E:: ('a\<times>'a) set. card E = 0 \<longrightarrow> (\<forall>e\<^sub>1 e\<^sub>2. (e\<^sub>1,e\<^sub>1) \<notin> E \<and> ((e\<^sub>1,e\<^sub>2) \<in> E \<longrightarrow> (e\<^sub>2,e\<^sub>1) \<in> E)) \<longrightarrow> even 0" by auto
 next
   fix i 
-  assume IH: "(\<forall>j. j < Suc i \<longrightarrow> (\<forall> E:: ('a\<times>'a) set. card E = j \<longrightarrow> (\<forall>e1 e2. (e1,e1) \<notin> E \<and> ((e1,e2) \<in> E \<longrightarrow> (e2,e1) \<in> E)) \<longrightarrow> even j))" 
-  show "\<forall> E:: ('a\<times>'a) set. card E = Suc i \<longrightarrow> (\<forall>e1 e2. (e1,e1) \<notin> E \<and> ((e1,e2) \<in> E \<longrightarrow> (e2,e1) \<in> E)) \<longrightarrow> even (Suc i)"
+  assume IH: "(\<forall>j. j < Suc i \<longrightarrow> (\<forall> E:: ('a\<times>'a) set. card E = j \<longrightarrow> (\<forall>e\<^sub>1 e\<^sub>2. (e\<^sub>1,e\<^sub>1) \<notin> E \<and> ((e\<^sub>1,e\<^sub>2) \<in> E \<longrightarrow> (e\<^sub>2,e\<^sub>1) \<in> E)) \<longrightarrow> even j))" 
+  show "\<forall> E:: ('a\<times>'a) set. card E = Suc i \<longrightarrow> (\<forall>e\<^sub>1 e\<^sub>2. (e\<^sub>1,e\<^sub>1) \<notin> E \<and> ((e\<^sub>1,e\<^sub>2) \<in> E \<longrightarrow> (e\<^sub>2,e\<^sub>1) \<in> E)) \<longrightarrow> even (Suc i)"
   proof safe
     fix E :: "('a\<times>'a) set"
-    assume a0: "card E = Suc i" and a1: "(\<forall>e1 e2. (e1,e1) \<notin> E \<and> ((e1,e2) \<in> E \<longrightarrow> (e2,e1) \<in> E))"
+    assume a0: "card E = Suc i" and a1: "(\<forall>e\<^sub>1 e\<^sub>2. (e\<^sub>1,e\<^sub>1) \<notin> E \<and> ((e\<^sub>1,e\<^sub>2) \<in> E \<longrightarrow> (e\<^sub>2,e\<^sub>1) \<in> E))"
     show "even (Suc i)"
     proof(cases)
       assume a2: "i < 1" 
@@ -1232,21 +1240,21 @@ next
     next
       assume a2: "\<not>(i < 1)" 
       then have f0: "i \<ge> 1" by auto
-      then have IH2: "card E = i - 1 \<longrightarrow> (\<forall>e1 e2. (e1,e1) \<notin> E \<and> ((e1,e2) \<in> E \<longrightarrow> (e2,e1) \<in> E)) \<longrightarrow> even (i-1)" 
+      then have IH2: "card E = i - 1 \<longrightarrow> (\<forall>e\<^sub>1 e\<^sub>2. (e\<^sub>1,e\<^sub>1) \<notin> E \<and> ((e\<^sub>1,e\<^sub>2) \<in> E \<longrightarrow> (e\<^sub>2,e\<^sub>1) \<in> E)) \<longrightarrow> even (i-1)" 
         for E:: "('a\<times>'a) set" using IH diff_less_Suc by blast
       then obtain x1 x2 where "(x1,x2) \<in> E" 
         by (metis Suc_le_eq a0 card_empty card_mono finite.intros(1) gr_implies_not0 prod.collapse subset_eq)
       then have "(x2,x1) \<in> E" using a1 by blast
-      then have "card (E-{(x1,x2),(x2,x1)}) = i - 1 \<longrightarrow> (\<forall>e1 e2. (e1,e1) \<notin> (E-{(x1,x2),(x2,x1)}) \<and> ((e1,e2) \<in> (E-{(x1,x2),(x2,x1)}) \<longrightarrow> (e2,e1) \<in> (E-{(x1,x2),(x2,x1)}))) \<longrightarrow> even (i-1)"
+      then have "card (E-{(x1,x2),(x2,x1)}) = i - 1 \<longrightarrow> (\<forall>e\<^sub>1 e\<^sub>2. (e\<^sub>1,e\<^sub>1) \<notin> (E-{(x1,x2),(x2,x1)}) \<and> ((e\<^sub>1,e\<^sub>2) \<in> (E-{(x1,x2),(x2,x1)}) \<longrightarrow> (e\<^sub>2,e\<^sub>1) \<in> (E-{(x1,x2),(x2,x1)}))) \<longrightarrow> even (i-1)"
         using IH2[of "E-{(x1,x2),(x2,x1)}"] by auto
       moreover have "card (E-{(x1,x2),(x2,x1)}) = i - 1" 
         by (metis \<open>(x2, x1) \<in> E\<close> a0 a1 card_Diff_insert card_Diff_singleton card_infinite diff_Suc_1 empty_iff insert_iff nat.simps(3) snd_conv)
-      moreover have "(\<forall>e1 e2. (e1,e1) \<notin> (E-{(x1,x2),(x2,x1)}) \<and> ((e1,e2) \<in> (E-{(x1,x2),(x2,x1)}) \<longrightarrow> (e2,e1) \<in> (E-{(x1,x2),(x2,x1)})))" 
+      moreover have "(\<forall>e\<^sub>1 e\<^sub>2. (e\<^sub>1,e\<^sub>1) \<notin> (E-{(x1,x2),(x2,x1)}) \<and> ((e\<^sub>1,e\<^sub>2) \<in> (E-{(x1,x2),(x2,x1)}) \<longrightarrow> (e\<^sub>2,e\<^sub>1) \<in> (E-{(x1,x2),(x2,x1)})))" 
       proof (intro allI)
-        fix e1 e2
-        have "(e1,e1) \<notin> (E-{(x1,x2),(x2,x1)})" using a1 by blast
-        moreover have "((e1,e2) \<in> (E-{(x1,x2),(x2,x1)}) \<longrightarrow> (e2,e1) \<in> (E-{(x1,x2),(x2,x1)}))" using a1 by auto
-        ultimately show "(e1,e1) \<notin> (E-{(x1,x2),(x2,x1)}) \<and> ((e1,e2) \<in> (E-{(x1,x2),(x2,x1)}) \<longrightarrow> (e2,e1) \<in> (E-{(x1,x2),(x2,x1)}))" by auto
+        fix e\<^sub>1 e\<^sub>2
+        have "(e\<^sub>1,e\<^sub>1) \<notin> (E-{(x1,x2),(x2,x1)})" using a1 by blast
+        moreover have "((e\<^sub>1,e\<^sub>2) \<in> (E-{(x1,x2),(x2,x1)}) \<longrightarrow> (e\<^sub>2,e\<^sub>1) \<in> (E-{(x1,x2),(x2,x1)}))" using a1 by auto
+        ultimately show "(e\<^sub>1,e\<^sub>1) \<notin> (E-{(x1,x2),(x2,x1)}) \<and> ((e\<^sub>1,e\<^sub>2) \<in> (E-{(x1,x2),(x2,x1)}) \<longrightarrow> (e\<^sub>2,e\<^sub>1) \<in> (E-{(x1,x2),(x2,x1)}))" by auto
       qed
       ultimately have "even (i-1)" by auto
       then show "even (Suc i)" using a2 dvd_diffD1 even_Suc f0 by blast
@@ -1259,7 +1267,7 @@ lemma (in weighted_pair_graph) even_arcs:
 shows "even q"
 (*<*)proof-
   have "card (parcs G) = q" by simp
-  moreover have "(\<forall>e1 e2. (e1,e1) \<notin> (parcs G) \<and> ((e1,e2) \<in> (parcs G) \<longrightarrow> (e2,e1) \<in> (parcs G)))" 
+  moreover have "(\<forall>e\<^sub>1 e\<^sub>2. (e\<^sub>1,e\<^sub>1) \<notin> (parcs G) \<and> ((e\<^sub>1,e\<^sub>2) \<in> (parcs G) \<longrightarrow> (e\<^sub>2,e\<^sub>1) \<in> (parcs G)))" 
     using adj_not_same graph_symmetric by blast
   ultimately show "even q" 
     using aux_even_arcs by blast
@@ -1284,8 +1292,8 @@ distinctiveness is not wished for. On the other hand, 0 might not be available a
 
 locale distinct_weighted_pair_graph = weighted_pair_graph + (*TODO: RENAME*)
   assumes zero: "\<forall> v\<^sub>1 v\<^sub>2. (v\<^sub>1,v\<^sub>2) \<notin> parcs G \<longleftrightarrow> w (v\<^sub>1,v\<^sub>2) = 0"
-      and distinct: "\<forall> (v\<^sub>1,v\<^sub>2) \<in> parcs G. \<forall> (u1,u2) \<in> parcs G. 
-      ((v\<^sub>1 = u2 \<and> v\<^sub>2 = u1) \<or> (v\<^sub>1 = u1 \<and> v\<^sub>2 = u2)) \<longleftrightarrow> w (v\<^sub>1,v\<^sub>2) = w (u1,u2)" 
+      and distinct: "\<forall> (v\<^sub>1,v\<^sub>2) \<in> parcs G. \<forall> (u\<^sub>1,u\<^sub>2) \<in> parcs G. 
+      ((v\<^sub>1 = u\<^sub>2 \<and> v\<^sub>2 = u\<^sub>1) \<or> (v\<^sub>1 = u\<^sub>1 \<and> v\<^sub>2 = u\<^sub>2)) \<longleftrightarrow> w (v\<^sub>1,v\<^sub>2) = w (u\<^sub>1,u\<^sub>2)" 
 
 (*<*)context distinct_weighted_pair_graph
 begin
@@ -1319,8 +1327,8 @@ lemma weight_not_zero_implies_arc [simp]:
   using assms dom zero by blast
 
 lemma weight_unique:
-  assumes "w (v\<^sub>1,v\<^sub>2) = k" and "(v\<^sub>1,v\<^sub>2) \<noteq> (u1,u2)" and "(v\<^sub>1,v\<^sub>2) \<noteq> (u2,u1)" and "k \<noteq> 0" and "distinct"
-  shows "w (u1,u2) \<noteq> k" 
+  assumes "w (v\<^sub>1,v\<^sub>2) = k" and "(v\<^sub>1,v\<^sub>2) \<noteq> (u\<^sub>1,u\<^sub>2)" and "(v\<^sub>1,v\<^sub>2) \<noteq> (u\<^sub>2,u\<^sub>1)" and "k \<noteq> 0" and "distinct"
+  shows "w (u\<^sub>1,u\<^sub>2) \<noteq> k" 
 proof-
   have "(v\<^sub>1, v\<^sub>2) \<in> parcs G" using assms weight_not_zero_implies_arc by auto
   then show ?thesis 
