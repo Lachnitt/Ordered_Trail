@@ -972,23 +972,23 @@ next
 qed(*>*)
 
 (*<*)lemma(in pair_sym_digraph) decTrail_implies_rev_incTrail:
-  assumes "\<forall> x1 x2. w (x1,x2) = w(x2,x1)" 
-  shows "decTrail G w xs \<longrightarrow> incTrail G w (rev (map (\<lambda>(x1,x2). (x2,x1)) xs))"
+  assumes "\<forall> x\<^sub>1 x\<^sub>2. w (x\<^sub>1,x\<^sub>2) = w(x\<^sub>2,x\<^sub>1)" 
+  shows "decTrail G w xs \<longrightarrow> incTrail G w (rev (map (\<lambda>(x\<^sub>1,x\<^sub>2). (x\<^sub>2,x\<^sub>1)) xs))"
 proof(induction xs)
-  show "decTrail G w [] \<longrightarrow> incTrail G w (rev (map (\<lambda>(x1,x2). (x2,x1)) []))" by auto
+  show "decTrail G w [] \<longrightarrow> incTrail G w (rev (map (\<lambda>(x\<^sub>1,x\<^sub>2). (x\<^sub>2,x\<^sub>1)) []))" by auto
 next
   fix x xs
-  assume IH: "decTrail G w xs \<longrightarrow> incTrail G w (rev (map (\<lambda>(x1,x2). (x2,x1)) xs))"
-  show "decTrail G w (x#xs) \<longrightarrow> incTrail G w (rev (map (\<lambda>(x1,x2). (x2,x1)) (x#xs)))"
+  assume IH: "decTrail G w xs \<longrightarrow> incTrail G w (rev (map (\<lambda>(x\<^sub>1,x\<^sub>2). (x\<^sub>2,x\<^sub>1)) xs))"
+  show "decTrail G w (x#xs) \<longrightarrow> incTrail G w (rev (map (\<lambda>(x\<^sub>1,x\<^sub>2). (x\<^sub>2,x\<^sub>1)) (x#xs)))"
   proof
     assume a0: "decTrail G w (x#xs)"
-    show "incTrail G w (rev (map (\<lambda>(x1,x2). (x2,x1)) (x#xs)))"
+    show "incTrail G w (rev (map (\<lambda>(x\<^sub>1,x\<^sub>2). (x\<^sub>2,x\<^sub>1)) (x#xs)))"
     proof(rule disjE)
       show "length xs = 0 \<or> length xs \<ge> 1" 
         using not_less by auto
     next
       assume "length xs = 0"
-      then show "incTrail G w (rev (map (\<lambda>(x1,x2). (x2,x1)) (x#xs)))"
+      then show "incTrail G w (rev (map (\<lambda>(x\<^sub>1,x\<^sub>2). (x\<^sub>2,x\<^sub>1)) (x#xs)))"
         using a0 arcs_symmetric
         by (metis (mono_tags, lifting) decTrail.simps(2) in_arcs_imp_in_arcs_ends incTrail.simps(2) length_0_conv list.map_disc_iff list.simps(9) prod.case_eq_if singleton_rev_conv)
     next
@@ -997,54 +997,54 @@ next
         by (metis One_nat_def Suc_le_length_iff) 
       then have f1: "w x > w y \<and> x \<in> parcs G \<and> snd x = fst y \<and> decTrail G w (y#ys)" 
         by (metis a0 decTrail.simps(3))
-      then have "incTrail G w (rev (map (\<lambda>(x1,x2). (x2,x1)) xs))" using IH by (simp add: \<open>xs = y # ys\<close>)
-      moreover have "1 \<le> length (rev (map (\<lambda>(x1, x2). (x2, x1)) xs))" 
+      then have "incTrail G w (rev (map (\<lambda>(x\<^sub>1,x\<^sub>2). (x\<^sub>2,x\<^sub>1)) xs))" using IH by (simp add: \<open>xs = y # ys\<close>)
+      moreover have "1 \<le> length (rev (map (\<lambda>(x\<^sub>1, x\<^sub>2). (x\<^sub>2, x\<^sub>1)) xs))" 
         using a1 by auto
-      moreover have "w (last (rev (map (\<lambda>(x1, x2). (x2, x1)) xs))) < w (snd x, fst x)" 
+      moreover have "w (last (rev (map (\<lambda>(x\<^sub>1, x\<^sub>2). (x\<^sub>2, x\<^sub>1)) xs))) < w (snd x, fst x)" 
       proof-
-        have "(last (rev (map (\<lambda>(x1, x2). (x2, x1)) xs))) = (snd y, fst y)" 
+        have "(last (rev (map (\<lambda>(x\<^sub>1, x\<^sub>2). (x\<^sub>2, x\<^sub>1)) xs))) = (snd y, fst y)" 
           by (simp add: \<open>xs = y # ys\<close> case_prod_beta')
         moreover have "w y = w (snd y, fst y)" using arcs_symmetric assms by simp
         ultimately show ?thesis using f1 by (metis assms prod.collapse)
       qed
-      moreover have "snd x = snd (last (rev (map (\<lambda>(x1, x2). (x2, x1)) xs)))"           
+      moreover have "snd x = snd (last (rev (map (\<lambda>(x\<^sub>1, x\<^sub>2). (x\<^sub>2, x\<^sub>1)) xs)))"           
         by (simp add: \<open>xs = y # ys\<close> f1 case_prod_beta')
       moreover have "(snd x, fst x) \<in> parcs G" 
         using arcs_symmetric f1 in_arcs_imp_in_arcs_ends by blast
-      ultimately have "incTrail G w (rev (map (\<lambda>(x1,x2). (x2,x1)) xs) @ [(snd x, fst x)])" 
-        using IH incTrail_append[of G w "(rev (map (\<lambda>(x1,x2). (x2,x1)) xs))" "snd x" "fst x"] by auto
-      moreover have "[(snd x, fst x)] = map (\<lambda>(x1,x2). (x2,x1)) [(fst x, snd x)]" 
+      ultimately have "incTrail G w (rev (map (\<lambda>(x\<^sub>1,x\<^sub>2). (x\<^sub>2,x\<^sub>1)) xs) @ [(snd x, fst x)])" 
+        using IH incTrail_append[of G w "(rev (map (\<lambda>(x\<^sub>1,x\<^sub>2). (x\<^sub>2,x\<^sub>1)) xs))" "snd x" "fst x"] by auto
+      moreover have "[(snd x, fst x)] = map (\<lambda>(x\<^sub>1,x\<^sub>2). (x\<^sub>2,x\<^sub>1)) [(fst x, snd x)]" 
         by (metis case_prod_conv list.simps(8) list.simps(9))
       moreover have "[(fst x, snd x)] = [x]" by simp
-      moreover have "rev (map (\<lambda>(x1,x2). (x2,x1)) xs) @ (map (\<lambda>(x1,x2). (x2,x1)) [x])
-                   = rev ((map (\<lambda>(x1,x2). (x2,x1)) (x#xs)))"
+      moreover have "rev (map (\<lambda>(x\<^sub>1,x\<^sub>2). (x\<^sub>2,x\<^sub>1)) xs) @ (map (\<lambda>(x\<^sub>1,x\<^sub>2). (x\<^sub>2,x\<^sub>1)) [x])
+                   = rev ((map (\<lambda>(x\<^sub>1,x\<^sub>2). (x\<^sub>2,x\<^sub>1)) (x#xs)))"
         by simp
-      ultimately show "incTrail G w (rev (map (\<lambda>(x1,x2). (x2,x1)) (x#xs)))" 
+      ultimately show "incTrail G w (rev (map (\<lambda>(x\<^sub>1,x\<^sub>2). (x\<^sub>2,x\<^sub>1)) (x#xs)))" 
         by auto
     qed
   qed
 qed(*>*)
 
 (*<*)lemma(in pair_sym_digraph) incTrail_implies_rev_decTrail:
-  assumes "\<forall> x1 x2. w (x1,x2) = w(x2,x1)" 
-  shows "\<forall>xs. length xs = k \<longrightarrow> incTrail G w (rev (map (\<lambda>(x1,x2). (x2,x1)) xs)) \<longrightarrow> decTrail G w xs"
+  assumes "\<forall> x\<^sub>1 x\<^sub>2. w (x\<^sub>1,x\<^sub>2) = w(x\<^sub>2,x\<^sub>1)" 
+  shows "\<forall>xs. length xs = k \<longrightarrow> incTrail G w (rev (map (\<lambda>(x\<^sub>1,x\<^sub>2). (x\<^sub>2,x\<^sub>1)) xs)) \<longrightarrow> decTrail G w xs"
 proof(induction k)
-  show "\<forall>xs. length xs = 0 \<longrightarrow> incTrail G w (rev (map (\<lambda>(x1,x2). (x2,x1)) xs)) \<longrightarrow> decTrail G w xs" by auto
+  show "\<forall>xs. length xs = 0 \<longrightarrow> incTrail G w (rev (map (\<lambda>(x\<^sub>1,x\<^sub>2). (x\<^sub>2,x\<^sub>1)) xs)) \<longrightarrow> decTrail G w xs" by auto
 next
   fix k
-  assume IH: "\<forall>xs. length xs = k \<longrightarrow> incTrail G w (rev (map (\<lambda>(x1,x2). (x2,x1)) xs)) \<longrightarrow> decTrail G w xs"
-  show "\<forall>xs. length xs = Suc k \<longrightarrow> incTrail G w (rev (map (\<lambda>(x1,x2). (x2,x1)) xs)) \<longrightarrow> decTrail G w xs"
+  assume IH: "\<forall>xs. length xs = k \<longrightarrow> incTrail G w (rev (map (\<lambda>(x\<^sub>1,x\<^sub>2). (x\<^sub>2,x\<^sub>1)) xs)) \<longrightarrow> decTrail G w xs"
+  show "\<forall>xs. length xs = Suc k \<longrightarrow> incTrail G w (rev (map (\<lambda>(x\<^sub>1,x\<^sub>2). (x\<^sub>2,x\<^sub>1)) xs)) \<longrightarrow> decTrail G w xs"
   proof(rule allI, rule impI, rule impI)
     fix xs
-    assume a0: "length xs = Suc k" and a1: "incTrail G w (rev (map (\<lambda>(x1,x2). (x2,x1)) xs))"
+    assume a0: "length xs = Suc k" and a1: "incTrail G w (rev (map (\<lambda>(x\<^sub>1,x\<^sub>2). (x\<^sub>2,x\<^sub>1)) xs))"
     obtain y ys where f0: "xs = ys @ [y]" 
       by (metis a0 append_Nil2 append_eq_conv_conj lessI take_hd_drop)
-    then have "incTrail G w (rev (map (\<lambda>(x1,x2). (x2,x1)) (ys@[y])))" using a1 by auto
-    then have f1: "incTrail G w ((snd y,fst y) # rev (map (\<lambda>(x1,x2). (x2,x1)) ys))" 
+    then have "incTrail G w (rev (map (\<lambda>(x\<^sub>1,x\<^sub>2). (x\<^sub>2,x\<^sub>1)) (ys@[y])))" using a1 by auto
+    then have f1: "incTrail G w ((snd y,fst y) # rev (map (\<lambda>(x\<^sub>1,x\<^sub>2). (x\<^sub>2,x\<^sub>1)) ys))" 
       by (simp add: prod.case_eq_if) 
-    moreover have "drop 1 ((snd y,fst y) # rev (map (\<lambda>(x1,x2). (x2,x1)) ys)) = rev (map (\<lambda>(x1,x2). (x2,x1)) ys)" by simp 
-    ultimately have "incTrail G w (rev (map (\<lambda>(x1,x2). (x2,x1)) ys))" using incTrail_subtrail by metis
-    moreover have "length (rev (map (\<lambda>(x1,x2). (x2,x1)) ys)) = k" 
+    moreover have "drop 1 ((snd y,fst y) # rev (map (\<lambda>(x\<^sub>1,x\<^sub>2). (x\<^sub>2,x\<^sub>1)) ys)) = rev (map (\<lambda>(x\<^sub>1,x\<^sub>2). (x\<^sub>2,x\<^sub>1)) ys)" by simp 
+    ultimately have "incTrail G w (rev (map (\<lambda>(x\<^sub>1,x\<^sub>2). (x\<^sub>2,x\<^sub>1)) ys))" using incTrail_subtrail by metis
+    moreover have "length (rev (map (\<lambda>(x\<^sub>1,x\<^sub>2). (x\<^sub>2,x\<^sub>1)) ys)) = k" 
       using a0 f0 by auto 
     ultimately have "decTrail G w ys" using IH by auto
     show "decTrail G w xs"
@@ -1058,13 +1058,13 @@ next
       assume a2: "length ys \<ge> 1" 
       then obtain z zs where f2: "ys = zs @ [z]" 
         by (metis le_numeral_extra(2) length_0_conv rev_exhaust)
-      moreover have "rev (map (\<lambda>(x1,x2). (x2,x1)) ys) = rev (map (\<lambda>(x1,x2). (x2,x1)) (zs@[z]))" using f2 by auto
-      moreover have "rev (map (\<lambda>(x1,x2). (x2,x1)) (zs@[z])) = (snd z, fst z) # rev (map (\<lambda>(x1,x2). (x2,x1)) zs)" by (simp add: prod.case_eq_if) 
-      ultimately have "incTrail G w ((snd y,fst y) # (snd z, fst z) # rev (map (\<lambda>(x1,x2). (x2,x1)) zs))" 
+      moreover have "rev (map (\<lambda>(x\<^sub>1,x\<^sub>2). (x\<^sub>2,x\<^sub>1)) ys) = rev (map (\<lambda>(x\<^sub>1,x\<^sub>2). (x\<^sub>2,x\<^sub>1)) (zs@[z]))" using f2 by auto
+      moreover have "rev (map (\<lambda>(x\<^sub>1,x\<^sub>2). (x\<^sub>2,x\<^sub>1)) (zs@[z])) = (snd z, fst z) # rev (map (\<lambda>(x\<^sub>1,x\<^sub>2). (x\<^sub>2,x\<^sub>1)) zs)" by (simp add: prod.case_eq_if) 
+      ultimately have "incTrail G w ((snd y,fst y) # (snd z, fst z) # rev (map (\<lambda>(x\<^sub>1,x\<^sub>2). (x\<^sub>2,x\<^sub>1)) zs))" 
         using f1 by auto
       then have t3: "w (snd y,fst y) < w (snd z, fst z) \<and> (snd y,fst y) \<in> parcs G \<and> snd (snd y,fst y) = fst (snd z, fst z)"
         using f1 a2 f2 by (meson incTrail.simps(3))
-      moreover have "(hd (rev (map (\<lambda>(x1,x2). (x2,x1)) ys))) = (snd z,fst z)" 
+      moreover have "(hd (rev (map (\<lambda>(x\<^sub>1,x\<^sub>2). (x\<^sub>2,x\<^sub>1)) ys))) = (snd z,fst z)" 
         by (simp add: f2 case_prod_beta')
       moreover have "w (fst y, snd y) < w (last ys)" 
         by (metis assms f2 last_snoc prod.collapse t3)
@@ -1099,17 +1099,17 @@ lemma(in pair_sym_digraph) incTrail_eq_rev_decTrail:
   assumes "\<forall> v\<^sub>1 v\<^sub>2. w (v\<^sub>1,v\<^sub>2) = w(v\<^sub>2,v\<^sub>1)" 
   shows "incTrail G w es \<longleftrightarrow> decTrail G w (rev (map (\<lambda>(v\<^sub>1,v\<^sub>2). (v\<^sub>2,v\<^sub>1)) es))"
 (*<*)proof-
-  have "decTrail G w (rev (map (\<lambda>(x1,x2). (x2,x1)) es)) \<longleftrightarrow> incTrail G w (rev (map (\<lambda>(x1,x2). (x2,x1)) (rev (map (\<lambda>(x1,x2). (x2,x1)) es))))"
+  have "decTrail G w (rev (map (\<lambda>(x\<^sub>1,x\<^sub>2). (x\<^sub>2,x\<^sub>1)) es)) \<longleftrightarrow> incTrail G w (rev (map (\<lambda>(x\<^sub>1,x\<^sub>2). (x\<^sub>2,x\<^sub>1)) (rev (map (\<lambda>(x\<^sub>1,x\<^sub>2). (x\<^sub>2,x\<^sub>1)) es))))"
     using assms decTrail_implies_rev_incTrail incTrail_implies_rev_decTrail by blast
-  moreover have "(rev (map (\<lambda>(x1,x2). (x2,x1)) (rev (map (\<lambda>(x1,x2). (x2,x1)) es)))) = es" 
+  moreover have "(rev (map (\<lambda>(x\<^sub>1,x\<^sub>2). (x\<^sub>2,x\<^sub>1)) (rev (map (\<lambda>(x\<^sub>1,x\<^sub>2). (x\<^sub>2,x\<^sub>1)) es)))) = es" 
   proof-
-    have "(rev (map (\<lambda>(x1,x2). (x2,x1)) (rev (map (\<lambda>(x1,x2). (x2,x1)) es)))) = (map (\<lambda>(x1,x2). (x2,x1)) (rev (rev (map (\<lambda>(x1,x2). (x2,x1)) es))))" 
+    have "(rev (map (\<lambda>(x\<^sub>1,x\<^sub>2). (x\<^sub>2,x\<^sub>1)) (rev (map (\<lambda>(x\<^sub>1,x\<^sub>2). (x\<^sub>2,x\<^sub>1)) es)))) = (map (\<lambda>(x\<^sub>1,x\<^sub>2). (x\<^sub>2,x\<^sub>1)) (rev (rev (map (\<lambda>(x\<^sub>1,x\<^sub>2). (x\<^sub>2,x\<^sub>1)) es))))" 
       using rev_map by blast
-    moreover have "(\<lambda>(x1,x2). (x2,x1)) \<circ> (\<lambda>(x1,x2). (x2,x1)) = id " by auto 
+    moreover have "(\<lambda>(x\<^sub>1,x\<^sub>2). (x\<^sub>2,x\<^sub>1)) \<circ> (\<lambda>(x\<^sub>1,x\<^sub>2). (x\<^sub>2,x\<^sub>1)) = id " by auto 
     ultimately show ?thesis 
-      by (simp add: \<open>(\<lambda>(x1, x2). (x2, x1)) \<circ> (\<lambda>(x1, x2). (x2, x1)) = id\<close>)
+      by (simp add: \<open>(\<lambda>(x\<^sub>1, x\<^sub>2). (x\<^sub>2, x\<^sub>1)) \<circ> (\<lambda>(x\<^sub>1, x\<^sub>2). (x\<^sub>2, x\<^sub>1)) = id\<close>)
   qed
-  ultimately show "incTrail G w es \<longleftrightarrow> decTrail G w (rev (map (\<lambda>(x1,x2). (x2,x1)) es))"
+  ultimately show "incTrail G w es \<longleftrightarrow> decTrail G w (rev (map (\<lambda>(x\<^sub>1,x\<^sub>2). (x\<^sub>2,x\<^sub>1)) es))"
     by auto
 qed(*>*)
 
@@ -1229,9 +1229,9 @@ next
     proof(cases)
       assume a2: "i < 1" 
       then have "i = 0" by blast
-      then obtain x1 x2 where f0: "E = {(x1,x2)}" 
+      then obtain x\<^sub>1 x\<^sub>2 where f0: "E = {(x\<^sub>1,x\<^sub>2)}" 
         using a0 card_1_singletonE by fastforce
-      then have "(x2,x1) \<in> E" 
+      then have "(x\<^sub>2,x\<^sub>1) \<in> E" 
         using a1 by auto
       then have "card E \<ge> 2" 
         using f0 a1 by blast 
@@ -1242,19 +1242,19 @@ next
       then have f0: "i \<ge> 1" by auto
       then have IH2: "card E = i - 1 \<longrightarrow> (\<forall>e\<^sub>1 e\<^sub>2. (e\<^sub>1,e\<^sub>1) \<notin> E \<and> ((e\<^sub>1,e\<^sub>2) \<in> E \<longrightarrow> (e\<^sub>2,e\<^sub>1) \<in> E)) \<longrightarrow> even (i-1)" 
         for E:: "('a\<times>'a) set" using IH diff_less_Suc by blast
-      then obtain x1 x2 where "(x1,x2) \<in> E" 
+      then obtain x\<^sub>1 x\<^sub>2 where "(x\<^sub>1,x\<^sub>2) \<in> E" 
         by (metis Suc_le_eq a0 card_empty card_mono finite.intros(1) gr_implies_not0 prod.collapse subset_eq)
-      then have "(x2,x1) \<in> E" using a1 by blast
-      then have "card (E-{(x1,x2),(x2,x1)}) = i - 1 \<longrightarrow> (\<forall>e\<^sub>1 e\<^sub>2. (e\<^sub>1,e\<^sub>1) \<notin> (E-{(x1,x2),(x2,x1)}) \<and> ((e\<^sub>1,e\<^sub>2) \<in> (E-{(x1,x2),(x2,x1)}) \<longrightarrow> (e\<^sub>2,e\<^sub>1) \<in> (E-{(x1,x2),(x2,x1)}))) \<longrightarrow> even (i-1)"
-        using IH2[of "E-{(x1,x2),(x2,x1)}"] by auto
-      moreover have "card (E-{(x1,x2),(x2,x1)}) = i - 1" 
-        by (metis \<open>(x2, x1) \<in> E\<close> a0 a1 card_Diff_insert card_Diff_singleton card_infinite diff_Suc_1 empty_iff insert_iff nat.simps(3) snd_conv)
-      moreover have "(\<forall>e\<^sub>1 e\<^sub>2. (e\<^sub>1,e\<^sub>1) \<notin> (E-{(x1,x2),(x2,x1)}) \<and> ((e\<^sub>1,e\<^sub>2) \<in> (E-{(x1,x2),(x2,x1)}) \<longrightarrow> (e\<^sub>2,e\<^sub>1) \<in> (E-{(x1,x2),(x2,x1)})))" 
+      then have "(x\<^sub>2,x\<^sub>1) \<in> E" using a1 by blast
+      then have "card (E-{(x\<^sub>1,x\<^sub>2),(x\<^sub>2,x\<^sub>1)}) = i - 1 \<longrightarrow> (\<forall>e\<^sub>1 e\<^sub>2. (e\<^sub>1,e\<^sub>1) \<notin> (E-{(x\<^sub>1,x\<^sub>2),(x\<^sub>2,x\<^sub>1)}) \<and> ((e\<^sub>1,e\<^sub>2) \<in> (E-{(x\<^sub>1,x\<^sub>2),(x\<^sub>2,x\<^sub>1)}) \<longrightarrow> (e\<^sub>2,e\<^sub>1) \<in> (E-{(x\<^sub>1,x\<^sub>2),(x\<^sub>2,x\<^sub>1)}))) \<longrightarrow> even (i-1)"
+        using IH2[of "E-{(x\<^sub>1,x\<^sub>2),(x\<^sub>2,x\<^sub>1)}"] by auto
+      moreover have "card (E-{(x\<^sub>1,x\<^sub>2),(x\<^sub>2,x\<^sub>1)}) = i - 1" 
+        by (metis \<open>(x\<^sub>2, x\<^sub>1) \<in> E\<close> a0 a1 card_Diff_insert card_Diff_singleton card_infinite diff_Suc_1 empty_iff insert_iff nat.simps(3) snd_conv)
+      moreover have "(\<forall>e\<^sub>1 e\<^sub>2. (e\<^sub>1,e\<^sub>1) \<notin> (E-{(x\<^sub>1,x\<^sub>2),(x\<^sub>2,x\<^sub>1)}) \<and> ((e\<^sub>1,e\<^sub>2) \<in> (E-{(x\<^sub>1,x\<^sub>2),(x\<^sub>2,x\<^sub>1)}) \<longrightarrow> (e\<^sub>2,e\<^sub>1) \<in> (E-{(x\<^sub>1,x\<^sub>2),(x\<^sub>2,x\<^sub>1)})))" 
       proof (intro allI)
         fix e\<^sub>1 e\<^sub>2
-        have "(e\<^sub>1,e\<^sub>1) \<notin> (E-{(x1,x2),(x2,x1)})" using a1 by blast
-        moreover have "((e\<^sub>1,e\<^sub>2) \<in> (E-{(x1,x2),(x2,x1)}) \<longrightarrow> (e\<^sub>2,e\<^sub>1) \<in> (E-{(x1,x2),(x2,x1)}))" using a1 by auto
-        ultimately show "(e\<^sub>1,e\<^sub>1) \<notin> (E-{(x1,x2),(x2,x1)}) \<and> ((e\<^sub>1,e\<^sub>2) \<in> (E-{(x1,x2),(x2,x1)}) \<longrightarrow> (e\<^sub>2,e\<^sub>1) \<in> (E-{(x1,x2),(x2,x1)}))" by auto
+        have "(e\<^sub>1,e\<^sub>1) \<notin> (E-{(x\<^sub>1,x\<^sub>2),(x\<^sub>2,x\<^sub>1)})" using a1 by blast
+        moreover have "((e\<^sub>1,e\<^sub>2) \<in> (E-{(x\<^sub>1,x\<^sub>2),(x\<^sub>2,x\<^sub>1)}) \<longrightarrow> (e\<^sub>2,e\<^sub>1) \<in> (E-{(x\<^sub>1,x\<^sub>2),(x\<^sub>2,x\<^sub>1)}))" using a1 by auto
+        ultimately show "(e\<^sub>1,e\<^sub>1) \<notin> (E-{(x\<^sub>1,x\<^sub>2),(x\<^sub>2,x\<^sub>1)}) \<and> ((e\<^sub>1,e\<^sub>2) \<in> (E-{(x\<^sub>1,x\<^sub>2),(x\<^sub>2,x\<^sub>1)}) \<longrightarrow> (e\<^sub>2,e\<^sub>1) \<in> (E-{(x\<^sub>1,x\<^sub>2),(x\<^sub>2,x\<^sub>1)}))" by auto
       qed
       ultimately have "even (i-1)" by auto
       then show "even (Suc i)" using a2 dvd_diffD1 even_Suc f0 by blast
@@ -1299,7 +1299,7 @@ locale distinct_weighted_pair_graph = weighted_pair_graph + (*TODO: RENAME*)
 begin
 
 abbreviation(in weighted_pair_graph) surjective where
-"surjective \<equiv> (\<forall>y \<in> W. \<exists>(x1,x2) \<in> (parcs G). w (x1,x2) = y)"
+"surjective \<equiv> (\<forall>y \<in> W. \<exists>(x\<^sub>1,x\<^sub>2) \<in> (parcs G). w (x\<^sub>1,x\<^sub>2) = y)"
 
 abbreviation(in weighted_pair_graph) distinct where 
 "distinct \<equiv> \<forall> (x,y) \<in> parcs G. \<forall> (z,a) \<in> parcs G. 
@@ -1371,74 +1371,74 @@ next
         using a2 by force
     next
       assume a0b: "i \<ge> 1" 
-    then have "\<exists>x1 x2. (x1,x2) \<in> A \<and> (x2,x1) \<in> A" 
+    then have "\<exists>x\<^sub>1 x\<^sub>2. (x\<^sub>1,x\<^sub>2) \<in> A \<and> (x\<^sub>2,x\<^sub>1) \<in> A" 
       by (metis One_nat_def Suc_n_not_le_n a0b a2 card.empty card_insert_disjoint card_le_Suc_iff equals0I le_eq_less_or_eq order.trans prod.collapse)
-    then obtain x1 x2 where f0: "(x1,x2) \<in> A \<and> x1 < x2" by (metis a3 neqE)
-    then have "finite (A-{(x1,x2),(x2,x1)})" by (simp add: a1)
-    moreover have "card (A-{(x1,x2),(x2,x1)}) = i - 2" 
+    then obtain x\<^sub>1 x\<^sub>2 where f0: "(x\<^sub>1,x\<^sub>2) \<in> A \<and> x\<^sub>1 < x\<^sub>2" by (metis a3 neqE)
+    then have "finite (A-{(x\<^sub>1,x\<^sub>2),(x\<^sub>2,x\<^sub>1)})" by (simp add: a1)
+    moreover have "card (A-{(x\<^sub>1,x\<^sub>2),(x\<^sub>2,x\<^sub>1)}) = i - 2" 
       using a1 a4 f0 a0 
       by (smt Diff_empty Suc_1 a2 card_Diff_insert diff_Suc_eq_diff_pred insert_absorb insert_iff insert_not_empty prod.inject)
-    moreover have "(\<forall>y. (y,y) \<notin> (A-{(x1,x2),(x2,x1)}))" 
+    moreover have "(\<forall>y. (y,y) \<notin> (A-{(x\<^sub>1,x\<^sub>2),(x\<^sub>2,x\<^sub>1)}))" 
       using a3 by auto
-    moreover have "(\<forall>x y. (x,y) \<in> (A-{(x1,x2),(x2,x1)}) \<longrightarrow> (y,x) \<in> (A-{(x1,x2),(x2,x1)}))" 
+    moreover have "(\<forall>x y. (x,y) \<in> (A-{(x\<^sub>1,x\<^sub>2),(x\<^sub>2,x\<^sub>1)}) \<longrightarrow> (y,x) \<in> (A-{(x\<^sub>1,x\<^sub>2),(x\<^sub>2,x\<^sub>1)}))" 
       using a4 by auto 
-    ultimately have "card {(p1,p2). (p1,p2) \<in> (A-{(x1,x2),(x2,x1)}) \<and> p2 < p1} = (i - 2) div 2" 
-      using IH2[of "i-2" "(A-{(x1,x2),(x2,x1)})"] 
+    ultimately have "card {(p1,p2). (p1,p2) \<in> (A-{(x\<^sub>1,x\<^sub>2),(x\<^sub>2,x\<^sub>1)}) \<and> p2 < p1} = (i - 2) div 2" 
+      using IH2[of "i-2" "(A-{(x\<^sub>1,x\<^sub>2),(x\<^sub>2,x\<^sub>1)})"] 
       by (metis (no_types, lifting) Suc_1 Suc_diff_Suc Suc_leD a0 a0b a2 aux_even_arcs card_Suc_Diff1 diff_Suc_1 f0 le_Suc_eq le_eq_less_or_eq odd_one)
-    then have f1: "card {(p1,p2). (p1,p2) \<in> (A-{(x1,x2),(x2,x1)}) \<and> p2 < p1} = i div 2 - 1" 
+    then have f1: "card {(p1,p2). (p1,p2) \<in> (A-{(x\<^sub>1,x\<^sub>2),(x\<^sub>2,x\<^sub>1)}) \<and> p2 < p1} = i div 2 - 1" 
       using plus_1_eq_Suc by linarith
-    moreover have f2: "{(p1,p2). (p1,p2) \<in> {(x1,x2),(x2,x1)} \<and> p2 < p1} = {(x2,x1)}" 
+    moreover have f2: "{(p1,p2). (p1,p2) \<in> {(x\<^sub>1,x\<^sub>2),(x\<^sub>2,x\<^sub>1)} \<and> p2 < p1} = {(x\<^sub>2,x\<^sub>1)}" 
     proof
-      show "{(p1, p2). (p1, p2) \<in> {(x1, x2), (x2, x1)} \<and> p2 < p1} \<subseteq> {(x2, x1)}"
+      show "{(p1, p2). (p1, p2) \<in> {(x\<^sub>1, x\<^sub>2), (x\<^sub>2, x\<^sub>1)} \<and> p2 < p1} \<subseteq> {(x\<^sub>2, x\<^sub>1)}"
       proof
         fix x 
-        assume "x \<in> {(p1, p2). (p1, p2) \<in> {(x1, x2), (x2, x1)} \<and> p2 < p1}"
-        then have "x = (x2,x1)" 
+        assume "x \<in> {(p1, p2). (p1, p2) \<in> {(x\<^sub>1, x\<^sub>2), (x\<^sub>2, x\<^sub>1)} \<and> p2 < p1}"
+        then have "x = (x\<^sub>2,x\<^sub>1)" 
           using f0 by auto
-        then show "x \<in> {(x2, x1)}" by auto
+        then show "x \<in> {(x\<^sub>2, x\<^sub>1)}" by auto
       qed
-      show "{(x2,x1)} \<subseteq> {(p1, p2). (p1, p2) \<in> {(x1, x2), (x2, x1)} \<and> p2 < p1}" 
+      show "{(x\<^sub>2,x\<^sub>1)} \<subseteq> {(p1, p2). (p1, p2) \<in> {(x\<^sub>1, x\<^sub>2), (x\<^sub>2, x\<^sub>1)} \<and> p2 < p1}" 
         by (simp add: f0)
     qed
     moreover have "card {(p1,p2). (p1,p2) \<in> A \<and> p2 < p1} 
-                 = card {(p1,p2). (p1,p2) \<in> (A-{(x1,x2),(x2,x1)}) \<and> p2 < p1} + card {(p1,p2). (p1,p2) \<in> {(x1,x2),(x2,x1)} \<and> p2 < p1}"
+                 = card {(p1,p2). (p1,p2) \<in> (A-{(x\<^sub>1,x\<^sub>2),(x\<^sub>2,x\<^sub>1)}) \<and> p2 < p1} + card {(p1,p2). (p1,p2) \<in> {(x\<^sub>1,x\<^sub>2),(x\<^sub>2,x\<^sub>1)} \<and> p2 < p1}"
     proof-
       have "{(p1,p2). (p1,p2) \<in> A \<and> p2 < p1}  
-          = {(p1,p2). (p1,p2) \<in> (A-{(x1,x2),(x2,x1)}) \<and> p2 < p1} \<union> {(p1,p2). (p1,p2) \<in> {(x1,x2),(x2,x1)} \<and> p2 < p1}" 
+          = {(p1,p2). (p1,p2) \<in> (A-{(x\<^sub>1,x\<^sub>2),(x\<^sub>2,x\<^sub>1)}) \<and> p2 < p1} \<union> {(p1,p2). (p1,p2) \<in> {(x\<^sub>1,x\<^sub>2),(x\<^sub>2,x\<^sub>1)} \<and> p2 < p1}" 
       proof
         show "{(p1,p2). (p1,p2) \<in> A \<and> p2 < p1}  
-          \<subseteq> {(p1,p2). (p1,p2) \<in> (A-{(x1,x2),(x2,x1)}) \<and> p2 < p1} \<union> {(p1,p2). (p1,p2) \<in> {(x1,x2),(x2,x1)} \<and> p2 < p1}" by auto
-        show "{(p1,p2). (p1,p2) \<in> (A-{(x1,x2),(x2,x1)}) \<and> p2 < p1} \<union> {(p1,p2). (p1,p2) \<in> {(x1,x2),(x2,x1)} \<and> p2 < p1}
+          \<subseteq> {(p1,p2). (p1,p2) \<in> (A-{(x\<^sub>1,x\<^sub>2),(x\<^sub>2,x\<^sub>1)}) \<and> p2 < p1} \<union> {(p1,p2). (p1,p2) \<in> {(x\<^sub>1,x\<^sub>2),(x\<^sub>2,x\<^sub>1)} \<and> p2 < p1}" by auto
+        show "{(p1,p2). (p1,p2) \<in> (A-{(x\<^sub>1,x\<^sub>2),(x\<^sub>2,x\<^sub>1)}) \<and> p2 < p1} \<union> {(p1,p2). (p1,p2) \<in> {(x\<^sub>1,x\<^sub>2),(x\<^sub>2,x\<^sub>1)} \<and> p2 < p1}
             \<subseteq> {(p1,p2). (p1,p2) \<in> A \<and> p2 < p1}  " 
         proof
           fix x
-          assume "x \<in> {(p1,p2). (p1,p2) \<in> (A-{(x1,x2),(x2,x1)}) \<and> p2 < p1} \<union> {(p1,p2). (p1,p2) \<in> {(x1,x2),(x2,x1)} \<and> p2 < p1}"
+          assume "x \<in> {(p1,p2). (p1,p2) \<in> (A-{(x\<^sub>1,x\<^sub>2),(x\<^sub>2,x\<^sub>1)}) \<and> p2 < p1} \<union> {(p1,p2). (p1,p2) \<in> {(x\<^sub>1,x\<^sub>2),(x\<^sub>2,x\<^sub>1)} \<and> p2 < p1}"
           show "x \<in> {(p1,p2). (p1,p2) \<in> A \<and> p2 < p1} "  
-            using Product_Type.Collect_case_prodD \<open>x \<in> {(p1, p2). (p1, p2) \<in> A - {(x1, x2), (x2, x1)} \<and> p2 < p1} \<union> {(p1, p2). (p1, p2) \<in> {(x1, x2), (x2, x1)} \<and> p2 < p1}\<close> a4 f0 by auto
+            using Product_Type.Collect_case_prodD \<open>x \<in> {(p1, p2). (p1, p2) \<in> A - {(x\<^sub>1, x\<^sub>2), (x\<^sub>2, x\<^sub>1)} \<and> p2 < p1} \<union> {(p1, p2). (p1, p2) \<in> {(x\<^sub>1, x\<^sub>2), (x\<^sub>2, x\<^sub>1)} \<and> p2 < p1}\<close> a4 f0 by auto
         qed
       qed
-      moreover have "{} = {(p1,p2). (p1,p2) \<in> (A-{(x1,x2),(x2,x1)}) \<and> p2 < p1} \<inter> {(p1,p2). (p1,p2) \<in> {(x1,x2),(x2,x1)} \<and> p2 < p1}" 
+      moreover have "{} = {(p1,p2). (p1,p2) \<in> (A-{(x\<^sub>1,x\<^sub>2),(x\<^sub>2,x\<^sub>1)}) \<and> p2 < p1} \<inter> {(p1,p2). (p1,p2) \<in> {(x\<^sub>1,x\<^sub>2),(x\<^sub>2,x\<^sub>1)} \<and> p2 < p1}" 
       proof
-        show "{} \<subseteq> {(p1, p2). (p1, p2) \<in> A - {(x1, x2), (x2, x1)} \<and> p2 < p1} \<inter> {(p1, p2). (p1, p2) \<in> {(x1, x2), (x2, x1)} \<and> p2 < p1}" by blast
+        show "{} \<subseteq> {(p1, p2). (p1, p2) \<in> A - {(x\<^sub>1, x\<^sub>2), (x\<^sub>2, x\<^sub>1)} \<and> p2 < p1} \<inter> {(p1, p2). (p1, p2) \<in> {(x\<^sub>1, x\<^sub>2), (x\<^sub>2, x\<^sub>1)} \<and> p2 < p1}" by blast
       next
-        show "{(p1,p2). (p1,p2) \<in> (A-{(x1,x2),(x2,x1)}) \<and> p2 < p1} \<inter> {(p1,p2). (p1,p2) \<in> {(x1,x2),(x2,x1)} \<and> p2 < p1} \<subseteq> {}"
+        show "{(p1,p2). (p1,p2) \<in> (A-{(x\<^sub>1,x\<^sub>2),(x\<^sub>2,x\<^sub>1)}) \<and> p2 < p1} \<inter> {(p1,p2). (p1,p2) \<in> {(x\<^sub>1,x\<^sub>2),(x\<^sub>2,x\<^sub>1)} \<and> p2 < p1} \<subseteq> {}"
           by auto
       qed
-      moreover have "finite {(p1,p2). (p1,p2) \<in> (A-{(x1,x2),(x2,x1)}) \<and> p2 < p1}" 
+      moreover have "finite {(p1,p2). (p1,p2) \<in> (A-{(x\<^sub>1,x\<^sub>2),(x\<^sub>2,x\<^sub>1)}) \<and> p2 < p1}" 
       proof-
-        have "{(p1,p2). (p1,p2) \<in> (A-{(x1,x2),(x2,x1)}) \<and> p2 < p1} \<subseteq> {x. x \<in> A}" by auto
+        have "{(p1,p2). (p1,p2) \<in> (A-{(x\<^sub>1,x\<^sub>2),(x\<^sub>2,x\<^sub>1)}) \<and> p2 < p1} \<subseteq> {x. x \<in> A}" by auto
         moreover have "finite {x. x \<in> A}" using a1 by auto
         ultimately show ?thesis 
           by (simp add: finite_subset)
       qed
-      moreover have "finite {(p1,p2). (p1,p2) \<in> {(x1,x2),(x2,x1)} \<and> p2 < p1}" 
+      moreover have "finite {(p1,p2). (p1,p2) \<in> {(x\<^sub>1,x\<^sub>2),(x\<^sub>2,x\<^sub>1)} \<and> p2 < p1}" 
         using card_eq_0_iff f2 by fastforce
       ultimately show ?thesis 
         using card_Un_disjoint by (metis (no_types, lifting))
     qed
     ultimately have "card {(p1,p2). (p1,p2) \<in> A \<and> p2 < p1} = i div 2 - 1 + 1" by simp
     then have "card {(p1,p2). (p1,p2) \<in> A \<and> p2 < p1} = i div 2" 
-      using Suc_diff_Suc \<open>card {(p1, p2). (p1, p2) \<in> A - {(x1, x2), (x2, x1)} \<and> p2 < p1} = (i - 2) div 2\<close> 
+      using Suc_diff_Suc \<open>card {(p1, p2). (p1, p2) \<in> A - {(x\<^sub>1, x\<^sub>2), (x\<^sub>2, x\<^sub>1)} \<and> p2 < p1} = (i - 2) div 2\<close> 
           a0b a2 add.commute aux_even_arcs f1 le_add_diff_inverse le_eq_less_or_eq odd_one one_add_one plus_1_eq_Suc 
       by (metis (no_types, lifting) div2_Suc_Suc ordered_cancel_comm_monoid_diff_class.add_diff_inverse)
     then show "card {(p1,p2). (p1,p2) \<in> A \<and> p2 < p1} = i div 2" 
@@ -1480,7 +1480,7 @@ lemma(in distinct_weighted_pair_graph) restricted_weight_fun_surjective:
   show "n = 1 \<or> n \<ge> 2" using vert_ge by auto
 next
   assume "n = 1" 
-  then show "(\<forall>y \<in> W. \<exists>(x1,x2) \<in> (parcs G). w (x1,x2) = y)" 
+  then show "(\<forall>y \<in> W. \<exists>(x\<^sub>1,x\<^sub>2) \<in> (parcs G). w (x\<^sub>1,x\<^sub>2) = y)" 
     using max_arcs by auto
 next
   assume "n \<ge> 2" 
@@ -1497,13 +1497,13 @@ next
     fix x y
     assume a0: "x \<in> {(p1, p2). (p1,p2) \<in> (parcs G) \<and> p2 < p1}" 
        and a1: "y \<in> {(p1, p2). (p1,p2) \<in> (parcs G) \<and> p2 < p1}" and a2: "w x = w y"
-    obtain x1 x2 where x_def: "x = (x1,x2)" using a0 by blast
+    obtain x\<^sub>1 x\<^sub>2 where x_def: "x = (x\<^sub>1,x\<^sub>2)" using a0 by blast
     obtain y1 y2 where y_def: "y = (y1,y2)" using a1 by blast
-    have "((x1 = y1 \<and> x2 = y2) \<or> (x1 = y2 \<and> x2 = y1) \<or> (x1 = x2 \<and> y1 = y2))" 
+    have "((x\<^sub>1 = y1 \<and> x\<^sub>2 = y2) \<or> (x\<^sub>1 = y2 \<and> x\<^sub>2 = y1) \<or> (x\<^sub>1 = x\<^sub>2 \<and> y1 = y2))" 
       by (metis (no_types, lifting) Product_Type.Collect_case_prodD a1 a2 fst_conv snd_conv weight_unique x_def y_def zero distinct)
-    moreover have "x2 < x1" using x_def a0 by auto
+    moreover have "x\<^sub>2 < x\<^sub>1" using x_def a0 by auto
     moreover have "y2 < y1" using y_def a1 by auto
-    ultimately have "(x1 = y1 \<and> x2 = y2)" by auto
+    ultimately have "(x\<^sub>1 = y1 \<and> x\<^sub>2 = y2)" by auto
     then show "x = y" by (simp add: x_def y_def)
   qed
   moreover have "card {(p1,p2). (p1,p2) \<in> (parcs G) \<and> p2 < p1} \<ge> card (real ` W)" 
@@ -1532,15 +1532,15 @@ lemma(in distinct_weighted_pair_graph) weight_fun_surjective:
 (*<*)proof-
   have "{(p1,p2). (p1,p2) \<in> (parcs G) \<and> p2 < p1} \<subseteq> (parcs G)" 
   by blast
-  then have "distinct \<longrightarrow> (\<forall>y \<in> W. \<exists>(x1,x2) \<in> (parcs G). w (x1,x2) = y)" 
+  then have "distinct \<longrightarrow> (\<forall>y \<in> W. \<exists>(x\<^sub>1,x\<^sub>2) \<in> (parcs G). w (x\<^sub>1,x\<^sub>2) = y)" 
     using restricted_weight_fun_surjective by blast
-  then have "distinct \<longrightarrow> (\<forall>y \<in> W. \<exists>(x1,x2) \<in> (parcs G). w (x1,x2) = y)" 
+  then have "distinct \<longrightarrow> (\<forall>y \<in> W. \<exists>(x\<^sub>1,x\<^sub>2) \<in> (parcs G). w (x\<^sub>1,x\<^sub>2) = y)" 
     by (meson Diff_subset in_mono)
   then show ?thesis using distinct by auto
 qed
 
 lemma weight_different:
-  assumes "y \<noteq> (x1,x2)" and "y \<noteq> (x2,x1)" and "w (x1,x2) = k" and "(x1,x2) \<in> parcs G" 
+  assumes "y \<noteq> (x\<^sub>1,x\<^sub>2)" and "y \<noteq> (x\<^sub>2,x\<^sub>1)" and "w (x\<^sub>1,x\<^sub>2) = k" and "(x\<^sub>1,x\<^sub>2) \<in> parcs G" 
   shows "w y \<noteq> k" 
   by (metis (no_types, lifting) assms(1-4) distinct weight_unique zero prod.collapse) 
 
@@ -1549,16 +1549,13 @@ lemma weight_different:
 (*<*)end
 
 instantiation prod :: (linorder,linorder) linorder begin
-definition "less_eq_prod \<equiv> \<lambda>(x1,x2) (y1,y2). x1<y1 \<or> x1=y1 \<and> x2\<le>y2"
-definition "less_prod \<equiv> \<lambda>(x1,x2) (y1,y2). x1<y1 \<or> x1=y1 \<and> x2<y2"
+definition "less_eq_prod \<equiv> \<lambda>(x\<^sub>1,x\<^sub>2) (y1,y2). x\<^sub>1 < y1 \<or> x\<^sub>1 = y1 \<and> x\<^sub>2 \<le> y2"
+definition "less_prod \<equiv> \<lambda>(x\<^sub>1,x\<^sub>2) (y1,y2). x\<^sub>1 < y1 \<or> x\<^sub>1 = y1 \<and> x\<^sub>2 < y2"
 instance by standard (auto simp add: less_eq_prod_def less_prod_def) 
 end
 
 definition set_to_list :: "('a::linorder\<times>'a) set \<Rightarrow> ('a\<times>'a) list"
   where "set_to_list A = sorted_list_of_set A" 
-
-(*definition set_to_list :: "('a\<times>'a) set \<Rightarrow> ('a\<times>'a) list"
-  where "set_to_list A = (SOME L. set L = A)" Exchange this sorted_list_of_set then export code work *)
 
 lemma set_set_to_list:
   shows "finite A \<Longrightarrow> set (set_to_list A) = A"
@@ -1587,46 +1584,46 @@ begin
 
 lemma aux_findEdge_success:
   assumes "a \<ge> 1"
-  shows "\<forall>ys. k \<in> W \<and> w (x1,x2) = k \<and> length ys = a \<and> ((x1,x2) \<in> set ys \<or> (x2,x1) \<in> set ys) \<longrightarrow>
-(\<exists>xs. (findEdge w ys k) = (findEdge w ((x1,x2)#xs) k)) \<or> (\<exists>xs. (findEdge w ys k) = (findEdge w ((x2,x1)#xs) k))"
+  shows "\<forall>ys. k \<in> W \<and> w (x\<^sub>1,x\<^sub>2) = k \<and> length ys = a \<and> ((x\<^sub>1,x\<^sub>2) \<in> set ys \<or> (x\<^sub>2,x\<^sub>1) \<in> set ys) \<longrightarrow>
+(\<exists>xs. (findEdge w ys k) = (findEdge w ((x\<^sub>1,x\<^sub>2)#xs) k)) \<or> (\<exists>xs. (findEdge w ys k) = (findEdge w ((x\<^sub>2,x\<^sub>1)#xs) k))"
 proof(rule Nat.nat_induct_at_least[of 1 a])
   show "a \<ge> 1" using assms by simp
 next
-  show "\<forall>ys. k \<in> W \<and> w (x1, x2) = real k \<and> length ys = 1 \<and> ((x1,x2) \<in> set ys \<or> (x2,x1) \<in> set ys) \<longrightarrow>
-    (\<exists>xs. findEdge w ys k = findEdge w ((x1, x2) # xs) k) \<or> (\<exists>xs. findEdge w ys k = findEdge w ((x2, x1) # xs) k)"
+  show "\<forall>ys. k \<in> W \<and> w (x\<^sub>1, x\<^sub>2) = real k \<and> length ys = 1 \<and> ((x\<^sub>1,x\<^sub>2) \<in> set ys \<or> (x\<^sub>2,x\<^sub>1) \<in> set ys) \<longrightarrow>
+    (\<exists>xs. findEdge w ys k = findEdge w ((x\<^sub>1, x\<^sub>2) # xs) k) \<or> (\<exists>xs. findEdge w ys k = findEdge w ((x\<^sub>2, x\<^sub>1) # xs) k)"
   proof(rule allI, rule impI)
     fix ys
-    assume a0: "k \<in> W \<and> w (x1, x2) = real k \<and> length ys = 1 \<and> ((x1,x2) \<in> set ys \<or> (x2,x1) \<in> set ys)" 
-    then have "hd ys = (x1,x2) \<or> hd ys = (x2,x1)"
+    assume a0: "k \<in> W \<and> w (x\<^sub>1, x\<^sub>2) = real k \<and> length ys = 1 \<and> ((x\<^sub>1,x\<^sub>2) \<in> set ys \<or> (x\<^sub>2,x\<^sub>1) \<in> set ys)" 
+    then have "hd ys = (x\<^sub>1,x\<^sub>2) \<or> hd ys = (x\<^sub>2,x\<^sub>1)"
       by (smt One_nat_def Suc_length_conv hd_Cons_tl length_0_conv list.sel(3) list.set(1) list.set(2) singletonD)
-    then show "(\<exists>xs. findEdge w ys k = findEdge w ((x1, x2) # xs) k) \<or> (\<exists>xs. findEdge w ys k = findEdge w ((x2, x1) # xs) k)"
+    then show "(\<exists>xs. findEdge w ys k = findEdge w ((x\<^sub>1, x\<^sub>2) # xs) k) \<or> (\<exists>xs. findEdge w ys k = findEdge w ((x\<^sub>2, x\<^sub>1) # xs) k)"
       by (metis One_nat_def a0 hd_Cons_tl length_0_conv nat.simps(3))
   qed
 next
   fix a
-  assume IH: "\<forall>ys. k \<in> W \<and> w (x1,x2) = k \<and> length ys = a \<and> ((x1,x2) \<in> set ys \<or> (x2,x1) \<in> set ys) \<longrightarrow>
-(\<exists>xs. (findEdge w ys k) = (findEdge w ((x1,x2)#xs) k)) \<or> (\<exists>xs. (findEdge w ys k) = (findEdge w ((x2,x1)#xs) k))"
-  show "\<forall>ys. k \<in> W \<and> w (x1,x2) = k \<and> length ys = (Suc a) \<and> ((x1,x2) \<in> set ys \<or> (x2,x1) \<in> set ys) \<longrightarrow>
-(\<exists>xs. (findEdge w ys k) = (findEdge w ((x1,x2)#xs) k)) \<or> (\<exists>xs. (findEdge w ys k) = (findEdge w ((x2,x1)#xs) k))"
+  assume IH: "\<forall>ys. k \<in> W \<and> w (x\<^sub>1,x\<^sub>2) = k \<and> length ys = a \<and> ((x\<^sub>1,x\<^sub>2) \<in> set ys \<or> (x\<^sub>2,x\<^sub>1) \<in> set ys) \<longrightarrow>
+(\<exists>xs. (findEdge w ys k) = (findEdge w ((x\<^sub>1,x\<^sub>2)#xs) k)) \<or> (\<exists>xs. (findEdge w ys k) = (findEdge w ((x\<^sub>2,x\<^sub>1)#xs) k))"
+  show "\<forall>ys. k \<in> W \<and> w (x\<^sub>1,x\<^sub>2) = k \<and> length ys = (Suc a) \<and> ((x\<^sub>1,x\<^sub>2) \<in> set ys \<or> (x\<^sub>2,x\<^sub>1) \<in> set ys) \<longrightarrow>
+(\<exists>xs. (findEdge w ys k) = (findEdge w ((x\<^sub>1,x\<^sub>2)#xs) k)) \<or> (\<exists>xs. (findEdge w ys k) = (findEdge w ((x\<^sub>2,x\<^sub>1)#xs) k))"
   proof(rule allI, rule impI)
     fix ys
-    assume a0: "k \<in> W \<and> w (x1,x2) = k \<and> length ys = (Suc a) \<and> ((x1,x2) \<in> set ys \<or> (x2,x1) \<in> set ys)"
-    show "(\<exists>xs. (findEdge w ys k) = (findEdge w ((x1,x2)#xs) k)) \<or> (\<exists>xs. (findEdge w ys k) = (findEdge w ((x2,x1)#xs) k))"
+    assume a0: "k \<in> W \<and> w (x\<^sub>1,x\<^sub>2) = k \<and> length ys = (Suc a) \<and> ((x\<^sub>1,x\<^sub>2) \<in> set ys \<or> (x\<^sub>2,x\<^sub>1) \<in> set ys)"
+    show "(\<exists>xs. (findEdge w ys k) = (findEdge w ((x\<^sub>1,x\<^sub>2)#xs) k)) \<or> (\<exists>xs. (findEdge w ys k) = (findEdge w ((x\<^sub>2,x\<^sub>1)#xs) k))"
     proof(rule disjE)
-      show "((hd ys) = (x1,x2) \<or> (hd ys) = (x2,x1)) \<or> ((hd ys) \<noteq> (x1,x2) \<and> (hd ys) \<noteq> (x2,x1))" by auto
+      show "((hd ys) = (x\<^sub>1,x\<^sub>2) \<or> (hd ys) = (x\<^sub>2,x\<^sub>1)) \<or> ((hd ys) \<noteq> (x\<^sub>1,x\<^sub>2) \<and> (hd ys) \<noteq> (x\<^sub>2,x\<^sub>1))" by auto
     next
-      assume "hd ys = (x1,x2) \<or> (hd ys) = (x2,x1)"
-      then show "(\<exists>xs. (findEdge w ys k) = (findEdge w ((x1,x2)#xs) k)) \<or> (\<exists>xs. (findEdge w ys k) = (findEdge w ((x2,x1)#xs) k))"
+      assume "hd ys = (x\<^sub>1,x\<^sub>2) \<or> (hd ys) = (x\<^sub>2,x\<^sub>1)"
+      then show "(\<exists>xs. (findEdge w ys k) = (findEdge w ((x\<^sub>1,x\<^sub>2)#xs) k)) \<or> (\<exists>xs. (findEdge w ys k) = (findEdge w ((x\<^sub>2,x\<^sub>1)#xs) k))"
         by (metis a0 hd_Cons_tl length_0_conv nat.simps(3))
     next
-      assume "(hd ys) \<noteq> (x1,x2) \<and> (hd ys) \<noteq> (x2,x1)"
-      moreover have "w (x1,x2) \<noteq> 0" 
+      assume "(hd ys) \<noteq> (x\<^sub>1,x\<^sub>2) \<and> (hd ys) \<noteq> (x\<^sub>2,x\<^sub>1)"
+      moreover have "w (x\<^sub>1,x\<^sub>2) \<noteq> 0" 
         using a0 weighted_pair_graph_axioms by auto
       ultimately have "w (hd ys) \<noteq> k" using a0 zero distinct weight_different 
         by (metis (no_types, lifting))
       then have "(findEdge w ys k) = (findEdge w (tl ys) k)"
         by (metis a0 findEdge.elims length_0_conv list.sel(1) list.sel(3) nat.simps(3)) 
-      then show "(\<exists>xs. (findEdge w ys k) = (findEdge w ((x1,x2)#xs) k)) \<or> (\<exists>xs. (findEdge w ys k) = (findEdge w ((x2,x1)#xs) k))"
+      then show "(\<exists>xs. (findEdge w ys k) = (findEdge w ((x\<^sub>1,x\<^sub>2)#xs) k)) \<or> (\<exists>xs. (findEdge w ys k) = (findEdge w ((x\<^sub>2,x\<^sub>1)#xs) k))"
         using IH 
         by (metis a0 add_diff_cancel_left' hd_Cons_tl length_0_conv length_tl nat.simps(3) plus_1_eq_Suc set_ConsD)
     qed
@@ -2167,11 +2164,9 @@ qed
     using dec_trail_exists by auto 
 qed
 
-
-
 end (* context graph *)
 
-lemma t4:
+lemma aux_complete_graph_edges:
   assumes "finite A" 
   shows "card {(v\<^sub>1,v\<^sub>2). v\<^sub>1 \<in> A \<and> v\<^sub>2 \<in> A \<and> v\<^sub>1 \<noteq> v\<^sub>2} = (card A)*(card A-1)"  (*TODO: Same code as above, make own lemma *)
   proof-
@@ -2238,8 +2233,8 @@ abbreviation ExampleGraphWeightFunction :: "(nat\<times>nat) weight_fun" where
                               (if (v\<^sub>1 = 3 \<and> v\<^sub>2 = 4) \<or> (v\<^sub>1 = 4 \<and> v\<^sub>2 = 3) then 2 else 
                                0))))))" 
 
-(*<*)
-lemma temp1:
+(*<*) (*TODO: Lemma name convention *)
+lemma codomain_ExampleGraphWeightFunction:
   assumes "(x,y) \<in> parcs ExampleGraph"
   shows "ExampleGraphWeightFunction (x,y) \<in> {1,2,3,4,5,6}" 
 proof-
@@ -2251,9 +2246,7 @@ proof-
     using singletonD by auto
 qed
 
-(*TODO: Wenn noch Zeit zeigen, dass surjective equal to distinctiveness ist.*)
-
-lemma temp2:
+lemma zero_ExampleGraphWeightFunction:
   assumes "(x,y) \<notin> parcs ExampleGraph"
   shows "ExampleGraphWeightFunction (x,y) = 0" 
 proof-
@@ -2271,7 +2264,7 @@ proof-
   have "finite {1,2,3,4}" by blast 
   moreover have "card {1,2,3,(4::nat)} = 4" by simp
   ultimately show "card (parcs ExampleGraph) = 12" 
-    using t4[of "{1,2,3,(4::nat)}"] by force
+    using aux_complete_graph_edges[of "{1,2,3,(4::nat)}"] by force
 qed(*>*)
 text \<open> We show that the graph $K_4$ of Figure \ref{exampleGraph} satisfies the conditions that were
 imposed in 
@@ -2291,7 +2284,7 @@ interpretation example:
     have "finite {1,2,3,4}" by blast 
     moreover have "card {1,2,3,(4::nat)} = 4" by simp
     ultimately have "card (parcs ExampleGraph) = 12" 
-      using t4[of "{1,2,3,(4::nat)}"] by force
+      using aux_complete_graph_edges[of "{1,2,3,(4::nat)}"] by force
     then show ?thesis using card_ge_0_finite[of "parcs ExampleGraph"] by auto
   qed
   show "\<And>e. e \<in> parcs ExampleGraph \<Longrightarrow> fst e \<noteq> snd e" by auto
@@ -2305,7 +2298,7 @@ interpretation example:
     have "finite {1,2,3,4}" by blast 
     moreover have "card {1,2,3,(4::nat)} = 4" by simp
     ultimately have "card (parcs ExampleGraph) = 12" 
-      using t4[of "{1,2,3,(4::nat)}"] by force
+      using aux_complete_graph_edges[of "{1,2,3,(4::nat)}"] by force
     then have f0: "card (parcs ExampleGraph) div 2 = 6" by auto 
     moreover have "real ` {1..card (parcs ExampleGraph) div 2} = {1,2,3,4,5,(6::real)}" 
     proof-
@@ -2315,12 +2308,12 @@ interpretation example:
       then show "real ` {1..card (parcs ExampleGraph) div 2} = {1,2,3,4,5,(6::real)}" by auto
     qed
     ultimately show "ExampleGraphWeightFunction x \<in> real ` {1::nat..card (parcs ExampleGraph) div (2::nat)}" 
-      using temp1 
+      using codomain_ExampleGraphWeightFunction 
       by (metis (no_types, lifting) a0 prod.collapse)
   qed
   show "1 \<le> card (pverts ExampleGraph)" by simp
   show "\<forall>x y. ((x, y) \<notin> parcs ExampleGraph) = (ExampleGraphWeightFunction (x, y) = 0)" 
-    by (smt \<open>\<And>x::nat \<times> nat. x \<in> parcs ExampleGraph \<longrightarrow> ExampleGraphWeightFunction x \<in> real ` {1::nat..card (parcs ExampleGraph) div (2::nat)}\<close> atLeastAtMost_iff imageE le_numeral_extra(2) of_nat_0_eq_iff temp2)
+    by (smt \<open>\<And>x::nat \<times> nat. x \<in> parcs ExampleGraph \<longrightarrow> ExampleGraphWeightFunction x \<in> real ` {1::nat..card (parcs ExampleGraph) div (2::nat)}\<close> atLeastAtMost_iff imageE le_numeral_extra(2) of_nat_0_eq_iff zero_ExampleGraphWeightFunction)
   show "\<forall>(x, y)\<in>parcs ExampleGraph.
         \<forall>(z, a)\<in>parcs ExampleGraph. (x = a \<and> y = z \<or> x = z \<and> y = a) = (ExampleGraphWeightFunction (x, y) = ExampleGraphWeightFunction (z, a))" 
   proof-
