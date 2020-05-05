@@ -2384,7 +2384,7 @@ text \<open> Now it is an easy task to prove that there is a trail of length 3. 
 @{text ExampleGraph} is a @{text "distinct_weighted_pair_graph"} and lemma @{text "dec_trail_exists"}. \<close>
 
 lemma ExampleGraph_decTrail:
-  "\<exists> xs. decTrail ExampleGraph ExampleGraphWeightFunction xs \<and> length xs = 3"
+  shows "\<exists> xs. decTrail ExampleGraph ExampleGraphWeightFunction xs \<and> length xs = 3"
 (*<*)  using example.distinct_weighted_pair_graph_axioms example.dec_trail_exists card_parcs_ExampleGraph 
     card_parcs_ExampleGraph by auto (*>*)
 
