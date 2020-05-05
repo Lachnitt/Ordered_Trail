@@ -8,6 +8,11 @@ Ballarin, C.: Tutorial to locales and locale interpretation. In: Contribuciones
   cient{\'\i}ficas en honor de Mirian Andr{\'e}s G{\'o}mez. pp. 123--140.
   Universidad de La Rioja (2010)
 
+\bibitem{bucic2018nearly}
+Bucic, M., Kwan, M., Pokrovskiy, A., Sudakov, B., Tran, T., Wagner, A.Z.:
+  Nearly-linear monotone paths in edge-ordered graphs. arXiv preprint
+  arXiv:1809.01468  (2018)
+
 \bibitem{calderbank1984increasing}
 Calderbank, A.R., Chung, F.R., Sturtevant, D.G.: Increasing sequences with
   nonzero block sums and increasing paths in edge-ordered graphs. Discrete
@@ -39,6 +44,9 @@ Graham, R., Kleitman, D.: Increasing paths in edge ordered graphs. Periodica
 \bibitem{Vampire13}
 Kov{\'{a}}cs, L., Voronkov, A.: First-order theorem proving and vampire. In:
   Proc. of CAV. pp. 1--35 (2013)
+
+\bibitem{milans2015monotone}
+Milans, K.G.: Monotone paths in dense edge-ordered graphs (2015)
 
 \bibitem{nipkow2002isabelle}
 Nipkow, T., Paulson, L.C., Wenzel, M.: Isabelle/HOL: a proof assistant for

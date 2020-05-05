@@ -2381,7 +2381,7 @@ qed
 (*>*)
 
 text \<open> Now it is an easy task to prove that there is a trail of length 3. We only add the fact that
-@{text ExampleGraph} is a @{text "distinct_weighted_pair_graph"} and lemma @{text "dec_trail_exists"}. \<close>
+@{text ExampleGraph} is a @{text "distinct_weighted_pair_graph"} and lemma @{text "dec_trail_exists"}.\<close>
 
 lemma ExampleGraph_decTrail:
   "\<exists> xs. decTrail ExampleGraph ExampleGraphWeightFunction xs \<and> length xs = 3"
@@ -2415,12 +2415,11 @@ We believe that formalizing this result would be a valuable extension to the the
 Another direction for further investigation are monotone paths. 
 Graham et al. \cite{graham1973increasing} show that in a complete graph with $n$ vertices there has to be an increasing path of length 
 at least $\frac{1}{2}(\sqrt{4n-3}-1)$ and at most $\frac{3n}{4}$. 
-The upper bound was afterwards improved by Calderbank, Chung and Sturtevant \cite{calderbank1984increasing}, Milans and 
-\cite{bucic2018nearly}. 
+The upper bound was afterwards improved by Calderbank, Chung and Sturtevant \cite{calderbank1984increasing}, 
+Milans \cite{milans2015monotone} and Buci{\'c} et al. \cite{bucic2018nearly}. 
 
 Recently, other classes of graphs have been considered, e.g., trees and planar graphs \cite{roditty2001monotone},
- on random edge-ordering \cite{yuster2001large} or on hypercubes \cite{de2015increasing}.
-\<close>
+on random edge-ordering \cite{yuster2001large} or on hypercubes \cite{de2015increasing}.\<close>
 
 section "Conclusion"
 
@@ -2433,7 +2432,6 @@ $2\cdot\lfloor\frac{q}{n}\rfloor$. For further work we plan to show that this is
 
 Our results are built on the already existing Isabelle @{text "Graph_theory"} from the Archive of Formal Proofs. 
 Thus, our results can be used by any theory using graphs that are specified as in this library.
-Therefore, our theory is highly reusable and might be the basis for further work in this field.
-\<close>
+Therefore, our theory is highly reusable and might be the basis for further work in this field.\<close>
 
 (*<*)end(*>*)
