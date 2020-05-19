@@ -403,8 +403,9 @@ fun incTrail :: "'a pair_pre_digraph \<Rightarrow> ('a \<times>'a) weight_fun \<
 
 definition(in pair_pre_digraph) incTrail2 where
 "incTrail2 w es u v \<equiv> sorted_wrt (\<lambda> e\<^sub>1 e\<^sub>2. w e\<^sub>1 < w e\<^sub>2) es \<and> (es = [] \<or> awalk u es v)"
-(*definition(in pair_pre_digraph) incTrail2b where (*TODO: Use this instead?*)
+(*definition(in pair_pre_digraph) incTrail2b where (* Use this instead? *)
 "incTrail2b w es u v \<equiv> (\<forall> es\<^sub>1 e\<^sub>1 e\<^sub>2 es\<^sub>2. es = es\<^sub>1 @ [e\<^sub>1,e\<^sub>2] @ es\<^sub>2 \<longrightarrow> w e\<^sub>1 < w e\<^sub>2) \<and> (es = [] \<or> awalk u es v)"*)
+
 fun decTrail :: "'a pair_pre_digraph \<Rightarrow> ('a \<times>'a) weight_fun \<Rightarrow> ('a \<times>'a) list \<Rightarrow> bool" where
 "decTrail g w [] = True" |
 "decTrail g w [e\<^sub>1] = (e\<^sub>1 \<in> parcs g)" |
@@ -418,7 +419,7 @@ text \<open> Defining trails as lists in Isabelle has many advantages including 
 e.g., drop. Thus, we can show one result that will be constantly needed in the following, that is, that
 {\em any subtrail of an ordered trail is an ordered trail itself}.\<close>
 
-lemma incTrail_subtrail: (* FINISHED *)
+lemma incTrail_subtrail:
   assumes "incTrail g w es"
   shows "incTrail g w (drop k es)" 
 (*<*)proof (induction k)
@@ -434,7 +435,7 @@ next
     assume a0: "length (drop (Suc k) es) \<noteq> 0"
     then have "\<exists> e\<^sub>2. (drop (Suc k) es) = e\<^sub>2 # (drop (Suc (Suc k)) es)" 
       by (metis Cons_nth_drop_Suc drop_eq_Nil length_0_conv not_less)
-    then have "\<exists> e\<^sub>1. \<exists> e\<^sub>2. (drop k es) = e\<^sub>1 # e\<^sub>2 # (drop (Suc (Suc k)) es)" 
+    then have "\<exists> e\<^sub>1. \<exists> e\<^sub>2. (drop k es) = e\<^sub>1 # e\<^sub>2 # (drop (Suc (Suc k)) es)"
       by (metis Cons_nth_drop_Suc drop_Suc drop_eq_Nil linorder_not_less list.sel(2) tl_drop)
     then show ?thesis 
       by (metis IH drop_Suc incTrail.simps(3) list.sel(3) tl_drop)
@@ -443,7 +444,7 @@ qed(*>*)
 
 text \<open> \<close>
 
-lemma decTrail_subtrail: (* FINISHED *)
+lemma decTrail_subtrail: 
   assumes "decTrail g w es"
   shows "decTrail g w (drop k es)" 
 (*<*)proof (induction k)
@@ -553,7 +554,7 @@ proof-
   then show ?thesis using assms by auto
 qed
 
-lemma decTrail_append: (*ultimately replace this by revised proof of incTrail_append *)
+lemma decTrail_append: 
   assumes "decTrail G w xs" and "length xs \<ge> 1 \<longrightarrow> w (last xs) > w (v\<^sub>1,v\<^sub>2) \<and> v\<^sub>1 = snd (last xs)" 
   and "(v\<^sub>1,v\<^sub>2) \<in> parcs G" 
   shows "decTrail G w (xs@[(v\<^sub>1,v\<^sub>2)])"
@@ -974,115 +975,115 @@ lemma(in pair_wf_digraph) incTrail_is_inc_walk:
 next
   assume "incTrail2 w es (fst (hd es)) (snd (last es))"
   then show "incTrail G w es" using incTrail2_is_incTrail by auto
-qed(*>*)
+qed
 
-(*<*)lemma(in pair_sym_digraph) decTrail_implies_rev_incTrail:
-  assumes "\<forall> x\<^sub>1 x\<^sub>2. w (x\<^sub>1,x\<^sub>2) = w(x\<^sub>2,x\<^sub>1)" 
-  shows "decTrail G w xs \<longrightarrow> incTrail G w (rev (map (\<lambda>(x\<^sub>1,x\<^sub>2). (x\<^sub>2,x\<^sub>1)) xs))"
-proof(induction xs)
-  show "decTrail G w [] \<longrightarrow> incTrail G w (rev (map (\<lambda>(x\<^sub>1,x\<^sub>2). (x\<^sub>2,x\<^sub>1)) []))" by auto
+lemma(in pair_sym_digraph) decTrail_implies_rev_incTrail:
+  assumes "\<forall> v\<^sub>1 v\<^sub>2. w (v\<^sub>1,v\<^sub>2) = w(v\<^sub>2,v\<^sub>1)" 
+  shows "decTrail G w es \<longrightarrow> incTrail G w (rev (map (\<lambda>(v\<^sub>1,v\<^sub>2). (v\<^sub>2,v\<^sub>1)) es))"
+proof(induction es)
+  show "decTrail G w [] \<longrightarrow> incTrail G w (rev (map (\<lambda>(v\<^sub>1,v\<^sub>2). (v\<^sub>2,v\<^sub>1)) []))" by auto
 next
-  fix x xs
-  assume IH: "decTrail G w xs \<longrightarrow> incTrail G w (rev (map (\<lambda>(x\<^sub>1,x\<^sub>2). (x\<^sub>2,x\<^sub>1)) xs))"
-  show "decTrail G w (x#xs) \<longrightarrow> incTrail G w (rev (map (\<lambda>(x\<^sub>1,x\<^sub>2). (x\<^sub>2,x\<^sub>1)) (x#xs)))"
+  fix e\<^sub>1 es
+  assume IH: "decTrail G w es \<longrightarrow> incTrail G w (rev (map (\<lambda>(x\<^sub>1,x\<^sub>2). (x\<^sub>2,x\<^sub>1)) es))"
+  show "decTrail G w (e\<^sub>1#es) \<longrightarrow> incTrail G w (rev (map (\<lambda>(x\<^sub>1,x\<^sub>2). (x\<^sub>2,x\<^sub>1)) (e\<^sub>1#es)))"
   proof
-    assume a0: "decTrail G w (x#xs)"
-    show "incTrail G w (rev (map (\<lambda>(x\<^sub>1,x\<^sub>2). (x\<^sub>2,x\<^sub>1)) (x#xs)))"
+    assume a0: "decTrail G w (e\<^sub>1#es)"
+    show "incTrail G w (rev (map (\<lambda>(x\<^sub>1,x\<^sub>2). (x\<^sub>2,x\<^sub>1)) (e\<^sub>1#es)))"
     proof(rule disjE)
-      show "length xs = 0 \<or> length xs \<ge> 1" 
+      show "length es = 0 \<or> length es \<ge> 1" 
         using not_less by auto
     next
-      assume "length xs = 0"
-      then show "incTrail G w (rev (map (\<lambda>(x\<^sub>1,x\<^sub>2). (x\<^sub>2,x\<^sub>1)) (x#xs)))"
+      assume "length es = 0"
+      then show "incTrail G w (rev (map (\<lambda>(x\<^sub>1,x\<^sub>2). (x\<^sub>2,x\<^sub>1)) (e\<^sub>1#es)))"
         using a0 arcs_symmetric
         by (metis (mono_tags, lifting) decTrail.simps(2) in_arcs_imp_in_arcs_ends incTrail.simps(2) length_0_conv list.map_disc_iff list.simps(9) prod.case_eq_if singleton_rev_conv)
     next
-      assume a1: "length xs \<ge> 1"
-      then obtain y ys where "xs = y # ys" 
+      assume a1: "length es \<ge> 1"
+      then obtain e\<^sub>2 ess where "es = e\<^sub>2 # ess" 
         by (metis One_nat_def Suc_le_length_iff) 
-      then have f1: "w x > w y \<and> x \<in> parcs G \<and> snd x = fst y \<and> decTrail G w (y#ys)" 
+      then have f1: "w e\<^sub>1 > w e\<^sub>2 \<and> e\<^sub>1 \<in> parcs G \<and> snd e\<^sub>1 = fst e\<^sub>2 \<and> decTrail G w (e\<^sub>2#ess)" 
         by (metis a0 decTrail.simps(3))
-      then have "incTrail G w (rev (map (\<lambda>(x\<^sub>1,x\<^sub>2). (x\<^sub>2,x\<^sub>1)) xs))" using IH by (simp add: \<open>xs = y # ys\<close>)
-      moreover have "1 \<le> length (rev (map (\<lambda>(x\<^sub>1, x\<^sub>2). (x\<^sub>2, x\<^sub>1)) xs))" 
+      then have "incTrail G w (rev (map (\<lambda>(x\<^sub>1,x\<^sub>2). (x\<^sub>2,x\<^sub>1)) es))" using IH by (simp add: \<open>es = e\<^sub>2 # ess\<close>)
+      moreover have "1 \<le> length (rev (map (\<lambda>(x\<^sub>1, x\<^sub>2). (x\<^sub>2, x\<^sub>1)) es))" 
         using a1 by auto
-      moreover have "w (last (rev (map (\<lambda>(x\<^sub>1, x\<^sub>2). (x\<^sub>2, x\<^sub>1)) xs))) < w (snd x, fst x)" 
+      moreover have "w (last (rev (map (\<lambda>(x\<^sub>1, x\<^sub>2). (x\<^sub>2, x\<^sub>1)) es))) < w (snd e\<^sub>1, fst e\<^sub>1)" 
       proof-
-        have "(last (rev (map (\<lambda>(x\<^sub>1, x\<^sub>2). (x\<^sub>2, x\<^sub>1)) xs))) = (snd y, fst y)" 
-          by (simp add: \<open>xs = y # ys\<close> case_prod_beta')
-        moreover have "w y = w (snd y, fst y)" using arcs_symmetric assms by simp
+        have "(last (rev (map (\<lambda>(x\<^sub>1, x\<^sub>2). (x\<^sub>2, x\<^sub>1)) es))) = (snd e\<^sub>2, fst e\<^sub>2)" 
+          by (simp add: \<open>es = e\<^sub>2 # ess\<close> case_prod_beta')
+        moreover have "w e\<^sub>2 = w (snd e\<^sub>2, fst e\<^sub>2)" using arcs_symmetric assms by simp
         ultimately show ?thesis using f1 by (metis assms prod.collapse)
       qed
-      moreover have "snd x = snd (last (rev (map (\<lambda>(x\<^sub>1, x\<^sub>2). (x\<^sub>2, x\<^sub>1)) xs)))"           
-        by (simp add: \<open>xs = y # ys\<close> f1 case_prod_beta')
-      moreover have "(snd x, fst x) \<in> parcs G" 
+      moreover have "snd e\<^sub>1 = snd (last (rev (map (\<lambda>(x\<^sub>1, x\<^sub>2). (x\<^sub>2, x\<^sub>1)) es)))"           
+        by (simp add: \<open>es = e\<^sub>2 # ess\<close> f1 case_prod_beta')
+      moreover have "(snd e\<^sub>1, fst e\<^sub>1) \<in> parcs G" 
         using arcs_symmetric f1 in_arcs_imp_in_arcs_ends by blast
-      ultimately have "incTrail G w (rev (map (\<lambda>(x\<^sub>1,x\<^sub>2). (x\<^sub>2,x\<^sub>1)) xs) @ [(snd x, fst x)])" 
-        using IH incTrail_append[of G w "(rev (map (\<lambda>(x\<^sub>1,x\<^sub>2). (x\<^sub>2,x\<^sub>1)) xs))" "snd x" "fst x"] by auto
-      moreover have "[(snd x, fst x)] = map (\<lambda>(x\<^sub>1,x\<^sub>2). (x\<^sub>2,x\<^sub>1)) [(fst x, snd x)]" 
+      ultimately have "incTrail G w (rev (map (\<lambda>(x\<^sub>1,x\<^sub>2). (x\<^sub>2,x\<^sub>1)) es) @ [(snd e\<^sub>1, fst e\<^sub>1)])" 
+        using IH incTrail_append[of G w "(rev (map (\<lambda>(x\<^sub>1,x\<^sub>2). (x\<^sub>2,x\<^sub>1)) es))" "snd e\<^sub>1" "fst e\<^sub>1"] by auto
+      moreover have "[(snd e\<^sub>1, fst e\<^sub>1)] = map (\<lambda>(x\<^sub>1,x\<^sub>2). (x\<^sub>2,x\<^sub>1)) [(fst e\<^sub>1, snd e\<^sub>1)]" 
         by (metis case_prod_conv list.simps(8) list.simps(9))
-      moreover have "[(fst x, snd x)] = [x]" by simp
-      moreover have "rev (map (\<lambda>(x\<^sub>1,x\<^sub>2). (x\<^sub>2,x\<^sub>1)) xs) @ (map (\<lambda>(x\<^sub>1,x\<^sub>2). (x\<^sub>2,x\<^sub>1)) [x])
-                   = rev ((map (\<lambda>(x\<^sub>1,x\<^sub>2). (x\<^sub>2,x\<^sub>1)) (x#xs)))"
+      moreover have "[(fst e\<^sub>1, snd e\<^sub>1)] = [e\<^sub>1]" by simp
+      moreover have "rev (map (\<lambda>(x\<^sub>1,x\<^sub>2). (x\<^sub>2,x\<^sub>1)) es) @ (map (\<lambda>(x\<^sub>1,x\<^sub>2). (x\<^sub>2,x\<^sub>1)) [e\<^sub>1])
+                   = rev ((map (\<lambda>(x\<^sub>1,x\<^sub>2). (x\<^sub>2,x\<^sub>1)) (e\<^sub>1#es)))"
         by simp
-      ultimately show "incTrail G w (rev (map (\<lambda>(x\<^sub>1,x\<^sub>2). (x\<^sub>2,x\<^sub>1)) (x#xs)))" 
+      ultimately show "incTrail G w (rev (map (\<lambda>(x\<^sub>1,x\<^sub>2). (x\<^sub>2,x\<^sub>1)) (e\<^sub>1#es)))" 
         by auto
     qed
   qed
-qed(*>*)
+qed
 
-(*<*)lemma(in pair_sym_digraph) incTrail_implies_rev_decTrail:
-  assumes "\<forall> x\<^sub>1 x\<^sub>2. w (x\<^sub>1,x\<^sub>2) = w(x\<^sub>2,x\<^sub>1)" 
-  shows "\<forall>xs. length xs = k \<longrightarrow> incTrail G w (rev (map (\<lambda>(x\<^sub>1,x\<^sub>2). (x\<^sub>2,x\<^sub>1)) xs)) \<longrightarrow> decTrail G w xs"
+lemma(in pair_sym_digraph) incTrail_implies_rev_decTrail:
+  assumes "\<forall> v\<^sub>1 v\<^sub>2. w (v\<^sub>1,v\<^sub>2) = w(v\<^sub>2,v\<^sub>1)" 
+  shows "\<forall>es. length es = k \<longrightarrow> incTrail G w (rev (map (\<lambda>(v\<^sub>1,v\<^sub>2). (v\<^sub>2,v\<^sub>1)) es)) \<longrightarrow> decTrail G w es"
 proof(induction k)
-  show "\<forall>xs. length xs = 0 \<longrightarrow> incTrail G w (rev (map (\<lambda>(x\<^sub>1,x\<^sub>2). (x\<^sub>2,x\<^sub>1)) xs)) \<longrightarrow> decTrail G w xs" by auto
+  show "\<forall>es. length es = 0 \<longrightarrow> incTrail G w (rev (map (\<lambda>(v\<^sub>1,v\<^sub>2). (v\<^sub>2,v\<^sub>1)) es)) \<longrightarrow> decTrail G w es" by auto
 next
   fix k
-  assume IH: "\<forall>xs. length xs = k \<longrightarrow> incTrail G w (rev (map (\<lambda>(x\<^sub>1,x\<^sub>2). (x\<^sub>2,x\<^sub>1)) xs)) \<longrightarrow> decTrail G w xs"
-  show "\<forall>xs. length xs = Suc k \<longrightarrow> incTrail G w (rev (map (\<lambda>(x\<^sub>1,x\<^sub>2). (x\<^sub>2,x\<^sub>1)) xs)) \<longrightarrow> decTrail G w xs"
+  assume IH: "\<forall>es. length es = k \<longrightarrow> incTrail G w (rev (map (\<lambda>(v\<^sub>1,v\<^sub>2). (v\<^sub>2,v\<^sub>1)) es)) \<longrightarrow> decTrail G w es"
+  show "\<forall>es. length es = Suc k \<longrightarrow> incTrail G w (rev (map (\<lambda>(v\<^sub>1,v\<^sub>2). (v\<^sub>2,v\<^sub>1)) es)) \<longrightarrow> decTrail G w es"
   proof(rule allI, rule impI, rule impI)
-    fix xs
-    assume a0: "length xs = Suc k" and a1: "incTrail G w (rev (map (\<lambda>(x\<^sub>1,x\<^sub>2). (x\<^sub>2,x\<^sub>1)) xs))"
-    obtain y ys where f0: "xs = ys @ [y]" 
+    fix es
+    assume a0: "length es = Suc k" and a1: "incTrail G w (rev (map (\<lambda>(v\<^sub>1,v\<^sub>2). (v\<^sub>2,v\<^sub>1)) es))"
+    obtain e ess where f0: "es = ess @ [e]" 
       by (metis a0 append_Nil2 append_eq_conv_conj lessI take_hd_drop)
-    then have "incTrail G w (rev (map (\<lambda>(x\<^sub>1,x\<^sub>2). (x\<^sub>2,x\<^sub>1)) (ys@[y])))" using a1 by auto
-    then have f1: "incTrail G w ((snd y,fst y) # rev (map (\<lambda>(x\<^sub>1,x\<^sub>2). (x\<^sub>2,x\<^sub>1)) ys))" 
+    then have "incTrail G w (rev (map (\<lambda>(v\<^sub>1,v\<^sub>2). (v\<^sub>2,v\<^sub>1)) (ess@[e])))" using a1 by auto
+    then have f1: "incTrail G w ((snd e,fst e) # rev (map (\<lambda>(v\<^sub>1,v\<^sub>2). (v\<^sub>2,v\<^sub>1)) ess))" 
       by (simp add: prod.case_eq_if) 
-    moreover have "drop 1 ((snd y,fst y) # rev (map (\<lambda>(x\<^sub>1,x\<^sub>2). (x\<^sub>2,x\<^sub>1)) ys)) = rev (map (\<lambda>(x\<^sub>1,x\<^sub>2). (x\<^sub>2,x\<^sub>1)) ys)" by simp 
-    ultimately have "incTrail G w (rev (map (\<lambda>(x\<^sub>1,x\<^sub>2). (x\<^sub>2,x\<^sub>1)) ys))" using incTrail_subtrail by metis
-    moreover have "length (rev (map (\<lambda>(x\<^sub>1,x\<^sub>2). (x\<^sub>2,x\<^sub>1)) ys)) = k" 
+    moreover have "drop 1 ((snd e,fst e) # rev (map (\<lambda>(v\<^sub>1,v\<^sub>2). (v\<^sub>2,v\<^sub>1)) ess)) = rev (map (\<lambda>(v\<^sub>1,v\<^sub>2). (v\<^sub>2,v\<^sub>1)) ess)" by simp 
+    ultimately have "incTrail G w (rev (map (\<lambda>(v\<^sub>1,v\<^sub>2). (v\<^sub>2,v\<^sub>1)) ess))" using incTrail_subtrail by metis
+    moreover have "length (rev (map (\<lambda>(v\<^sub>1,v\<^sub>2). (v\<^sub>2,v\<^sub>1)) ess)) = k" 
       using a0 f0 by auto 
-    ultimately have "decTrail G w ys" using IH by auto
-    show "decTrail G w xs"
+    ultimately have "decTrail G w ess" using IH by auto
+    show "decTrail G w es"
     proof(rule disjE)
-      show "length ys = 0 \<or> length ys \<ge> 1" by linarith
+      show "length ess = 0 \<or> length ess \<ge> 1" by linarith
     next
-      assume "length ys = 0" 
-      then show "decTrail G w xs" 
+      assume "length ess = 0" 
+      then show "decTrail G w es" 
         using arcs_symmetric f0 f1 by force
     next
-      assume a2: "length ys \<ge> 1" 
-      then obtain z zs where f2: "ys = zs @ [z]" 
+      assume a2: "length ess \<ge> 1" 
+      then obtain z zs where f2: "ess = zs @ [z]" 
         by (metis le_numeral_extra(2) length_0_conv rev_exhaust)
-      moreover have "rev (map (\<lambda>(x\<^sub>1,x\<^sub>2). (x\<^sub>2,x\<^sub>1)) ys) = rev (map (\<lambda>(x\<^sub>1,x\<^sub>2). (x\<^sub>2,x\<^sub>1)) (zs@[z]))" using f2 by auto
-      moreover have "rev (map (\<lambda>(x\<^sub>1,x\<^sub>2). (x\<^sub>2,x\<^sub>1)) (zs@[z])) = (snd z, fst z) # rev (map (\<lambda>(x\<^sub>1,x\<^sub>2). (x\<^sub>2,x\<^sub>1)) zs)" by (simp add: prod.case_eq_if) 
-      ultimately have "incTrail G w ((snd y,fst y) # (snd z, fst z) # rev (map (\<lambda>(x\<^sub>1,x\<^sub>2). (x\<^sub>2,x\<^sub>1)) zs))" 
+      moreover have "rev (map (\<lambda>(v\<^sub>1,v\<^sub>2). (v\<^sub>2,v\<^sub>1)) ess) = rev (map (\<lambda>(v\<^sub>1,v\<^sub>2). (v\<^sub>2,v\<^sub>1)) (zs@[z]))" using f2 by auto
+      moreover have "rev (map (\<lambda>(v\<^sub>1,v\<^sub>2). (v\<^sub>2,v\<^sub>1)) (zs@[z])) = (snd z, fst z) # rev (map (\<lambda>(v\<^sub>1,v\<^sub>2). (v\<^sub>2,v\<^sub>1)) zs)" by (simp add: prod.case_eq_if) 
+      ultimately have "incTrail G w ((snd e,fst e) # (snd z, fst z) # rev (map (\<lambda>(v\<^sub>1,v\<^sub>2). (v\<^sub>2,v\<^sub>1)) zs))" 
         using f1 by auto
-      then have t3: "w (snd y,fst y) < w (snd z, fst z) \<and> (snd y,fst y) \<in> parcs G \<and> snd (snd y,fst y) = fst (snd z, fst z)"
+      then have t3: "w (snd e,fst e) < w (snd z, fst z) \<and> (snd e,fst e) \<in> parcs G \<and> snd (snd e,fst e) = fst (snd z, fst z)"
         using f1 a2 f2 by (meson incTrail.simps(3))
-      moreover have "(hd (rev (map (\<lambda>(x\<^sub>1,x\<^sub>2). (x\<^sub>2,x\<^sub>1)) ys))) = (snd z,fst z)" 
+      moreover have "(hd (rev (map (\<lambda>(v\<^sub>1,v\<^sub>2). (v\<^sub>2,v\<^sub>1)) ess))) = (snd z,fst z)" 
         by (simp add: f2 case_prod_beta')
-      moreover have "w (fst y, snd y) < w (last ys)" 
+      moreover have "w (fst e, snd e) < w (last ess)" 
         by (metis assms f2 last_snoc prod.collapse t3)
-      moreover have "last ys = z" 
+      moreover have "last ess = z" 
         by (simp add: f2)
-      moreover have "fst y = snd (last ys)" 
+      moreover have "fst e = snd (last ess)" 
         using calculation(4) t3 by auto 
-      moreover have "(fst y, snd y) \<in> parcs G" 
+      moreover have "(fst e, snd e) \<in> parcs G" 
         using arcs_symmetric t3 by blast
-      ultimately have "decTrail G w (ys@[(fst y,snd y)])" 
-        using decTrail_append[of G w ys "fst y" "snd y" ] 
-        using \<open>decTrail G w ys\<close> by blast
-      then show "decTrail G w xs" 
+      ultimately have "decTrail G w (ess@[(fst e,snd e)])" 
+        using decTrail_append[of G w ess "fst e" "snd e" ] 
+        using \<open>decTrail G w ess\<close> by blast
+      then show "decTrail G w es" 
         by (simp add: f0)
     qed
   qed
@@ -1104,17 +1105,17 @@ lemma(in pair_sym_digraph) incTrail_eq_rev_decTrail:
   assumes "\<forall> v\<^sub>1 v\<^sub>2. w (v\<^sub>1,v\<^sub>2) = w(v\<^sub>2,v\<^sub>1)" 
   shows "incTrail G w es \<longleftrightarrow> decTrail G w (rev (map (\<lambda>(v\<^sub>1,v\<^sub>2). (v\<^sub>2,v\<^sub>1)) es))"
 (*<*)proof-
-  have "decTrail G w (rev (map (\<lambda>(x\<^sub>1,x\<^sub>2). (x\<^sub>2,x\<^sub>1)) es)) \<longleftrightarrow> incTrail G w (rev (map (\<lambda>(x\<^sub>1,x\<^sub>2). (x\<^sub>2,x\<^sub>1)) (rev (map (\<lambda>(x\<^sub>1,x\<^sub>2). (x\<^sub>2,x\<^sub>1)) es))))"
+  have "decTrail G w (rev (map (\<lambda>(v\<^sub>1,v\<^sub>2). (v\<^sub>2,v\<^sub>1)) es)) \<longleftrightarrow> incTrail G w (rev (map (\<lambda>(v\<^sub>1,v\<^sub>2). (v\<^sub>2,v\<^sub>1)) (rev (map (\<lambda>(v\<^sub>1,v\<^sub>2). (v\<^sub>2,v\<^sub>1)) es))))"
     using assms decTrail_implies_rev_incTrail incTrail_implies_rev_decTrail by blast
-  moreover have "(rev (map (\<lambda>(x\<^sub>1,x\<^sub>2). (x\<^sub>2,x\<^sub>1)) (rev (map (\<lambda>(x\<^sub>1,x\<^sub>2). (x\<^sub>2,x\<^sub>1)) es)))) = es" 
+  moreover have "(rev (map (\<lambda>(v\<^sub>1,v\<^sub>2). (v\<^sub>2,v\<^sub>1)) (rev (map (\<lambda>(v\<^sub>1,v\<^sub>2). (v\<^sub>2,v\<^sub>1)) es)))) = es" 
   proof-
-    have "(rev (map (\<lambda>(x\<^sub>1,x\<^sub>2). (x\<^sub>2,x\<^sub>1)) (rev (map (\<lambda>(x\<^sub>1,x\<^sub>2). (x\<^sub>2,x\<^sub>1)) es)))) = (map (\<lambda>(x\<^sub>1,x\<^sub>2). (x\<^sub>2,x\<^sub>1)) (rev (rev (map (\<lambda>(x\<^sub>1,x\<^sub>2). (x\<^sub>2,x\<^sub>1)) es))))" 
+    have "(rev (map (\<lambda>(v\<^sub>1,v\<^sub>2). (v\<^sub>2,v\<^sub>1)) (rev (map (\<lambda>(v\<^sub>1,v\<^sub>2). (v\<^sub>2,v\<^sub>1)) es)))) = (map (\<lambda>(v\<^sub>1,v\<^sub>2). (v\<^sub>2,v\<^sub>1)) (rev (rev (map (\<lambda>(v\<^sub>1,v\<^sub>2). (v\<^sub>2,v\<^sub>1)) es))))" 
       using rev_map by blast
-    moreover have "(\<lambda>(x\<^sub>1,x\<^sub>2). (x\<^sub>2,x\<^sub>1)) \<circ> (\<lambda>(x\<^sub>1,x\<^sub>2). (x\<^sub>2,x\<^sub>1)) = id " by auto 
+    moreover have "(\<lambda>(v\<^sub>1,v\<^sub>2). (v\<^sub>2,v\<^sub>1)) \<circ> (\<lambda>(v\<^sub>1,v\<^sub>2). (v\<^sub>2,v\<^sub>1)) = id " by auto 
     ultimately show ?thesis 
-      by (simp add: \<open>(\<lambda>(x\<^sub>1, x\<^sub>2). (x\<^sub>2, x\<^sub>1)) \<circ> (\<lambda>(x\<^sub>1, x\<^sub>2). (x\<^sub>2, x\<^sub>1)) = id\<close>)
+      by (simp add: \<open>(\<lambda>(v\<^sub>1, v\<^sub>2). (v\<^sub>2, v\<^sub>1)) \<circ> (\<lambda>(v\<^sub>1, v\<^sub>2). (v\<^sub>2, v\<^sub>1)) = id\<close>)
   qed
-  ultimately show "incTrail G w es \<longleftrightarrow> decTrail G w (rev (map (\<lambda>(x\<^sub>1,x\<^sub>2). (x\<^sub>2,x\<^sub>1)) es))"
+  ultimately show "incTrail G w es \<longleftrightarrow> decTrail G w (rev (map (\<lambda>(v\<^sub>1,v\<^sub>2). (v\<^sub>2,v\<^sub>1)) es))"
     by auto
 qed(*>*)
 
@@ -1134,7 +1135,7 @@ of the function @{text real} that casts a natural number to a real.  \<close>
 locale weighted_pair_graph = pair_graph "(G:: ('a::linorder) pair_pre_digraph)" for G +
   fixes w :: "('a\<times>'a) weight_fun"
   assumes dom: "e \<in> parcs G \<longrightarrow> w e \<in> real ` {1..card (parcs G) div 2}" 
-      and vert_ge: "card (pverts G) \<ge> 1" (*TODO: If possible take this out. *)
+      and vert_ge: "card (pverts G) \<ge> 1" 
 (*<*)
 context weighted_pair_graph 
 begin
@@ -1202,24 +1203,24 @@ lemma (in weighted_pair_graph) max_arcs:
     ultimately show ?thesis by (simp add: finite_subset)
   qed
   ultimately show ?thesis using card_mono by fastforce
-qed(*>*)
+qed
 
-(*<*)lemma (in weighted_pair_graph) card_W:
+lemma card_W:
   shows "card (real ` W) = q div 2" 
 proof-
   have "card W = q div 2" by simp
   moreover have "card (image real W) = card W" 
     using card_image inj_on_of_nat by blast
   ultimately show ?thesis by simp
-qed(*>*)
+qed
 
-(*<*)lemma strict_induct:
+lemma strict_induct:
   assumes base: "P 0"
     and step: "\<And>i. (\<forall>j. j < Suc i \<longrightarrow> P j) \<Longrightarrow> P (Suc i)"
   shows "P i"
-  by (metis gr0_implies_Suc infinite_descent0 local.base local.step nat_induct)(*>*)
+  by (metis gr0_implies_Suc infinite_descent0 local.base local.step nat_induct)
 
-(*<*)lemma aux_even_arcs:
+lemma aux_even_arcs:
   shows "\<forall> E:: ('a\<times>'a) set. card E = k \<longrightarrow> (\<forall>e\<^sub>1 e\<^sub>2. (e\<^sub>1,e\<^sub>1) \<notin> E \<and> ((e\<^sub>1,e\<^sub>2) \<in> E \<longrightarrow> (e\<^sub>2,e\<^sub>1) \<in> E)) \<longrightarrow> even k" 
 proof(rule strict_induct)
   show "\<forall> E:: ('a\<times>'a) set. card E = 0 \<longrightarrow> (\<forall>e\<^sub>1 e\<^sub>2. (e\<^sub>1,e\<^sub>1) \<notin> E \<and> ((e\<^sub>1,e\<^sub>2) \<in> E \<longrightarrow> (e\<^sub>2,e\<^sub>1) \<in> E)) \<longrightarrow> even 0" by auto
@@ -1267,7 +1268,6 @@ next
   qed
 qed(*>*)
 
-
 lemma (in weighted_pair_graph) even_arcs: 
 shows "even q"
 (*<*)proof-
@@ -1278,7 +1278,7 @@ shows "even q"
     using aux_even_arcs by blast
 qed
 
-end \<comment> \<open>(*context weighted\_pair\_graph*)\<close>
+end (*context weighted_pair_graph*)
 (*>*)
 text \<open> The below sublocale @{text "distinct_weighted_pair_graph"} refines
 @{text "weighted_pair_graph"}. The condition 
@@ -1303,26 +1303,19 @@ locale distinct_weighted_pair_graph = weighted_pair_graph +
 (*<*)context distinct_weighted_pair_graph
 begin
 
-abbreviation(in weighted_pair_graph) surjective where
-"surjective \<equiv> (\<forall>y \<in> W. \<exists>(x\<^sub>1,x\<^sub>2) \<in> (parcs G). w (x\<^sub>1,x\<^sub>2) = y)"
-
-abbreviation(in weighted_pair_graph) distinct where 
-"distinct \<equiv> \<forall> (x,y) \<in> parcs G. \<forall> (z,a) \<in> parcs G. 
-                ((x = a \<and> y = z) \<or> (x = z \<and> y = a)) \<longleftrightarrow> w (x,y) = w (z,a)" 
-
 lemma undirected:
-  assumes "v\<^sub>1 \<in> (pverts G)" and "v\<^sub>2 \<in> (pverts G)" and "distinct"
+  assumes "v\<^sub>1 \<in> pverts G" and "v\<^sub>2 \<in> pverts G" 
   shows "w (v\<^sub>1,v\<^sub>2) = w (v\<^sub>2,v\<^sub>1)"
   using distinct assms 
   by (smt graph_symmetric old.prod.case zero)
 
 lemma weight_zero [simp]:
-  assumes "v\<^sub>1 \<notin> (pverts G) \<or> v\<^sub>2 \<notin> (pverts G)"
+  assumes "v\<^sub>1 \<notin> pverts G \<or> v\<^sub>2 \<notin> pverts G"
   shows "w (v\<^sub>1,v\<^sub>2) = 0"
   using assms zero in_arcsD1 in_arcsD2 by blast
 
 lemma weight_not_zero [simp]:
-  assumes "v\<^sub>1 \<in> (pverts G)" and "v\<^sub>2 \<in> (pverts G)" and "(v\<^sub>1,v\<^sub>2) \<in> parcs G"
+  assumes "v\<^sub>1 \<in> pverts G" and "v\<^sub>2 \<in> pverts G" and "(v\<^sub>1,v\<^sub>2) \<in> parcs G"
   shows "w (v\<^sub>1,v\<^sub>2) \<noteq> 0" 
   using assms atLeast0LessThan zero distinct by auto
 
@@ -1332,15 +1325,15 @@ lemma weight_not_zero_implies_arc [simp]:
   using assms dom zero by blast
 
 lemma weight_unique:
-  assumes "w (v\<^sub>1,v\<^sub>2) = k" and "(v\<^sub>1,v\<^sub>2) \<noteq> (u\<^sub>1,u\<^sub>2)" and "(v\<^sub>1,v\<^sub>2) \<noteq> (u\<^sub>2,u\<^sub>1)" and "k \<noteq> 0" and "distinct"
+  assumes "w (v\<^sub>1,v\<^sub>2) = k" and "(v\<^sub>1,v\<^sub>2) \<noteq> (u\<^sub>1,u\<^sub>2)" and "(v\<^sub>1,v\<^sub>2) \<noteq> (u\<^sub>2,u\<^sub>1)" and "k \<noteq> 0" 
   shows "w (u\<^sub>1,u\<^sub>2) \<noteq> k" 
 proof-
   have "(v\<^sub>1, v\<^sub>2) \<in> parcs G" using assms weight_not_zero_implies_arc by auto
   then show ?thesis 
-    by (smt assms(1-5) case_prodE distinct fst_conv snd_conv weight_not_zero_implies_arc)
+    by (smt assms case_prodE distinct fst_conv snd_conv weight_not_zero_implies_arc)
 qed
 
-lemma(in distinct_weighted_pair_graph) aux_restricted_weight_fun_card2: (*TODO: AdHoc fix make better *)
+lemma aux_restricted_weight_fun_card2: 
   fixes k :: nat
   shows "\<forall> i. i \<le> k \<longrightarrow> (\<forall>(A::('a\<times>'a) set). finite A \<and> card A = i \<and> (\<forall>x. (x,x) \<notin> A) \<and> (\<forall>x y. (x,y) \<in> A \<longrightarrow> (y,x) \<in> A) \<longrightarrow> card {(p1,p2). (p1,p2) \<in> A \<and> p2 < p1} = i div 2)" 
 proof(induction k)
@@ -1468,6 +1461,7 @@ lemma surjective_iff_injective_gen_le:
   assumes "finite S" and "finite T" and "card T \<le> card S" and "f ` S \<subseteq> T" and "inj_on f S"
   shows "(\<forall>y \<in> T. \<exists>x \<in> S. f x = y)"
   by (meson antisym assms card_inj_on_le surjective_iff_injective_gen)(*>*)
+
 text \<open> One important step in our formalization is to show that the weight function is surjective. However, having two 
 elements of the domain (edges) being mapped to the same element of the codomain (weight) makes 
 the proof complicated. We therefore first prove that the weight function is surjective on a restricted
@@ -1480,12 +1474,12 @@ distinctiveness is the more natural assumption that is more likely to appear in 
 of ordered trails. \<close>
 
 lemma(in distinct_weighted_pair_graph) restricted_weight_fun_surjective:  
-  shows "(\<forall>k \<in> W. \<exists>(v\<^sub>1,v\<^sub>2) \<in> (parcs G). w (v\<^sub>1,v\<^sub>2) = k)"
+  shows "\<forall>k \<in> W. \<exists>(v\<^sub>1,v\<^sub>2) \<in> {(p1,p2). (p1,p2) \<in> (parcs G) \<and> p2 < p1}. w (v\<^sub>1,v\<^sub>2) = k"
 (*<*)proof(rule disjE)
   show "n = 1 \<or> n \<ge> 2" using vert_ge by auto
 next
   assume "n = 1" 
-  then show "(\<forall>y \<in> W. \<exists>(x\<^sub>1,x\<^sub>2) \<in> (parcs G). w (x\<^sub>1,x\<^sub>2) = y)" 
+  then show "\<forall>y \<in> W. \<exists>(v\<^sub>1,x\<^sub>2) \<in> {(p1,p2). (p1,p2) \<in> (parcs G) \<and> p2 < p1}. w (v\<^sub>1,x\<^sub>2) = y" 
     using max_arcs by auto
 next
   assume "n \<ge> 2" 
@@ -1495,21 +1489,21 @@ next
     by (metis Suc_1 Suc_eq_plus1 add.commute diff_Suc_1 diff_is_0_eq dvd_div_mult_self even_Suc even_mult_iff le_iff_add mult_eq_0_iff not_less_eq_eq)
   then have "finite {(p1,p2). (p1,p2) \<in> (parcs G) \<and> p2 < p1}" 
     using restricted_weight_fun_card vert_ge 
-    by (metis (no_types, lifting) Product_Type.Collect_case_prodD finite_subset pair_finite_arcs prod.collapse subsetI with_proj_simps(3))
+    by (metis (no_types, lifting) Product_Type.Collect_case_prodD finite_subset pair_finite_arcs prod.collapse subsetI)
   moreover have "finite W" by auto
   moreover have "inj_on w {(p1,p2). (p1,p2) \<in> (parcs G) \<and> p2 < p1}" 
   proof
-    fix x y
-    assume a0: "x \<in> {(p1, p2). (p1,p2) \<in> (parcs G) \<and> p2 < p1}" 
-       and a1: "y \<in> {(p1, p2). (p1,p2) \<in> (parcs G) \<and> p2 < p1}" and a2: "w x = w y"
-    obtain x\<^sub>1 x\<^sub>2 where x_def: "x = (x\<^sub>1,x\<^sub>2)" using a0 by blast
-    obtain y1 y2 where y_def: "y = (y1,y2)" using a1 by blast
-    have "((x\<^sub>1 = y1 \<and> x\<^sub>2 = y2) \<or> (x\<^sub>1 = y2 \<and> x\<^sub>2 = y1) \<or> (x\<^sub>1 = x\<^sub>2 \<and> y1 = y2))" 
-      by (metis (no_types, lifting) Product_Type.Collect_case_prodD a1 a2 fst_conv snd_conv weight_unique x_def y_def zero distinct)
-    moreover have "x\<^sub>2 < x\<^sub>1" using x_def a0 by auto
-    moreover have "y2 < y1" using y_def a1 by auto
-    ultimately have "(x\<^sub>1 = y1 \<and> x\<^sub>2 = y2)" by auto
-    then show "x = y" by (simp add: x_def y_def)
+    fix v u
+    assume a0: "v \<in> {(p1, p2). (p1,p2) \<in> (parcs G) \<and> p2 < p1}" 
+       and a1: "u \<in> {(p1, p2). (p1,p2) \<in> (parcs G) \<and> p2 < p1}" and a2: "w v = w u"
+    obtain v\<^sub>1 v\<^sub>2 where v_def: "v = (v\<^sub>1,v\<^sub>2)" using a0 by blast
+    obtain u\<^sub>1 u\<^sub>2 where u_def: "u = (u\<^sub>1,u\<^sub>2)" using a1 by blast
+    have "((v\<^sub>1 = u\<^sub>1 \<and> v\<^sub>2 = u\<^sub>2) \<or> (v\<^sub>1 = u\<^sub>2 \<and> v\<^sub>2 = u\<^sub>1) \<or> (v\<^sub>1 = v\<^sub>2 \<and> u\<^sub>1 = u\<^sub>2))" 
+      by (metis (no_types, lifting) Product_Type.Collect_case_prodD a1 a2 fst_conv snd_conv weight_unique u_def v_def zero)
+    moreover have "v\<^sub>2 < v\<^sub>1" using v_def a0 by auto
+    moreover have "u\<^sub>2 < u\<^sub>1" using u_def a1 by auto
+    ultimately have "(v\<^sub>1 = u\<^sub>1 \<and> v\<^sub>2 = u\<^sub>2)" by auto
+    then show "v = u" by (simp add: u_def v_def)
   qed
   moreover have "card {(p1,p2). (p1,p2) \<in> (parcs G) \<and> p2 < p1} \<ge> card (real ` W)" 
     using card_W max_arcs restricted_weight_fun_card by linarith
@@ -1527,36 +1521,25 @@ next
     qed
     then show ?thesis by blast
   qed
-  ultimately show ?thesis 
-    using surjective_iff_injective_gen_le[of "{(p1,p2). (p1,p2) \<in> (parcs G) \<and> p2 < p1}" "real ` W" w] by auto
+  ultimately show ?thesis using surjective_iff_injective_gen_le[of "{(p1,p2). (p1,p2) \<in> (parcs G) \<and> p2 < p1}" "real ` W" w] by auto 
 qed(*>*)
 
-
 lemma(in distinct_weighted_pair_graph) weight_fun_surjective:
-  shows "(\<forall>k \<in> W. \<exists>(v\<^sub>1,v\<^sub>2) \<in> (parcs G). w (v\<^sub>1,v\<^sub>2) = k)"
-(*<*)proof-
-  have "{(p1,p2). (p1,p2) \<in> (parcs G) \<and> p2 < p1} \<subseteq> (parcs G)" 
-  by blast
-  then have "distinct \<longrightarrow> (\<forall>y \<in> W. \<exists>(x\<^sub>1,x\<^sub>2) \<in> (parcs G). w (x\<^sub>1,x\<^sub>2) = y)" 
-    using restricted_weight_fun_surjective by blast
-  then have "distinct \<longrightarrow> (\<forall>y \<in> W. \<exists>(x\<^sub>1,x\<^sub>2) \<in> (parcs G). w (x\<^sub>1,x\<^sub>2) = y)" 
-    by (meson Diff_subset in_mono)
-  then show ?thesis using distinct by auto
-qed
+  shows "(\<forall>k \<in> W. \<exists>(v\<^sub>1,v\<^sub>2) \<in> (parcs G). w (v\<^sub>1,v\<^sub>2) = k)" 
+(*<*) using restricted_weight_fun_surjective 
+  by (metis (no_types, lifting) case_prodE mem_Collect_eq restricted_weight_fun_card)
 
 lemma weight_different:
-  assumes "y \<noteq> (x\<^sub>1,x\<^sub>2)" and "y \<noteq> (x\<^sub>2,x\<^sub>1)" and "w (x\<^sub>1,x\<^sub>2) = k" and "(x\<^sub>1,x\<^sub>2) \<in> parcs G" 
+  assumes "y \<noteq> (v\<^sub>1,v\<^sub>2)" and "y \<noteq> (v\<^sub>2,v\<^sub>1)" and "w (v\<^sub>1,v\<^sub>2) = k" and "(v\<^sub>1,v\<^sub>2) \<in> parcs G" 
   shows "w y \<noteq> k" 
-  by (metis (no_types, lifting) assms(1-4) distinct weight_unique zero prod.collapse) 
+  by (metis (no_types, lifting) assms weight_unique zero prod.collapse) 
 
-(*>*)
-
-(*<*)end
+end
 
 instantiation prod :: (linorder,linorder) linorder begin
-definition "less_eq_prod \<equiv> \<lambda>(x\<^sub>1,x\<^sub>2) (y1,y2). x\<^sub>1 < y1 \<or> x\<^sub>1 = y1 \<and> x\<^sub>2 \<le> y2"
-definition "less_prod \<equiv> \<lambda>(x\<^sub>1,x\<^sub>2) (y1,y2). x\<^sub>1 < y1 \<or> x\<^sub>1 = y1 \<and> x\<^sub>2 < y2"
-instance by standard (auto simp add: less_eq_prod_def less_prod_def) 
+  definition "less_eq_prod \<equiv> \<lambda>(x\<^sub>1,x\<^sub>2) (y\<^sub>1,y\<^sub>2). x\<^sub>1 < y\<^sub>1 \<or> x\<^sub>1 = y\<^sub>1 \<and> x\<^sub>2 \<le> y\<^sub>2"
+  definition "less_prod \<equiv> \<lambda>(x\<^sub>1,x\<^sub>2) (y\<^sub>1,y\<^sub>2). x\<^sub>1 < y\<^sub>1 \<or> x\<^sub>1 = y\<^sub>1 \<and> x\<^sub>2 < y\<^sub>2"
+    instance by standard (auto simp add: less_eq_prod_def less_prod_def) 
 end
 
 definition set_to_list :: "('a::linorder\<times>'a) set \<Rightarrow> ('a\<times>'a) list"
