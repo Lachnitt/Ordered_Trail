@@ -39,7 +39,7 @@ with a different integer-valued weight ranging from $1, \ldots, 6$:
 		
 		\draw[] (c) -- (d)  node[midway, above] {$2$};
 		\end{tikzpicture}
-  \caption{Example graph $\protect K_4$}\label{exampleGraph}
+  \caption{Example graph $\protect K_4$}\label{example:K4}
 \end{figure}
 
 \noindent When considering $K_4$, the question we address in this paper is whether $K_4$ has a 
@@ -95,8 +95,8 @@ Graham and Kletman~\cite{graham1973increasing} proved that the lower bound of th
 is given by $2 \cdot \lfloor\frac{q}{n}\rfloor$, as also mentioned above. In our work, we formalize and verify 
 such results in Isabelle/HOL. Yet, our work is not a straightforward adaptation and formalization   
 of Graham and Kletman's proof~\cite{graham1973increasing}. Rather, we focus on decreasing trails instead of increasing trails 
-and give an algorithm computing longest decreasing trails of a given graph (Algorithm \ref{algo}).  
-By formalizing Algorithm \ref{algo} in Isabelle/HOL, we also formally verify the correctness 
+and give an algorithm computing longest decreasing trails of a given graph (Algorithm \ref{algo:FindLongestTrail}).  
+By formalizing Algorithm \ref{algo:FindLongestTrail} in Isabelle/HOL, we also formally verify the correctness 
 of the trails computed by our approach. Moreover, we prove that any strictly decreasing trail is also an strictly increasing 
 one, allowing this way to use our formalization in Isabelle/HOL also to formalize results of Graham and Kletman~\cite{graham1973increasing}.
 
@@ -107,7 +107,7 @@ We formalize strictly increasing trails and provide basic lemmas about their
 properties.
 \item[(2)] We formalize strictly decreasing trails, in addition to the increasing trail setting of~\cite{graham1973increasing}. 
 We prove the duality between strictly increasing and strictly decreasing trails, that is, any such decreasing trail is an increasing one, and vice versa.
-\item[(3)] We design an algorithm computing longest ordered paths (Algorithm \ref{algo}), and formally verify  its correctness in Isabelle/HOL.
+\item[(3)] We design an algorithm computing longest ordered paths (Algorithm \ref{algo:FindLongestTrail}), and formally verify  its correctness in Isabelle/HOL.
 We extract our algorithm to Haskell program code using Isabelle's program extraction tool. Thus, we obtain a fully verified algorithm to compute the length
 of strictly-ordered trails in any given graph and weight distribution.
 \item[(4)] We
@@ -129,7 +129,7 @@ formalization in Isabelle/HOL in Section 4. We discuss further directions in Sec
  \<close>
 
 section "Preliminaries" 
-text \<open> \label{Prelim}
+text \<open> \label{section:Prelim}
 We briefly recapitulate the basic notions of graph theory. A {\em graph} $G = (V,E)$ consists of
 a set $V$ of {\em vertices} and a set $E \subseteq V \times V$ of {\em edges}. A graph is undirected 
 if $(v_1,v_2)\in E$ implies that also $(v_2,v_1)\in E$. A graph is {\em complete}
@@ -149,7 +149,7 @@ is a trail such that $w (e_i) > w (e_{i+1})$. Likewise, a {\em strictly increasi
 
 We will denote the length of a longest strictly increasing trail with $P_i(w,G)$. Likewise we will denote the length
 of a longest strictly decreasing trail with $P_d(w,G)$. In any undirected graph, it holds that $P_i(w,G) = P_d(w,G)$, 
-a result that we will formally verify in Section \ref{trails}. 
+a result that we will formally verify in Section \ref{section:trails}. 
 
 Let $f_i(n) = \min P_i(w,K_n)$ denote the minimum length of an strictly increasing trail that must exist in 
 the complete graph with $n$ vertices. Likewise, $f_d(n) = \min P_d(w,K_n)$ in the case that we consider 
@@ -157,27 +157,27 @@ strictly decreasing trails. \<close>
 
 section "Lower Bounds on Increasing and Decreasing Trails in Weighted Graphs"
 
-text \<open>\label{PaperProof}
+text \<open>\label{symbolicProof}
 The proof introduced in the following is based on similar ideas as in \cite{graham1973increasing}. 
 However, we diverge from \cite{graham1973increasing} in several aspects. Firstly, we consider strictly decreasing instead of strictly increasing trails,
-reducing the complexity of the automated proof (see Section \ref{Formalization}). 
+reducing the complexity of the automated proof (see Section \ref{section:Formalization}). 
 Moreover, we add tighter bounds than necessary to give a fully constructive proof in terms of an algorithm for computing
-the length of these trails (see Section \ref{localeSurjective}). We discuss this further at the end of the section.
+the length of these trails (see Section \ref{section:localeSurjective}). We discuss this further at the end of the section.
 
 We start by introducing the notion of a weighted subgraph and then we built on that by specifying a family of labelling functions:
 
-\begin{definition}[Weighted Subgraph] \label{WeightedSG}
+\begin{definition}[Weighted Subgraph] \label{def:weightedSubgraph}
 	Let $G=(V,E)$ be a graph with weight function $w:E\rightarrow \{1,\ldots,q\}$ where $|E| = q$.
 	For each $i\in \{0,...,q\}$ define a weighted subgraph $G^i = (V,E^i)$ such that $e\in E^i$ iff $w(e)\in \{1,...,i\}$. 
   That is, $G^i$ contains only edges labelled with weights $\le i$.
 \end{definition}
 
-\begin{definition}[Labelling Function]\label{Labelling}
+\begin{definition}[Labelling Function]\label{def:Labelling}
 	For each $G^i=(V,E^i)$ we define $L^i:E^i\rightarrow \{1,\ldots,\frac{n(n-1)}{2}\}$ where $n = |V|$ a labelling function such 
 that $L^i(v)$ is the length of a longest strictly decreasing trail starting at vertex v using only edges in $E^i$.
 \end{definition}
 
-\noindent In Figure \ref{exampleSubgraph} the example graph from Figure \ref{exampleGraph} is revisited to 
+\noindent In Figure \ref{example:G5} the example graph from Figure \ref{example:K4} is revisited to 
 illustrate these definitions. We need to prove the following property.
 
 \begin{figure}
@@ -225,10 +225,10 @@ illustrate these definitions. We need to prove the following property.
 		Therefore, $L^5(v_1) = 2$
 	\end{multicols}
 	
-  \caption{Graph $G^5$ with labelling function $L^5$}\label{exampleSubgraph}
+  \caption{Graph $G^5$ with labelling function $L^5$}\label{example:G5}
 \end{figure}
 
-\begin{lemma}\label{sum}
+\begin{lemma}\label{lemma:sum}
 	Let $i < q$ and $G^i$ a labelled subgraph of G. Then, adding the edge labelled with $i+1$ to the 
 graph $G_i$ increases the sum of the lengths of strictly decreasing trails at least by 2, i.e.,
 	$\sum_{v\in V} L^{i+1}(v) \ge \sum_{v\in V} L^{i}(v)+2$.
@@ -240,7 +240,7 @@ therefore the graph $G^{i+1}$ is $G^i$ with the additional edge $e$. As $w(e') <
  $L^{i+1}(v) = L^i(v)$ for all $v\in V$ with $u_1\neq v, u_2\neq v$. It also holds that $L^{i+1}(u_1) = \max(L^i(u_2)+1,L^i(u_1))$ 
 because either that longest trail from $u_1$ can be prolonged with edge $e$ ($i+1$ will be greater than the weight of the first edge 
 in this trail by construction of $L^{i+1}$) or there is already a longer trail starting from $u_1$ not using e. 
-We derive $L^{i+1}(u_2) = \max(L^i(u_1)+1,L^i(u_2))$ based on a similar reasoning. See Figure \ref{cases} for a visualisation. 
+We derive $L^{i+1}(u_2) = \max(L^i(u_1)+1,L^i(u_2))$ based on a similar reasoning. See Figure \ref{figure:cases} for a visualisation. 
 
 Note that $L^{i+1}(v) = L^i(v)$ for $v\in V \setminus \{u_1,u_2\}$, because no edge incident to these vertices was added and
 a trail starting from them cannot be prolonged since the new edge has bigger weight than any edge in such a 
@@ -280,11 +280,11 @@ If $L(u_1)>L(u_2)$ then $L^{i+1}(u_2) = L^i(u_1) +1 \ge L^i(u_2)+2$, otherwise $
 	\node[draw,circle, label = $L^{i+1}(u_1)+1$] at (4, 0)   (d) {};			
 	\draw[] (c) -- (d)  node[below,midway] {$i+1$};
 	\end{tikzpicture}
-	\caption{Case distinction when adding edge $e$ in Lemma \ref{sum}}\label{cases}
+	\caption{Case distinction when adding edge $e$ in Lemma \ref{lemma:sum}}\label{figure:cases}
 \end{figure}
 			
 
-\noindent Note that the proof of Lemma \ref{sum} is constructive, yielding the Algorithm \ref{algo} for computing
+\noindent Note that the proof of Lemma \ref{lemma:sum} is constructive, yielding the Algorithm \ref{algo:FindLongestTrail} for computing
 longest strictly decreasing trails. Function $findEndpoints$ searches for an edge in a graph $G$ by its weight $i$ and returns
 both endpoints. Function $findMax$ returns the maximum value of the array $L$. 
 
@@ -301,13 +301,13 @@ both endpoints. Function $findMax$ returns the maximum value of the array $L$.
 
 	return findMax(L)\;
 
-\caption{Find Longest Strictly Decreasing Trail}\label{algo}
+\caption{Find Longest Strictly Decreasing Trail}\label{algo:FindLongestTrail}
 \end{algorithm}
 
 \begin{lemma}$\sum_{v\in V} L^{q}(v) \ge 2q$. \end{lemma}
 
 \begin{proof}
-By induction, using the property $\sum_{v\in V} L^{i+1}(v) \ge \sum_{v\in V} L^{i}(v)+2$ from Lemma \ref{sum}. For the induction base note that $\sum_{v\in V} L^{0}(v) = 0$ 
+By induction, using the property $\sum_{v\in V} L^{i+1}(v) \ge \sum_{v\in V} L^{i}(v)+2$ from Lemma \ref{lemma:sum}. For the induction base note that $\sum_{v\in V} L^{0}(v) = 0$ 
 because $G^0$ does not contain any edges and thus no vertex has a strictly decreasing trail of length greater than 0. \qed \end{proof}
 
 \noindent We next prove the lower bound on the length of longest strictly decreasing trails.
@@ -315,7 +315,7 @@ because $G^0$ does not contain any edges and thus no vertex has a strictly decre
 \begin{theorem}Let $G = (V,E)$ be an undirected edge-weighted graph such that $|V|=n$ and $|E| = q$. Let  
 $w:E\rightarrow \{1,\ldots,q\}$ be a weight function assuming different weights are mapped to to different edges. 
 Then, $P_d(w,G) \ge 2\cdot\lfloor\frac{q}{n}\rfloor$ i.e., there 
-exists a strictly decreasing trail of length $2\cdot\lfloor\frac{q}{n}\rfloor$.\label{main}\end{theorem}
+exists a strictly decreasing trail of length $2\cdot\lfloor\frac{q}{n}\rfloor$.\label{theorem:main}\end{theorem}
 
 \begin{proof}Assume that no vertex is a starting point of a trail of length at least $2\cdot\lfloor\frac{q}{n}\rfloor$, that is
 	$L^{q}(v) < 2\cdot\lfloor\frac{q}{n}\rfloor,$ for all $v \in V$. 
@@ -326,27 +326,27 @@ exists a strictly decreasing trail of length $2\cdot\lfloor\frac{q}{n}\rfloor$.\
 	the proof. 
 \end{proof} 
 
-\noindent Based on Theorem \ref{main}, we get the following results.
+\noindent Based on Theorem \ref{theorem:main}, we get the following results.
 
-\begin{corollary}\label{corInc}
+\begin{corollary}\label{corollary:IncreasingIsDecreasing}
 It also holds that $P_i(w,G) \ge 2\cdot\lfloor\frac{q}{n}\rfloor$ since when reversing a strictly decreasing trail 
 one obtains a strictly increasing one. In this case, define $L^i(v)$ as the 
 length of a longest strictly increasing trail ending at $v$ in $G^i$.\qed \end{corollary}
 
 \begin{corollary}
-Let G be as in Theorem \ref{main} and additionally assume that G is complete. Then, there exists a trail 
+Let G be as in Theorem \ref{theorem:main} and additionally assume that G is complete. Then, there exists a trail 
 of length at least $n-1$, i.e. $f_i(n) = f_d(n)  \ge n-1$.\qed
 \end{corollary}
 
-In \cite{graham1973increasing} the authors present a non-constructive proof. As in Lemma \ref{sum} they argue that the 
+In \cite{graham1973increasing} the authors present a non-constructive proof. As in Lemma \ref{lemma:sum} they argue that the 
 sum of the lengths of all increasing paths is at least 2. We however, use the exact increase therefore 
-making the proof constructive and obtaining Algorithm \ref{algo}.\<close>
+making the proof constructive and obtaining Algorithm \ref{algo:FindLongestTrail}.\<close>
 
 section "Formalization of Trail Properties in Isabelle/HOL"
-text \<open>\label{Formalization} \<close>
+text \<open>\label{section:Formalization} \<close>
 subsection "Graph Theory in the Archive of Formal Proofs"
 
-text \<open>\label{GraphTheory} To increase the reusability of our library we build upon the @{text "Graph_Theory"}
+text \<open>\label{section:GraphTheory} To increase the reusability of our library we build upon the @{text "Graph_Theory"}
 library by Noschinski \cite{Graph_Theory-AFP}. Graphs are represented as records consisting of vertices and edges that
 can be accessed using the selectors @{term "pverts"} and @{term "parcs"}. We recall the definition 
 of the type @{term pair_pre_digraph}:
@@ -381,11 +381,11 @@ Finally, there is an useful definition capturing the notion of a complete graph,
 
 subsection "Increasing and Decreasing Trails in Weighted Graphs"
 
-text \<open>\label{trails} In our work we extend the graph theory framework from Section \ref{GraphTheory} 
+text \<open>\label{section:trails} In our work we extend the graph theory framework from Section \ref{section:GraphTheory} 
 with new features enabling reasoning about ordered trails. To this end,
  a trail is defined as a list of edges. We will only consider strictly increasing trails 
 on graphs without parallel edges. For this we require the graph 
-to be of type @{term "pair_pre_digraph"}, as introduced in Section \ref{GraphTheory}. 
+to be of type @{term "pair_pre_digraph"}, as introduced in Section \ref{section:GraphTheory}. 
 
 Two different definitions
 are given in our formalization. Function @{text "incTrail"} can be used without specifying the first and last vertex of the trail
@@ -1121,7 +1121,7 @@ qed(*>*)
 
 subsection "Weighted Graphs"
 
-text \<open> \label{localeSurjective} We add the locale @{text "weighted_pair_graph"} 
+text \<open> \label{section:localeSurjective} We add the locale @{text "weighted_pair_graph"} 
 on top of the locale @{locale "pair_graph"} introduced in @{text "Graph_Theory"}. A  @{locale "pair_graph"} is a 
 finite, loop free and symmetric graph. We do not restrict the types of vertices and edges but impose 
 the condition that they have to be a linear order.
@@ -1140,7 +1140,7 @@ locale weighted_pair_graph = pair_graph "(G:: ('a::linorder) pair_pre_digraph)" 
 context weighted_pair_graph 
 begin
 (*>*)
-text \<open> We introduce some useful abbreviations, according to the ones in Section \ref{Prelim}  \<close>
+text \<open> We introduce some useful abbreviations, according to the ones in Section \ref{section:Prelim}  \<close>
 
 abbreviation(in weighted_pair_graph) "q \<equiv> card (parcs G)"
 abbreviation(in weighted_pair_graph) "n \<equiv> card (pverts G)"
@@ -1370,7 +1370,7 @@ next
     next
       assume a0b: "i \<ge> 1" 
     then have "\<exists>x\<^sub>1 x\<^sub>2. (x\<^sub>1,x\<^sub>2) \<in> A \<and> (x\<^sub>2,x\<^sub>1) \<in> A" 
-      by (metis One_nat_def Suc_n_not_le_n a0b a2 card.empty card_insert_disjoint card_le_Suc_iff equals0I le_eq_less_or_eq order.trans prod.collapse)
+      by (metis One_nat_def Suc_n_not_le_n a0b a2 card.empty equals0I prod.collapse)
     then obtain x\<^sub>1 x\<^sub>2 where f0: "(x\<^sub>1,x\<^sub>2) \<in> A \<and> x\<^sub>1 < x\<^sub>2" by (metis a3 neqE)
     then have "finite (A-{(x\<^sub>1,x\<^sub>2),(x\<^sub>2,x\<^sub>1)})" by (simp add: a1)
     moreover have "card (A-{(x\<^sub>1,x\<^sub>2),(x\<^sub>2,x\<^sub>1)}) = i - 2" 
@@ -1438,7 +1438,7 @@ next
     then have "card {(p1,p2). (p1,p2) \<in> A \<and> p2 < p1} = i div 2" 
       using Suc_diff_Suc \<open>card {(p1, p2). (p1, p2) \<in> A - {(x\<^sub>1, x\<^sub>2), (x\<^sub>2, x\<^sub>1)} \<and> p2 < p1} = (i - 2) div 2\<close> 
           a0b a2 add.commute aux_even_arcs f1 le_add_diff_inverse le_eq_less_or_eq odd_one one_add_one plus_1_eq_Suc 
-      by (metis (no_types, lifting) div2_Suc_Suc ordered_cancel_comm_monoid_diff_class.add_diff_inverse)
+      by (metis (no_types, lifting) div2_Suc_Suc)
     then show "card {(p1,p2). (p1,p2) \<in> A \<and> p2 < p1} = i div 2" 
       using \<open>finite A \<and> card A = i \<and> (\<forall>x. (x, x) \<notin> A) \<and> (\<forall>x y. (x, y) \<in> A \<longrightarrow> (y, x) \<in> A)\<close> a2 by linarith
   qed
@@ -1561,7 +1561,7 @@ lemma set_to_list_mono:
 
 subsection \<open> Computing a Longest Ordered Trail \<close>
 
-text \<open>\label{compAlgo}We next formally verify Algorithm \ref{algo} and compute longest ordered trails. To this end, 
+text \<open>\label{section:computeLongestTrail}We next formally verify Algorithm \ref{algo:FindLongestTrail} and compute longest ordered trails. To this end, 
 we introduce the function @{text "findEdge"} to find an edge in a list of edges by its weight. \<close>
 
 fun findEdge :: "('a\<times>'a) weight_fun \<Rightarrow> ('a\<times>'a) list \<Rightarrow> real \<Rightarrow> ('a\<times>'a)" where
@@ -1573,46 +1573,46 @@ begin
 
 lemma aux_findEdge_success:
   assumes "a \<ge> 1"
-  shows "\<forall>ys. k \<in> W \<and> w (x\<^sub>1,x\<^sub>2) = k \<and> length ys = a \<and> ((x\<^sub>1,x\<^sub>2) \<in> set ys \<or> (x\<^sub>2,x\<^sub>1) \<in> set ys) \<longrightarrow>
-(\<exists>xs. (findEdge w ys k) = (findEdge w ((x\<^sub>1,x\<^sub>2)#xs) k)) \<or> (\<exists>xs. (findEdge w ys k) = (findEdge w ((x\<^sub>2,x\<^sub>1)#xs) k))"
+  shows "\<forall>ys. k \<in> W \<and> w (v\<^sub>1,v\<^sub>2) = k \<and> length ys = a \<and> ((v\<^sub>1,v\<^sub>2) \<in> set ys \<or> (v\<^sub>2,v\<^sub>1) \<in> set ys) \<longrightarrow>
+(\<exists>xs. (findEdge w ys k) = (findEdge w ((v\<^sub>1,v\<^sub>2)#xs) k)) \<or> (\<exists>xs. (findEdge w ys k) = (findEdge w ((v\<^sub>2,v\<^sub>1)#xs) k))"
 proof(rule Nat.nat_induct_at_least[of 1 a])
   show "a \<ge> 1" using assms by simp
 next
-  show "\<forall>ys. k \<in> W \<and> w (x\<^sub>1, x\<^sub>2) = real k \<and> length ys = 1 \<and> ((x\<^sub>1,x\<^sub>2) \<in> set ys \<or> (x\<^sub>2,x\<^sub>1) \<in> set ys) \<longrightarrow>
-    (\<exists>xs. findEdge w ys k = findEdge w ((x\<^sub>1, x\<^sub>2) # xs) k) \<or> (\<exists>xs. findEdge w ys k = findEdge w ((x\<^sub>2, x\<^sub>1) # xs) k)"
+  show "\<forall>ys. k \<in> W \<and> w (v\<^sub>1, v\<^sub>2) = real k \<and> length ys = 1 \<and> ((v\<^sub>1,v\<^sub>2) \<in> set ys \<or> (v\<^sub>2,v\<^sub>1) \<in> set ys) \<longrightarrow>
+    (\<exists>xs. findEdge w ys k = findEdge w ((v\<^sub>1, v\<^sub>2) # xs) k) \<or> (\<exists>xs. findEdge w ys k = findEdge w ((v\<^sub>2, v\<^sub>1) # xs) k)"
   proof(rule allI, rule impI)
     fix ys
-    assume a0: "k \<in> W \<and> w (x\<^sub>1, x\<^sub>2) = real k \<and> length ys = 1 \<and> ((x\<^sub>1,x\<^sub>2) \<in> set ys \<or> (x\<^sub>2,x\<^sub>1) \<in> set ys)" 
-    then have "hd ys = (x\<^sub>1,x\<^sub>2) \<or> hd ys = (x\<^sub>2,x\<^sub>1)"
+    assume a0: "k \<in> W \<and> w (v\<^sub>1, v\<^sub>2) = real k \<and> length ys = 1 \<and> ((v\<^sub>1,v\<^sub>2) \<in> set ys \<or> (v\<^sub>2,v\<^sub>1) \<in> set ys)" 
+    then have "hd ys = (v\<^sub>1,v\<^sub>2) \<or> hd ys = (v\<^sub>2,v\<^sub>1)"
       by (smt One_nat_def Suc_length_conv hd_Cons_tl length_0_conv list.sel(3) list.set(1) list.set(2) singletonD)
-    then show "(\<exists>xs. findEdge w ys k = findEdge w ((x\<^sub>1, x\<^sub>2) # xs) k) \<or> (\<exists>xs. findEdge w ys k = findEdge w ((x\<^sub>2, x\<^sub>1) # xs) k)"
+    then show "(\<exists>xs. findEdge w ys k = findEdge w ((v\<^sub>1, v\<^sub>2) # xs) k) \<or> (\<exists>xs. findEdge w ys k = findEdge w ((v\<^sub>2, v\<^sub>1) # xs) k)"
       by (metis One_nat_def a0 hd_Cons_tl length_0_conv nat.simps(3))
   qed
 next
   fix a
-  assume IH: "\<forall>ys. k \<in> W \<and> w (x\<^sub>1,x\<^sub>2) = k \<and> length ys = a \<and> ((x\<^sub>1,x\<^sub>2) \<in> set ys \<or> (x\<^sub>2,x\<^sub>1) \<in> set ys) \<longrightarrow>
-(\<exists>xs. (findEdge w ys k) = (findEdge w ((x\<^sub>1,x\<^sub>2)#xs) k)) \<or> (\<exists>xs. (findEdge w ys k) = (findEdge w ((x\<^sub>2,x\<^sub>1)#xs) k))"
-  show "\<forall>ys. k \<in> W \<and> w (x\<^sub>1,x\<^sub>2) = k \<and> length ys = (Suc a) \<and> ((x\<^sub>1,x\<^sub>2) \<in> set ys \<or> (x\<^sub>2,x\<^sub>1) \<in> set ys) \<longrightarrow>
-(\<exists>xs. (findEdge w ys k) = (findEdge w ((x\<^sub>1,x\<^sub>2)#xs) k)) \<or> (\<exists>xs. (findEdge w ys k) = (findEdge w ((x\<^sub>2,x\<^sub>1)#xs) k))"
+  assume IH: "\<forall>ys. k \<in> W \<and> w (v\<^sub>1,v\<^sub>2) = k \<and> length ys = a \<and> ((v\<^sub>1,v\<^sub>2) \<in> set ys \<or> (v\<^sub>2,v\<^sub>1) \<in> set ys) \<longrightarrow>
+(\<exists>xs. (findEdge w ys k) = (findEdge w ((v\<^sub>1,v\<^sub>2)#xs) k)) \<or> (\<exists>xs. (findEdge w ys k) = (findEdge w ((v\<^sub>2,v\<^sub>1)#xs) k))"
+  show "\<forall>ys. k \<in> W \<and> w (v\<^sub>1,v\<^sub>2) = k \<and> length ys = (Suc a) \<and> ((v\<^sub>1,v\<^sub>2) \<in> set ys \<or> (v\<^sub>2,v\<^sub>1) \<in> set ys) \<longrightarrow>
+(\<exists>xs. (findEdge w ys k) = (findEdge w ((v\<^sub>1,v\<^sub>2)#xs) k)) \<or> (\<exists>xs. (findEdge w ys k) = (findEdge w ((v\<^sub>2,v\<^sub>1)#xs) k))"
   proof(rule allI, rule impI)
     fix ys
-    assume a0: "k \<in> W \<and> w (x\<^sub>1,x\<^sub>2) = k \<and> length ys = (Suc a) \<and> ((x\<^sub>1,x\<^sub>2) \<in> set ys \<or> (x\<^sub>2,x\<^sub>1) \<in> set ys)"
-    show "(\<exists>xs. (findEdge w ys k) = (findEdge w ((x\<^sub>1,x\<^sub>2)#xs) k)) \<or> (\<exists>xs. (findEdge w ys k) = (findEdge w ((x\<^sub>2,x\<^sub>1)#xs) k))"
+    assume a0: "k \<in> W \<and> w (v\<^sub>1,v\<^sub>2) = k \<and> length ys = (Suc a) \<and> ((v\<^sub>1,v\<^sub>2) \<in> set ys \<or> (v\<^sub>2,v\<^sub>1) \<in> set ys)"
+    show "(\<exists>xs. (findEdge w ys k) = (findEdge w ((v\<^sub>1,v\<^sub>2)#xs) k)) \<or> (\<exists>xs. (findEdge w ys k) = (findEdge w ((v\<^sub>2,v\<^sub>1)#xs) k))"
     proof(rule disjE)
-      show "((hd ys) = (x\<^sub>1,x\<^sub>2) \<or> (hd ys) = (x\<^sub>2,x\<^sub>1)) \<or> ((hd ys) \<noteq> (x\<^sub>1,x\<^sub>2) \<and> (hd ys) \<noteq> (x\<^sub>2,x\<^sub>1))" by auto
+      show "((hd ys) = (v\<^sub>1,v\<^sub>2) \<or> (hd ys) = (v\<^sub>2,v\<^sub>1)) \<or> ((hd ys) \<noteq> (v\<^sub>1,v\<^sub>2) \<and> (hd ys) \<noteq> (v\<^sub>2,v\<^sub>1))" by auto
     next
-      assume "hd ys = (x\<^sub>1,x\<^sub>2) \<or> (hd ys) = (x\<^sub>2,x\<^sub>1)"
-      then show "(\<exists>xs. (findEdge w ys k) = (findEdge w ((x\<^sub>1,x\<^sub>2)#xs) k)) \<or> (\<exists>xs. (findEdge w ys k) = (findEdge w ((x\<^sub>2,x\<^sub>1)#xs) k))"
+      assume "hd ys = (v\<^sub>1,v\<^sub>2) \<or> (hd ys) = (v\<^sub>2,v\<^sub>1)"
+      then show "(\<exists>xs. (findEdge w ys k) = (findEdge w ((v\<^sub>1,v\<^sub>2)#xs) k)) \<or> (\<exists>xs. (findEdge w ys k) = (findEdge w ((v\<^sub>2,v\<^sub>1)#xs) k))"
         by (metis a0 hd_Cons_tl length_0_conv nat.simps(3))
     next
-      assume "(hd ys) \<noteq> (x\<^sub>1,x\<^sub>2) \<and> (hd ys) \<noteq> (x\<^sub>2,x\<^sub>1)"
-      moreover have "w (x\<^sub>1,x\<^sub>2) \<noteq> 0" 
+      assume "(hd ys) \<noteq> (v\<^sub>1,v\<^sub>2) \<and> (hd ys) \<noteq> (v\<^sub>2,v\<^sub>1)"
+      moreover have "w (v\<^sub>1,v\<^sub>2) \<noteq> 0" 
         using a0 weighted_pair_graph_axioms by auto
       ultimately have "w (hd ys) \<noteq> k" using a0 zero distinct weight_different 
         by (metis (no_types, lifting))
       then have "(findEdge w ys k) = (findEdge w (tl ys) k)"
         by (metis a0 findEdge.elims length_0_conv list.sel(1) list.sel(3) nat.simps(3)) 
-      then show "(\<exists>xs. (findEdge w ys k) = (findEdge w ((x\<^sub>1,x\<^sub>2)#xs) k)) \<or> (\<exists>xs. (findEdge w ys k) = (findEdge w ((x\<^sub>2,x\<^sub>1)#xs) k))"
+      then show "(\<exists>xs. (findEdge w ys k) = (findEdge w ((v\<^sub>1,v\<^sub>2)#xs) k)) \<or> (\<exists>xs. (findEdge w ys k) = (findEdge w ((v\<^sub>2,v\<^sub>1)#xs) k))"
         using IH 
         by (metis a0 add_diff_cancel_left' hd_Cons_tl length_0_conv length_tl nat.simps(3) plus_1_eq_Suc set_ConsD)
     qed
@@ -1638,7 +1638,7 @@ lemma(in distinct_weighted_pair_graph) findEdge_success:
   moreover have "\<forall>xs. (findEdge w ((v\<^sub>1,v\<^sub>2)#xs) k) = (v\<^sub>1,v\<^sub>2)" by (simp add: assms(2))
   moreover have "\<forall>xs. (findEdge w ((v\<^sub>2,v\<^sub>1)#xs) k) = (v\<^sub>2,v\<^sub>1)" 
     using assms(2) distinct_weighted_pair_graph.undirected distinct_weighted_pair_graph_axioms 
-    by (metis (no_types, lifting) distinct findEdge.simps(2) in_arcsD1 in_arcsD2 undirected zero)
+    by (metis (no_types, lifting) findEdge.simps(2) in_arcsD1 in_arcsD2 zero)
   ultimately show ?thesis by metis
 qed
 
@@ -1669,7 +1669,7 @@ proof-
   then have "v\<^sub>1 \<noteq> v\<^sub>2" 
     using pair_no_loops of_nat_neq_0 weight_not_zero_implies_arc adj_not_same by blast
   moreover have "v\<^sub>1 \<in> pverts G \<and> v\<^sub>2 \<in> pverts G" using f0 of_nat_neq_0 of_nat_0_eq_iff assms 
-    by (metis Zero_not_Suc of_nat_eq_0_iff distinct_weighted_pair_graph.weight_zero distinct_weighted_pair_graph_axioms with_proj_simps(1))
+    by fastforce
   moreover have "parcs G \<noteq> {}" using f0 calculation weight_not_zero_implies_arc by fastforce
   moreover have "(v\<^sub>1, v\<^sub>2) \<in> parcs G" using weight_not_zero_implies_arc assms by (simp add: f0)
   ultimately have f1: "(findEdge w (set_to_list (parcs G)) (Suc i)) = (v\<^sub>1,v\<^sub>2) \<or> (findEdge w (set_to_list (parcs G)) (Suc i)) = (v\<^sub>2,v\<^sub>1)" 
@@ -1682,9 +1682,9 @@ qed
  
 end(*>*)
 
-text \<open>We translate the notion of a labelling function $L^i(v)$ (see Definition \ref{Labelling}) into Isabelle.
+text \<open>We translate the notion of a labelling function $L^i(v)$ (see Definition \ref{def:Labelling}) into Isabelle.
 Function @{text "getL G w"}, in short for get label, returns the length of the longest strictly decreasing
-path starting at vertex $v$. In contrast to Definition \ref{Labelling} subgraphs are treated here implicitly. Intuitively,
+path starting at vertex $v$. In contrast to Definition \ref{def:Labelling} subgraphs are treated here implicitly. Intuitively,
 this can be seen as adding edges to an empty graph in order of their weight. 
  \<close>
 
@@ -1812,7 +1812,7 @@ next
   next
     assume a3: "length xs \<ge> 1" 
     moreover have a4: "w (v\<^sub>1,v\<^sub>2) = Suc k" using a0 a2 findEdge_surjective  
-      by (metis atLeastAtMost_iff fst_conv image_eqI le_add1 plus_1_eq_Suc snd_conv)
+      by (metis atLeastAtMost_iff fst_conv le_add1 plus_1_eq_Suc snd_conv)
     moreover have "w (v\<^sub>1,v\<^sub>2) > w (hd xs)"
       using a3 a4 f1 by linarith
     moreover have "(v\<^sub>1,v\<^sub>2) \<in> parcs G" 
@@ -1871,10 +1871,10 @@ next
     qed
   qed
 qed(*>*)
-text \<open> Using an induction proof and extensive case distinction, the correctness of Algorithm \ref{algo} 
+text \<open> Using an induction proof and extensive case distinction, the correctness of Algorithm \ref{algo:FindLongestTrail} 
 is then shown in our formalization, by proving the following theorem: \<close>
 
-theorem(in distinct_weighted_pair_graph)  correctness:
+theorem(in distinct_weighted_pair_graph) correctness:
   assumes "\<exists> v \<in> (pverts G). getL G w (q div 2) v = k"
   shows "\<exists> xs. decTrail G w xs \<and> length xs = k" 
 (*<*)proof-
@@ -1884,8 +1884,31 @@ theorem(in distinct_weighted_pair_graph)  correctness:
   then have "length (drop (length xs - k) xs) = k" by simp
   moreover have "decTrail G w (drop (length xs - k) xs)" using incTrail_subtrail f0 decTrail_subtrail by blast
   ultimately show "\<exists> xs. decTrail G w xs \<and> length xs = k" by auto
-qed(*>*)
+qed
 
+theorem(in distinct_weighted_pair_graph) correctness_getLongestTrail:
+  assumes "getLongestTrail G w = k"
+  shows "\<exists> xs. decTrail G w xs \<and> length xs = k" 
+proof-
+  have "Max (set [(getL G w (q div 2) v) . v <- sorted_list_of_set (pverts G)]) = k" 
+    using assms by (simp add: getLongestTrail_def)
+  moreover have "(set [(getL G w (q div 2) v) . v <- sorted_list_of_set (pverts G)]) \<noteq> {}" 
+  proof-
+    have "finite (pverts G)" by simp
+    then have "pverts G \<noteq> {}" using vert_ge by auto
+    then have "sorted_list_of_set (pverts G) \<noteq> []" by simp
+    then have "[(getL G w (q div 2) v) . v <- sorted_list_of_set (pverts G)] \<noteq> []" by blast
+    then show ?thesis by blast
+  qed
+  moreover have "finite (set [(getL G w (q div 2) v) . v <- sorted_list_of_set (pverts G)])" 
+    by blast
+  ultimately have "k \<in> (set [(getL G w (q div 2) v) . v <- sorted_list_of_set (pverts G)])" 
+    using Max_in by blast
+  then have "\<exists>v. (getL G w (q div 2) v) = k" by auto
+  then show ?thesis using aux_correctness by blast
+qed
+
+(*>*)
 subsection \<open> Minimum Length of Ordered Trails \<close>
 
 (*<*)lemma aux_minimal_increase_one_step:
@@ -1949,8 +1972,8 @@ proof-
   then show ?thesis using v\<^sub>2_def v\<^sub>1_def v_def by simp
 qed(*>*)
 
-text \<open>\label{minLength}
-The algorithm introduced in Section \ref{compAlgo} is already useful on its own. Additionally, it can be
+text \<open>\label{section:minLength}
+The algorithm introduced in Section \ref{section:computeLongestTrail} is already useful on its own. Additionally, it can be
 used to verify the lower bound on the minimum length of a strictly decreasing trail $P_d(w,G) \ge 2 \cdot \lfloor \frac{q}{n} \rfloor$.
 
 To this end, Lemma 1 from Section \ref{PaperProof} is translated into Isabelle as the lemma
@@ -2024,7 +2047,6 @@ next
   qed
 qed(*>*)
 
-
 lemma(in distinct_weighted_pair_graph) minimal_increase_total:
   shows "(\<Sum> v \<in> pverts G. getL G w (q div 2) v) \<ge> q"
 (*<*)proof(cases)
@@ -2037,9 +2059,9 @@ next
   moreover have "2*(q div 2) = q" 
     using dvd_mult_div_cancel even_arcs by blast
   ultimately show ?thesis using aux_minimal_increase_total[of "q div 2"] by auto
-qed(*>*)
+qed
 
-(*<*)lemma set_sum: 
+lemma set_sum: 
   assumes "k \<ge> 1" and "card A = k" and "(\<forall> v \<in> A. f v < (q div n) \<and> f v \<ge> 0)"
   shows "(\<Sum> v \<in> A. f v) < (q div n)*k" 
 proof(rule disjE)
@@ -2075,7 +2097,7 @@ lemma(in distinct_weighted_pair_graph) algo_result_min:
 qed(*>*)
 
 text \<open> Finally, using lemma @{term "algo_result_min"} together with the @{term "correctness"} theorem 
-of section \ref{compAlgo}, we prove the lower bound of $2\cdot\lfloor \frac{q}{n} \rfloor$ over the length 
+of section \ref{section:computeLongestTrail}, we prove the lower bound of $2\cdot\lfloor \frac{q}{n} \rfloor$ over the length 
 of a longest strictly decreasing trail. This general approach could also be used to extend our
 formalization and prove existence of other trails. For example, assume that some restrictions on the graph 
 give raise to the existence of a trail of length $m \ge 2\cdot\lfloor \frac{q}{n} \rfloor$. Then, it is
@@ -2094,16 +2116,57 @@ theorem(in distinct_weighted_pair_graph) dec_trail_exists:
     using decTrail_subtrail by blast
 qed(*>*)
 
-
 theorem(in distinct_weighted_pair_graph) inc_trail_exists: 
   shows "\<exists> es. incTrail G w es \<and> length es = q div n"
-  (*<*)using dec_trail_exists 
+(*<*)using dec_trail_exists 
   by (smt distinct graph_symmetric in_arcsD1 length_map length_rev pair_sym_digraph.decTrail_eq_rev_incTrail pair_sym_digraph_axioms undirected zero)
-(*>*)
+end (*>*)
 text \<open> Corollary 1 is translated into @{text "dec_trail_exists_complete"}. The proof first argues
-that the number of edges is $n\cdot(n-1)$ by restricting its domain as done already in Section \ref{localeSurjective}.
+that the number of edges is $n\cdot(n-1)$ by restricting its domain as done already in Section \ref{section:localeSurjective}.
   \<close>
 
+(*<*)lemma aux_complete_graph_edges:
+  assumes "finite A" 
+  shows "card {(v\<^sub>1,v\<^sub>2). v\<^sub>1 \<in> A \<and> v\<^sub>2 \<in> A \<and> v\<^sub>1 \<noteq> v\<^sub>2} = (card A)*(card A-1)" 
+proof-
+  have "{(v\<^sub>1,v\<^sub>2). v\<^sub>1 \<in> A \<and> v\<^sub>2 \<in> A \<and> v\<^sub>1 \<noteq> v\<^sub>2} = {v\<^sub>1. v\<^sub>1 \<in> A} \<times> {v\<^sub>2. v\<^sub>2 \<in> A} - {(v\<^sub>1,v\<^sub>2). v\<^sub>1 \<in> A \<and> v\<^sub>2 \<in> A \<and> v\<^sub>1 = v\<^sub>2}"
+  proof
+    show "{(v\<^sub>1,v\<^sub>2). v\<^sub>1 \<in> A \<and> v\<^sub>2 \<in> A \<and> v\<^sub>1 \<noteq> v\<^sub>2} \<subseteq> {v\<^sub>1. v\<^sub>1 \<in> A} \<times> {v\<^sub>2. v\<^sub>2 \<in> A} - {(v\<^sub>1,v\<^sub>2). v\<^sub>1 \<in> A \<and> v\<^sub>2 \<in> A \<and> v\<^sub>1 = v\<^sub>2}"
+    proof
+      fix x 
+      assume a0: "x \<in> {(v\<^sub>1,v\<^sub>2). v\<^sub>1 \<in> A \<and> v\<^sub>2 \<in> A \<and> v\<^sub>1 \<noteq> v\<^sub>2}"
+      then have "x \<in> {v\<^sub>1. v\<^sub>1 \<in> A} \<times> {v\<^sub>2. v\<^sub>2 \<in> A}" by blast
+      moreover have "x \<notin> {(v\<^sub>1,v\<^sub>2). v\<^sub>1 \<in> A \<and> v\<^sub>2 \<in> A \<and> v\<^sub>1 = v\<^sub>2}" using a0 by blast
+      ultimately show "x \<in> {v\<^sub>1. v\<^sub>1 \<in> A} \<times> {v\<^sub>2. v\<^sub>2 \<in> A} - {(v\<^sub>1,v\<^sub>2). v\<^sub>1 \<in> A \<and> v\<^sub>2 \<in> A \<and> v\<^sub>1 = v\<^sub>2}"
+        by blast
+    qed
+  next
+    show "{v\<^sub>1. v\<^sub>1 \<in> A} \<times> {v\<^sub>2. v\<^sub>2 \<in> A} - {(v\<^sub>1,v\<^sub>2). v\<^sub>1 \<in> A \<and> v\<^sub>2 \<in> A \<and> v\<^sub>1 = v\<^sub>2} \<subseteq> {(v\<^sub>1,v\<^sub>2). v\<^sub>1 \<in> A \<and> v\<^sub>2 \<in> A \<and> v\<^sub>1 \<noteq> v\<^sub>2}"
+      by blast
+  qed
+  moreover have "{(v\<^sub>1,v\<^sub>2). v\<^sub>1 \<in> A \<and> v\<^sub>2 \<in> A \<and> v\<^sub>1 = v\<^sub>2} \<subseteq> {v\<^sub>1. v\<^sub>1 \<in> A} \<times> {v\<^sub>2. v\<^sub>2 \<in> A}" by blast
+  moreover have "finite {(v\<^sub>1,v\<^sub>2). v\<^sub>1 \<in> A \<and> v\<^sub>2 \<in> A \<and> v\<^sub>1 = v\<^sub>2}" 
+    using calculation(2) finite_subset assms by auto
+  ultimately have "card {(v\<^sub>1,v\<^sub>2). v\<^sub>1 \<in> A \<and> v\<^sub>2 \<in> A \<and> v\<^sub>1 \<noteq> v\<^sub>2} 
+                 = card ({v\<^sub>1. v\<^sub>1 \<in> A} \<times> {v\<^sub>2. v\<^sub>2 \<in> A}) - card {(v\<^sub>1,v\<^sub>2). v\<^sub>1 \<in> A \<and> v\<^sub>2 \<in> A \<and> v\<^sub>1 = v\<^sub>2}"
+    by (simp add: card_Diff_subset)
+  moreover have "card {v\<^sub>1. v\<^sub>1 \<in> A} = (card A)" by auto
+  moreover have "card {(v\<^sub>1,v\<^sub>2). v\<^sub>1 \<in> A \<and> v\<^sub>2 \<in> A \<and> v\<^sub>1 = v\<^sub>2} = card {v\<^sub>1. v\<^sub>1 \<in> A}" 
+  proof-
+    have "inj_on (\<lambda>(v\<^sub>1,v\<^sub>2). v\<^sub>1) {(v\<^sub>1,v\<^sub>2). v\<^sub>1 \<in> A \<and> v\<^sub>2 \<in> A \<and> v\<^sub>1 = v\<^sub>2}" 
+      by (smt Product_Type.Collect_case_prodD inj_onI prod.case_eq_if prod.collapse)
+    moreover have "(\<lambda>(v\<^sub>1,v\<^sub>2). v\<^sub>1) ` {(v\<^sub>1,v\<^sub>2). v\<^sub>1 \<in> A \<and> v\<^sub>2 \<in> A \<and> v\<^sub>1 = v\<^sub>2} = {v\<^sub>1. v\<^sub>1 \<in> A}" by auto
+    ultimately have "bij_betw (\<lambda>(v\<^sub>1,v\<^sub>2). v\<^sub>1) {(v\<^sub>1,v\<^sub>2). v\<^sub>1 \<in> A \<and> v\<^sub>2 \<in> A \<and> v\<^sub>1 = v\<^sub>2} {v\<^sub>1. v\<^sub>1 \<in> A}" 
+      by (simp add: bij_betw_def)
+    then show ?thesis 
+      using bij_betw_same_card by auto
+  qed
+  ultimately have "card {(v\<^sub>1,v\<^sub>2). v\<^sub>1 \<in> A \<and> v\<^sub>2 \<in> A \<and> v\<^sub>1 \<noteq> v\<^sub>2} = (card A)*(card A) - (card A)" 
+    by (simp add: \<open>card {(v\<^sub>1, v\<^sub>2). v\<^sub>1 \<in> A \<and> v\<^sub>2 \<in> A \<and> v\<^sub>1 \<noteq> v\<^sub>2} = card ({v\<^sub>1. v\<^sub>1 \<in> A} \<times> {v\<^sub>2. v\<^sub>2 \<in> A}) - card {(v\<^sub>1, v\<^sub>2). v\<^sub>1 \<in> A \<and> v\<^sub>2 \<in> A \<and> v\<^sub>1 = v\<^sub>2}\<close> card_cartesian_product)
+  then show ?thesis 
+    by (simp add: diff_mult_distrib2)
+qed
+(*>*)
 lemma(in distinct_weighted_pair_graph) dec_trail_exists_complete: 
   assumes "complete_digraph n G" 
   shows "(\<exists> es. decTrail G w es \<and> length es = n-1)" 
@@ -2111,101 +2174,17 @@ lemma(in distinct_weighted_pair_graph) dec_trail_exists_complete:
   have "card (arcs G) = (n * (n-1))" 
   proof-
     have "arcs G = {(v\<^sub>1,v\<^sub>2). v\<^sub>1 \<in> pverts G \<and> v\<^sub>2 \<in> pverts G \<and> v\<^sub>1 \<noteq> v\<^sub>2}" using assms complete_digraph_pair_def by auto
-    moreover have "card {(v\<^sub>1,v\<^sub>2). v\<^sub>1 \<in> pverts G \<and> v\<^sub>2 \<in> pverts G \<and> v\<^sub>1 \<noteq> v\<^sub>2} = n*(n-1)"  (*TODO: Same code as above, make own lemma *)
-  proof-
-    have "{(v\<^sub>1,v\<^sub>2). v\<^sub>1 \<in> pverts G \<and> v\<^sub>2 \<in> pverts G \<and> v\<^sub>1 \<noteq> v\<^sub>2} = {v\<^sub>1. v\<^sub>1 \<in> pverts G} \<times> {v\<^sub>2. v\<^sub>2 \<in> pverts G} - {(v\<^sub>1,v\<^sub>2). v\<^sub>1 \<in> pverts G \<and> v\<^sub>2 \<in> pverts G \<and> v\<^sub>1 = v\<^sub>2}"
-    proof
-      show "{(v\<^sub>1,v\<^sub>2). v\<^sub>1 \<in> pverts G \<and> v\<^sub>2 \<in> pverts G \<and> v\<^sub>1 \<noteq> v\<^sub>2} \<subseteq> {v\<^sub>1. v\<^sub>1 \<in> pverts G} \<times> {v\<^sub>2. v\<^sub>2 \<in> pverts G} - {(v\<^sub>1,v\<^sub>2). v\<^sub>1 \<in> pverts G \<and> v\<^sub>2 \<in> pverts G \<and> v\<^sub>1 = v\<^sub>2}"
-      proof
-        fix x 
-        assume a0: "x \<in> {(v\<^sub>1,v\<^sub>2). v\<^sub>1 \<in> pverts G \<and> v\<^sub>2 \<in> pverts G \<and> v\<^sub>1 \<noteq> v\<^sub>2}"
-        then have "x \<in> {v\<^sub>1. v\<^sub>1 \<in> pverts G} \<times> {v\<^sub>2. v\<^sub>2 \<in> pverts G}" by blast
-        moreover have "x \<notin> {(v\<^sub>1,v\<^sub>2). v\<^sub>1 \<in> pverts G \<and> v\<^sub>2 \<in> pverts G \<and> v\<^sub>1 = v\<^sub>2}" using a0 by blast
-        ultimately show "x \<in> {v\<^sub>1. v\<^sub>1 \<in> pverts G} \<times> {v\<^sub>2. v\<^sub>2 \<in> pverts G} - {(v\<^sub>1,v\<^sub>2). v\<^sub>1 \<in> pverts G \<and> v\<^sub>2 \<in> pverts G \<and> v\<^sub>1 = v\<^sub>2}"
-          by blast
-      qed
-    next
-      show "{v\<^sub>1. v\<^sub>1 \<in> pverts G} \<times> {v\<^sub>2. v\<^sub>2 \<in> pverts G} - {(v\<^sub>1,v\<^sub>2). v\<^sub>1 \<in> pverts G \<and> v\<^sub>2 \<in> pverts G \<and> v\<^sub>1 = v\<^sub>2}
-                \<subseteq> {(v\<^sub>1,v\<^sub>2). v\<^sub>1 \<in> pverts G \<and> v\<^sub>2 \<in> pverts G \<and> v\<^sub>1 \<noteq> v\<^sub>2}"
-        by blast
-    qed
-    moreover have "{(v\<^sub>1,v\<^sub>2). v\<^sub>1 \<in> pverts G \<and> v\<^sub>2 \<in> pverts G \<and> v\<^sub>1 = v\<^sub>2} \<subseteq> {v\<^sub>1. v\<^sub>1 \<in> pverts G} \<times> {v\<^sub>2. v\<^sub>2 \<in> pverts G}" by blast
-    moreover have "finite {(v\<^sub>1,v\<^sub>2). v\<^sub>1 \<in> pverts G \<and> v\<^sub>2 \<in> pverts G \<and> v\<^sub>1 = v\<^sub>2}" 
-      using calculation(2) finite_subset by fastforce
-    ultimately have "card {(v\<^sub>1,v\<^sub>2). v\<^sub>1 \<in> pverts G \<and> v\<^sub>2 \<in> pverts G \<and> v\<^sub>1 \<noteq> v\<^sub>2} 
-                   = card ({v\<^sub>1. v\<^sub>1 \<in> pverts G} \<times> {v\<^sub>2. v\<^sub>2 \<in> pverts G}) - card {(v\<^sub>1,v\<^sub>2). v\<^sub>1 \<in> pverts G \<and> v\<^sub>2 \<in> pverts G \<and> v\<^sub>1 = v\<^sub>2}"
-      by (simp add: card_Diff_subset)
-    moreover have "card {v\<^sub>1. v\<^sub>1 \<in> pverts G} = n" by auto
-    moreover have "card {(v\<^sub>1,v\<^sub>2). v\<^sub>1 \<in> pverts G \<and> v\<^sub>2 \<in> pverts G \<and> v\<^sub>1 = v\<^sub>2} = card {v\<^sub>1. v\<^sub>1 \<in> pverts G}" 
-    proof-
-      have "inj_on (\<lambda>(v\<^sub>1,v\<^sub>2). v\<^sub>1) {(v\<^sub>1,v\<^sub>2). v\<^sub>1 \<in> pverts G \<and> v\<^sub>2 \<in> pverts G \<and> v\<^sub>1 = v\<^sub>2}" 
-        by (smt Product_Type.Collect_case_prodD inj_onI prod.case_eq_if prod.collapse)
-      moreover have "(\<lambda>(v\<^sub>1,v\<^sub>2). v\<^sub>1) ` {(v\<^sub>1,v\<^sub>2). v\<^sub>1 \<in> pverts G \<and> v\<^sub>2 \<in> pverts G \<and> v\<^sub>1 = v\<^sub>2} = {v\<^sub>1. v\<^sub>1 \<in> pverts G}" by auto
-      ultimately have "bij_betw (\<lambda>(v\<^sub>1,v\<^sub>2). v\<^sub>1) {(v\<^sub>1,v\<^sub>2). v\<^sub>1 \<in> pverts G \<and> v\<^sub>2 \<in> pverts G \<and> v\<^sub>1 = v\<^sub>2} {v\<^sub>1. v\<^sub>1 \<in> pverts G}" 
-        by (simp add: bij_betw_def)
-      then show ?thesis 
-        using bij_betw_same_card by auto
-    qed
-    ultimately have "card {(v\<^sub>1,v\<^sub>2). v\<^sub>1 \<in> pverts G \<and> v\<^sub>2 \<in> pverts G \<and> v\<^sub>1 \<noteq> v\<^sub>2} = n*n - n" by auto
-    then show ?thesis 
-      by (simp add: diff_mult_distrib2)
+    moreover have "card {(v\<^sub>1,v\<^sub>2). v\<^sub>1 \<in> pverts G \<and> v\<^sub>2 \<in> pverts G \<and> v\<^sub>1 \<noteq> v\<^sub>2} = n*(n-1)" using aux_complete_graph_edges[of "pverts G"] by auto
+    ultimately show ?thesis by simp
   qed
-  ultimately show ?thesis by simp
-qed
   then show ?thesis 
     using dec_trail_exists by auto 
-qed
-
-end (* context graph *)
-
-lemma aux_complete_graph_edges:
-  assumes "finite A" 
-  shows "card {(v\<^sub>1,v\<^sub>2). v\<^sub>1 \<in> A \<and> v\<^sub>2 \<in> A \<and> v\<^sub>1 \<noteq> v\<^sub>2} = (card A)*(card A-1)"  (*TODO: Same code as above, make own lemma *)
-  proof-
-    have "{(v\<^sub>1,v\<^sub>2). v\<^sub>1 \<in> A \<and> v\<^sub>2 \<in> A \<and> v\<^sub>1 \<noteq> v\<^sub>2} = {v\<^sub>1. v\<^sub>1 \<in> A} \<times> {v\<^sub>2. v\<^sub>2 \<in> A} - {(v\<^sub>1,v\<^sub>2). v\<^sub>1 \<in> A \<and> v\<^sub>2 \<in> A \<and> v\<^sub>1 = v\<^sub>2}"
-    proof
-      show "{(v\<^sub>1,v\<^sub>2). v\<^sub>1 \<in> A \<and> v\<^sub>2 \<in> A \<and> v\<^sub>1 \<noteq> v\<^sub>2} \<subseteq> {v\<^sub>1. v\<^sub>1 \<in> A} \<times> {v\<^sub>2. v\<^sub>2 \<in> A} - {(v\<^sub>1,v\<^sub>2). v\<^sub>1 \<in> A \<and> v\<^sub>2 \<in> A \<and> v\<^sub>1 = v\<^sub>2}"
-      proof
-        fix x 
-        assume a0: "x \<in> {(v\<^sub>1,v\<^sub>2). v\<^sub>1 \<in> A \<and> v\<^sub>2 \<in> A \<and> v\<^sub>1 \<noteq> v\<^sub>2}"
-        then have "x \<in> {v\<^sub>1. v\<^sub>1 \<in> A} \<times> {v\<^sub>2. v\<^sub>2 \<in> A}" by blast
-        moreover have "x \<notin> {(v\<^sub>1,v\<^sub>2). v\<^sub>1 \<in> A \<and> v\<^sub>2 \<in> A \<and> v\<^sub>1 = v\<^sub>2}" using a0 by blast
-        ultimately show "x \<in> {v\<^sub>1. v\<^sub>1 \<in> A} \<times> {v\<^sub>2. v\<^sub>2 \<in> A} - {(v\<^sub>1,v\<^sub>2). v\<^sub>1 \<in> A \<and> v\<^sub>2 \<in> A \<and> v\<^sub>1 = v\<^sub>2}"
-          by blast
-      qed
-    next
-      show "{v\<^sub>1. v\<^sub>1 \<in> A} \<times> {v\<^sub>2. v\<^sub>2 \<in> A} - {(v\<^sub>1,v\<^sub>2). v\<^sub>1 \<in> A \<and> v\<^sub>2 \<in> A \<and> v\<^sub>1 = v\<^sub>2}
-                \<subseteq> {(v\<^sub>1,v\<^sub>2). v\<^sub>1 \<in> A \<and> v\<^sub>2 \<in> A \<and> v\<^sub>1 \<noteq> v\<^sub>2}"
-        by blast
-    qed
-    moreover have "{(v\<^sub>1,v\<^sub>2). v\<^sub>1 \<in> A \<and> v\<^sub>2 \<in> A \<and> v\<^sub>1 = v\<^sub>2} \<subseteq> {v\<^sub>1. v\<^sub>1 \<in> A} \<times> {v\<^sub>2. v\<^sub>2 \<in> A}" by blast
-    moreover have "finite {(v\<^sub>1,v\<^sub>2). v\<^sub>1 \<in> A \<and> v\<^sub>2 \<in> A \<and> v\<^sub>1 = v\<^sub>2}" 
-      using calculation(2) finite_subset assms by auto
-    ultimately have "card {(v\<^sub>1,v\<^sub>2). v\<^sub>1 \<in> A \<and> v\<^sub>2 \<in> A \<and> v\<^sub>1 \<noteq> v\<^sub>2} 
-                   = card ({v\<^sub>1. v\<^sub>1 \<in> A} \<times> {v\<^sub>2. v\<^sub>2 \<in> A}) - card {(v\<^sub>1,v\<^sub>2). v\<^sub>1 \<in> A \<and> v\<^sub>2 \<in> A \<and> v\<^sub>1 = v\<^sub>2}"
-      by (simp add: card_Diff_subset)
-    moreover have "card {v\<^sub>1. v\<^sub>1 \<in> A} = (card A)" by auto
-    moreover have "card {(v\<^sub>1,v\<^sub>2). v\<^sub>1 \<in> A \<and> v\<^sub>2 \<in> A \<and> v\<^sub>1 = v\<^sub>2} = card {v\<^sub>1. v\<^sub>1 \<in> A}" 
-    proof-
-      have "inj_on (\<lambda>(v\<^sub>1,v\<^sub>2). v\<^sub>1) {(v\<^sub>1,v\<^sub>2). v\<^sub>1 \<in> A \<and> v\<^sub>2 \<in> A \<and> v\<^sub>1 = v\<^sub>2}" 
-        by (smt Product_Type.Collect_case_prodD inj_onI prod.case_eq_if prod.collapse)
-      moreover have "(\<lambda>(v\<^sub>1,v\<^sub>2). v\<^sub>1) ` {(v\<^sub>1,v\<^sub>2). v\<^sub>1 \<in> A \<and> v\<^sub>2 \<in> A \<and> v\<^sub>1 = v\<^sub>2} = {v\<^sub>1. v\<^sub>1 \<in> A}" by auto
-      ultimately have "bij_betw (\<lambda>(v\<^sub>1,v\<^sub>2). v\<^sub>1) {(v\<^sub>1,v\<^sub>2). v\<^sub>1 \<in> A \<and> v\<^sub>2 \<in> A \<and> v\<^sub>1 = v\<^sub>2} {v\<^sub>1. v\<^sub>1 \<in> A}" 
-        by (simp add: bij_betw_def)
-      then show ?thesis 
-        using bij_betw_same_card by auto
-    qed
-    ultimately have "card {(v\<^sub>1,v\<^sub>2). v\<^sub>1 \<in> A \<and> v\<^sub>2 \<in> A \<and> v\<^sub>1 \<noteq> v\<^sub>2} = (card A)*(card A) - (card A)" 
-      by (simp add: \<open>card {(v\<^sub>1, v\<^sub>2). v\<^sub>1 \<in> A \<and> v\<^sub>2 \<in> A \<and> v\<^sub>1 \<noteq> v\<^sub>2} = card ({v\<^sub>1. v\<^sub>1 \<in> A} \<times> {v\<^sub>2. v\<^sub>2 \<in> A}) - card {(v\<^sub>1, v\<^sub>2). v\<^sub>1 \<in> A \<and> v\<^sub>2 \<in> A \<and> v\<^sub>1 = v\<^sub>2}\<close> card_cartesian_product)
-    then show ?thesis 
-      by (simp add: diff_mult_distrib2)
-  qed
-(*>*)
+qed(*>*)
 
 subsection \<open> Example Graph $K_4$ \<close>
 
-text \<open> We return to the example graph from Figure \ref{exampleGraph} and show that our results from 
-Sections \ref{trails}-\ref{minLength} can be used to prove existence of trails of length $k$, in particular
+text \<open> We return to the example graph from Figure \ref{example:K4} and show that our results from 
+Sections \ref{section:trails}-\ref{section:minLength} can be used to prove existence of trails of length $k$, in particular
 $k = 3$ in $K_4$. Defining the graph and the 
 weight function separately, we use natural numbers as vertices. \<close>
 
@@ -2225,7 +2204,7 @@ abbreviation ExampleGraphWeightFunction :: "(nat\<times>nat) weight_fun" where
                               (if (v\<^sub>1 = 3 \<and> v\<^sub>2 = 4) \<or> (v\<^sub>1 = 4 \<and> v\<^sub>2 = 3) then 2 else 
                                0))))))" 
 
-(*<*) (*TODO: Lemma name convention *)
+(*<*) 
 lemma codomain_ExampleGraphWeightFunction:
   assumes "(x,y) \<in> parcs ExampleGraph"
   shows "ExampleGraphWeightFunction (x,y) \<in> {1,2,3,4,5,6}" 
@@ -2258,7 +2237,7 @@ proof-
   ultimately show "card (parcs ExampleGraph) = 12" 
     using aux_complete_graph_edges[of "{1,2,3,(4::nat)}"] by force
 qed(*>*)
-text \<open> We show that the graph $K_4$ of Figure \ref{exampleGraph} satisfies the conditions that were
+text \<open> We show that the graph $K_4$ of Figure \ref{example:K4} satisfies the conditions that were
 imposed in 
 @{text "distinct_weighted_pair_graph"} and its parent locale, including for example no self loops 
 and distinctiveness. Of course there is still some effort required for this. However, it is necessary
@@ -2376,7 +2355,7 @@ section \<open> Discussion and Related Work \<close>
 text \<open>
 Our formalization can be easily extended and could therefore serve as a basis for further work in this field.
 The definitions @{term "incTrail"} and @{term "decTrail"} and the respective properties that are proven in 
-Section \ref{trails} are the key to many other variants of trail properties. 
+Section \ref{section:trails} are the key to many other variants of trail properties. 
 
 Graham et al.~\cite{graham1973increasing} also showed upper bounds for trails in complete graphs by decomposing
 them into either into cycles or 1-factors. We are currently working on formalizing and certifying the result 

@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015/Debian) (preloaded format=pdflatex 2019.4.8)  5 MAY 2020 18:04
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015/Debian) (preloaded format=pdflatex 2019.4.8)  20 MAY 2020 11:10
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -854,13 +854,21 @@ Underfull \hbox (badness 10000) in paragraph at lines 314--315
 
  []
 
-[5] [6] [7] [8] [9] [10] [11]
-Overfull \hbox (18.92067pt too wide) in paragraph at lines 1402--1406
+[5] [6] [7] [8] [9]
+
+LaTeX Warning: Reference `PaperProof' on page 10 undefined on input line 862.
+
+[10] [11]
+
+LaTeX Warning: Reference `PaperProof' on page 12 undefined on input line 1414.
+
+
+Overfull \hbox (18.92067pt too wide) in paragraph at lines 1414--1418
 \OT1/cmr/m/n/10 case dis-tinc-tion. Lemma 2 is sub-se-quently proved, here name
 d \OT1/cmr/m/it/10 minimal[]increase[]total\OT1/cmr/m/n/10 . 
  []
 
-[12] [13] [14])) (./root.bbl) [15]
+[12] [13])) [14] (./root.bbl) [15]
 Package atveryend Info: Empty hook `BeforeClearDocument' on input line 85.
 Package atveryend Info: Empty hook `AfterLastShipout' on input line 85.
  (./root.aux)
@@ -872,13 +880,16 @@ Package rerunfilecheck Info: File `root.out' has not changed.
 
 LaTeX Font Warning: Some font shapes were not available, defaults substituted.
 
+
+LaTeX Warning: There were undefined references.
+
 Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 85.
  ) 
 Here is how much of TeX's memory you used:
- 19236 strings out of 493029
- 361836 string characters out of 6136235
- 454892 words of memory out of 5000000
- 22366 multiletter control sequences out of 15000+600000
+ 19237 strings out of 493029
+ 361989 string characters out of 6136235
+ 454898 words of memory out of 5000000
+ 22367 multiletter control sequences out of 15000+600000
  13680 words of font info for 52 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  56i,11n,67p,898b,887s stack positions out of 5000i,500n,10000p,200000b,80000s
@@ -905,10 +916,10 @@ msfonts/cm/cmti10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfont
 s/cm/cmti9.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cm
 tt9.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/symbols/msbm
 10.pfb>
-Output written on root.pdf (15 pages, 329528 bytes).
+Output written on root.pdf (15 pages, 329716 bytes).
 PDF statistics:
- 328 PDF objects out of 1000 (max. 8388607)
- 255 compressed objects within 3 object streams
+ 326 PDF objects out of 1000 (max. 8388607)
+ 253 compressed objects within 3 object streams
  59 named destinations out of 1000 (max. 500000)
  21 words of extra memory for PDF output out of 10000 (max. 10000000)
 
