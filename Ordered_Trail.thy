@@ -43,8 +43,8 @@ with a different integer-valued weight ranging from $1, \ldots, 6$:
 \end{figure}
 
 \noindent When considering $K_4$, the question we address in this paper is whether $K_4$ has a 
-strictly decreasing trail of length $k\geq 1$. A trail is a sequence of edges in which both endpoints of 
-an edge are incident to a different direct neighbor's endpoint in that sequence.
+strictly decreasing trail of length $k\geq 1$. A trail is a sequence of distinct edges $(e_1,\ldots,e_k)$, $e_i \in E$ such that
+there exists a corresponding sequence of vertices $(v_0,...,v_k)$ where $e_i = v_{i-1}v_i$. 
 Moreover, our work provides a formally verified algorithm 
 computing such trails. Note that there is a decreasing trail in $K_4$ starting at vertex $v_3$, 
 with trail length 3; namely $(v_3v_2; v_2v_4; v_4v_3)$ is such a trail, with each edge in the trail having 
@@ -157,7 +157,7 @@ strictly decreasing trails. \<close>
 
 section "Lower Bounds on Increasing and Decreasing Trails in Weighted Graphs"
 
-text \<open>\label{symbolicProof}
+text \<open>\label{section:symbolicProof}
 The proof introduced in the following is based on similar ideas as in \cite{graham1973increasing}. 
 However, we diverge from \cite{graham1973increasing} in several aspects. Firstly, we consider strictly decreasing instead of strictly increasing trails,
 reducing the complexity of the automated proof (see Section \ref{section:Formalization}). 
@@ -173,7 +173,7 @@ We start by introducing the notion of a weighted subgraph and then we built on t
 \end{definition}
 
 \begin{definition}[Labelling Function]\label{def:Labelling}
-	For each $G^i=(V,E^i)$ we define $L^i:E^i\rightarrow \{1,\ldots,\frac{n(n-1)}{2}\}$ where $n = |V|$ a labelling function such 
+	For each $G^i=(V,E^i)$, $n = |V|$  we define $L^i:E^i\rightarrow \{1,\ldots,\frac{n(n-1)}{2}\}$ a labelling function such 
 that $L^i(v)$ is the length of a longest strictly decreasing trail starting at vertex v using only edges in $E^i$.
 \end{definition}
 
@@ -339,7 +339,7 @@ of length at least $n-1$, i.e. $f_i(n) = f_d(n)  \ge n-1$.\qed
 \end{corollary}
 
 In \cite{graham1973increasing} the authors present a non-constructive proof. As in Lemma \ref{lemma:sum} they argue that the 
-sum of the lengths of all increasing paths is at least 2. We however, use the exact increase therefore 
+sum of the lengths of all increasing paths is at least 2. Thus, they overestimate the increase. We however, use the exact increase therefore 
 making the proof constructive and obtaining Algorithm \ref{algo:FindLongestTrail}.\<close>
 
 section "Formalization of Trail Properties in Isabelle/HOL"
@@ -405,7 +405,6 @@ definition(in pair_pre_digraph) incTrail2 where
 "incTrail2 w es u v \<equiv> sorted_wrt (\<lambda> e\<^sub>1 e\<^sub>2. w e\<^sub>1 < w e\<^sub>2) es \<and> (es = [] \<or> awalk u es v)"
 (*definition(in pair_pre_digraph) incTrail2b where (* Use this instead? *)
 "incTrail2b w es u v \<equiv> (\<forall> es\<^sub>1 e\<^sub>1 e\<^sub>2 es\<^sub>2. es = es\<^sub>1 @ [e\<^sub>1,e\<^sub>2] @ es\<^sub>2 \<longrightarrow> w e\<^sub>1 < w e\<^sub>2) \<and> (es = [] \<or> awalk u es v)"*)
-
 fun decTrail :: "'a pair_pre_digraph \<Rightarrow> ('a \<times>'a) weight_fun \<Rightarrow> ('a \<times>'a) list \<Rightarrow> bool" where
 "decTrail g w [] = True" |
 "decTrail g w [e\<^sub>1] = (e\<^sub>1 \<in> parcs g)" |
@@ -1267,9 +1266,9 @@ next
     qed
   qed
 qed(*>*)
-
+text \<open>\<close>
 lemma (in weighted_pair_graph) even_arcs: 
-shows "even q"
+  shows "even q"
 (*<*)proof-
   have "card (parcs G) = q" by simp
   moreover have "(\<forall>e\<^sub>1 e\<^sub>2. (e\<^sub>1,e\<^sub>1) \<notin> (parcs G) \<and> ((e\<^sub>1,e\<^sub>2) \<in> (parcs G) \<longrightarrow> (e\<^sub>2,e\<^sub>1) \<in> (parcs G)))" 
@@ -1299,8 +1298,8 @@ locale distinct_weighted_pair_graph = weighted_pair_graph +
   assumes zero: "\<forall> v\<^sub>1 v\<^sub>2. (v\<^sub>1,v\<^sub>2) \<notin> parcs G \<longleftrightarrow> w (v\<^sub>1,v\<^sub>2) = 0"
       and distinct: "\<forall> (v\<^sub>1,v\<^sub>2) \<in> parcs G. \<forall> (u\<^sub>1,u\<^sub>2) \<in> parcs G. 
       ((v\<^sub>1 = u\<^sub>2 \<and> v\<^sub>2 = u\<^sub>1) \<or> (v\<^sub>1 = u\<^sub>1 \<and> v\<^sub>2 = u\<^sub>2)) \<longleftrightarrow> w (v\<^sub>1,v\<^sub>2) = w (u\<^sub>1,u\<^sub>2)" 
-
-(*<*)context distinct_weighted_pair_graph
+(*<*)
+context distinct_weighted_pair_graph
 begin
 
 lemma undirected:
@@ -1333,7 +1332,7 @@ proof-
     by (smt assms case_prodE distinct fst_conv snd_conv weight_not_zero_implies_arc)
 qed
 
-lemma aux_restricted_weight_fun_card2: 
+lemma aux_restricted_weight_fun_card: 
   fixes k :: nat
   shows "\<forall> i. i \<le> k \<longrightarrow> (\<forall>(A::('a\<times>'a) set). finite A \<and> card A = i \<and> (\<forall>x. (x,x) \<notin> A) \<and> (\<forall>x y. (x,y) \<in> A \<longrightarrow> (y,x) \<in> A) \<longrightarrow> card {(p1,p2). (p1,p2) \<in> A \<and> p2 < p1} = i div 2)" 
 proof(induction k)
@@ -1446,13 +1445,13 @@ qed
 qed
 
 lemma restricted_weight_fun_card:
-  shows "card {(p1,p2). (p1,p2) \<in> (parcs G) \<and> p2 < p1} = q div 2" 
+  shows "card {(p1,p2). (p1,p2) \<in> parcs G \<and> p2 < p1} = q div 2" 
 proof-
   have "(\<forall>(A::('a\<times>'a) set). finite A \<and> card A = q \<and> (\<forall>x. (x,x) \<notin> A) \<and> (\<forall>x y. (x,y) \<in> A \<longrightarrow> (y,x) \<in> A) \<longrightarrow> card {(p1,p2). (p1,p2) \<in> A \<and> p2 < p1} = q div 2)" 
-    using aux_restricted_weight_fun_card2 by auto
-  then have "finite (parcs G) \<and> card (parcs G) = q \<and> (\<forall>x. (x,x) \<notin> (parcs G)) \<and> (\<forall>x y. (x,y) \<in> (parcs G) \<longrightarrow> (y,x) \<in> (parcs G)) \<longrightarrow> 
+    using aux_restricted_weight_fun_card by auto
+  then have "finite (parcs G) \<and> card (parcs G) = q \<and> (\<forall>x. (x,x) \<notin> parcs G) \<and> (\<forall>x y. (x,y) \<in> parcs G \<longrightarrow> (y,x) \<in> parcs G) \<longrightarrow> 
               card {(p1,p2). (p1,p2) \<in> (parcs G) \<and> p2 < p1} = q div 2" by auto
-  moreover have "finite (parcs G) \<and> card (parcs G) = q \<and> (\<forall>x. (x,x) \<notin> (parcs G)) \<and> (\<forall>x y. (x,y) \<in> (parcs G) \<longrightarrow> (y,x) \<in> (parcs G))" 
+  moreover have "finite (parcs G) \<and> card (parcs G) = q \<and> (\<forall>x. (x,x) \<notin> parcs G) \<and> (\<forall>x y. (x,y) \<in> parcs G \<longrightarrow> (y,x) \<in> parcs G)" 
     using adj_not_same arcs_symmetric pair_finite_arcs by blast
   ultimately show ?thesis by auto
 qed
@@ -1460,8 +1459,8 @@ qed
 lemma surjective_iff_injective_gen_le:
   assumes "finite S" and "finite T" and "card T \<le> card S" and "f ` S \<subseteq> T" and "inj_on f S"
   shows "(\<forall>y \<in> T. \<exists>x \<in> S. f x = y)"
-  by (meson antisym assms card_inj_on_le surjective_iff_injective_gen)(*>*)
-
+  by (meson antisym assms card_inj_on_le surjective_iff_injective_gen)
+(*>*)
 text \<open> One important step in our formalization is to show that the weight function is surjective. However, having two 
 elements of the domain (edges) being mapped to the same element of the codomain (weight) makes 
 the proof complicated. We therefore first prove that the weight function is surjective on a restricted
@@ -1474,12 +1473,12 @@ distinctiveness is the more natural assumption that is more likely to appear in 
 of ordered trails. \<close>
 
 lemma(in distinct_weighted_pair_graph) restricted_weight_fun_surjective:  
-  shows "\<forall>k \<in> W. \<exists>(v\<^sub>1,v\<^sub>2) \<in> {(p1,p2). (p1,p2) \<in> (parcs G) \<and> p2 < p1}. w (v\<^sub>1,v\<^sub>2) = k"
+  "\<forall>k \<in> W. \<exists>(v\<^sub>1,v\<^sub>2) \<in> {(p1,p2). (p1,p2) \<in> parcs G \<and> p2 < p1}. w (v\<^sub>1,v\<^sub>2) = k"
 (*<*)proof(rule disjE)
   show "n = 1 \<or> n \<ge> 2" using vert_ge by auto
 next
   assume "n = 1" 
-  then show "\<forall>y \<in> W. \<exists>(v\<^sub>1,x\<^sub>2) \<in> {(p1,p2). (p1,p2) \<in> (parcs G) \<and> p2 < p1}. w (v\<^sub>1,x\<^sub>2) = y" 
+  then show "\<forall>y \<in> W. \<exists>(v\<^sub>1,x\<^sub>2) \<in> {(p1,p2). (p1,p2) \<in> parcs G \<and> p2 < p1}. w (v\<^sub>1,x\<^sub>2) = y" 
     using max_arcs by auto
 next
   assume "n \<ge> 2" 
@@ -1487,15 +1486,15 @@ next
     apply (induction n)
     apply simp
     by (metis Suc_1 Suc_eq_plus1 add.commute diff_Suc_1 diff_is_0_eq dvd_div_mult_self even_Suc even_mult_iff le_iff_add mult_eq_0_iff not_less_eq_eq)
-  then have "finite {(p1,p2). (p1,p2) \<in> (parcs G) \<and> p2 < p1}" 
+  then have "finite {(p1,p2). (p1,p2) \<in> parcs G \<and> p2 < p1}" 
     using restricted_weight_fun_card vert_ge 
     by (metis (no_types, lifting) Product_Type.Collect_case_prodD finite_subset pair_finite_arcs prod.collapse subsetI)
   moreover have "finite W" by auto
-  moreover have "inj_on w {(p1,p2). (p1,p2) \<in> (parcs G) \<and> p2 < p1}" 
+  moreover have "inj_on w {(p1,p2). (p1,p2) \<in> parcs G \<and> p2 < p1}" 
   proof
     fix v u
-    assume a0: "v \<in> {(p1, p2). (p1,p2) \<in> (parcs G) \<and> p2 < p1}" 
-       and a1: "u \<in> {(p1, p2). (p1,p2) \<in> (parcs G) \<and> p2 < p1}" and a2: "w v = w u"
+    assume a0: "v \<in> {(p1, p2). (p1,p2) \<in> parcs G \<and> p2 < p1}" 
+       and a1: "u \<in> {(p1, p2). (p1,p2) \<in> parcs G \<and> p2 < p1}" and a2: "w v = w u"
     obtain v\<^sub>1 v\<^sub>2 where v_def: "v = (v\<^sub>1,v\<^sub>2)" using a0 by blast
     obtain u\<^sub>1 u\<^sub>2 where u_def: "u = (u\<^sub>1,u\<^sub>2)" using a1 by blast
     have "((v\<^sub>1 = u\<^sub>1 \<and> v\<^sub>2 = u\<^sub>2) \<or> (v\<^sub>1 = u\<^sub>2 \<and> v\<^sub>2 = u\<^sub>1) \<or> (v\<^sub>1 = v\<^sub>2 \<and> u\<^sub>1 = u\<^sub>2))" 
@@ -1505,15 +1504,15 @@ next
     ultimately have "(v\<^sub>1 = u\<^sub>1 \<and> v\<^sub>2 = u\<^sub>2)" by auto
     then show "v = u" by (simp add: u_def v_def)
   qed
-  moreover have "card {(p1,p2). (p1,p2) \<in> (parcs G) \<and> p2 < p1} \<ge> card (real ` W)" 
+  moreover have "card {(p1,p2). (p1,p2) \<in> parcs G \<and> p2 < p1} \<ge> card (real ` W)" 
     using card_W max_arcs restricted_weight_fun_card by linarith
-  moreover have "w ` {(p1,p2). (p1,p2) \<in> (parcs G) \<and> p2 < p1} \<subseteq> (real ` W)" 
+  moreover have "w ` {(p1,p2). (p1,p2) \<in> parcs G \<and> p2 < p1} \<subseteq> (real ` W)" 
   proof-
-    have "{y. \<exists>x\<in>{(p1,p2). (p1,p2) \<in> (parcs G) \<and> p2 < p1}. y = w x} \<subseteq> (real ` W)" 
+    have "{y. \<exists>x\<in>{(p1,p2). (p1,p2) \<in> parcs G \<and> p2 < p1}. y = w x} \<subseteq> (real ` W)" 
     proof
       fix y
-      assume a0: "y \<in> {y. \<exists>x\<in>{(p1,p2). (p1,p2) \<in> (parcs G) \<and> p2 < p1}. y = w x}"
-      then obtain p1 p2 where f1: "(p1,p2) \<in> (parcs G) \<and> p2 < p1 \<and> y = w (p1,p2)" by auto
+      assume a0: "y \<in> {y. \<exists>x\<in>{(p1,p2). (p1,p2) \<in> parcs G \<and> p2 < p1}. y = w x}"
+      then obtain p1 p2 where f1: "(p1,p2) \<in> parcs G \<and> p2 < p1 \<and> y = w (p1,p2)" by auto
       then have "y \<noteq> 0" using dom zero by auto
       moreover have "y \<in> (real ` {1..q div 2})" using dom f1 calculation weight_not_zero_implies_arc by blast
       ultimately show "y \<in> (real ` W)" 
@@ -1523,9 +1522,9 @@ next
   qed
   ultimately show ?thesis using surjective_iff_injective_gen_le[of "{(p1,p2). (p1,p2) \<in> (parcs G) \<and> p2 < p1}" "real ` W" w] by auto 
 qed(*>*)
-
+text \<open>\<close>
 lemma(in distinct_weighted_pair_graph) weight_fun_surjective:
-  shows "(\<forall>k \<in> W. \<exists>(v\<^sub>1,v\<^sub>2) \<in> (parcs G). w (v\<^sub>1,v\<^sub>2) = k)" 
+  shows "\<forall>k \<in> W. \<exists>(v\<^sub>1,v\<^sub>2) \<in> parcs G. w (v\<^sub>1,v\<^sub>2) = k" 
 (*<*) using restricted_weight_fun_surjective 
   by (metis (no_types, lifting) case_prodE mem_Collect_eq restricted_weight_fun_card)
 
@@ -1567,8 +1566,8 @@ we introduce the function @{text "findEdge"} to find an edge in a list of edges 
 fun findEdge :: "('a\<times>'a) weight_fun \<Rightarrow> ('a\<times>'a) list \<Rightarrow> real \<Rightarrow> ('a\<times>'a)" where
 "findEdge f [] k = undefined" |
 "findEdge f (e#es) k = (if f e = k then e else findEdge f es k)" 
-
-(*<*)context distinct_weighted_pair_graph
+(*<*)
+context distinct_weighted_pair_graph
 begin
 
 lemma aux_findEdge_success:
@@ -1692,9 +1691,8 @@ fun getL :: "('a::linorder) pair_pre_digraph \<Rightarrow> ('a\<times>'a) weight
              \<Rightarrow> nat \<Rightarrow> 'a \<Rightarrow> nat" where
 "getL g w 0 v = 0" |  
 "getL g w (Suc i) v = (let (v\<^sub>1,v\<^sub>2) = (findEdge w (set_to_list (arcs g)) (Suc i)) in 
-                      (if v = v\<^sub>1 then max ((getL g w i v\<^sub>2)+1) (getL g w i v) else 
-                      (if v = v\<^sub>2 then max ((getL g w i v\<^sub>1)+1) (getL g w i v) else 
-                       getL g w i v)))"
+          (if v = v\<^sub>1 then max ((getL g w i v\<^sub>2)+1) (getL g w i v) else 
+          (if v = v\<^sub>2 then max ((getL g w i v\<^sub>1)+1) (getL g w i v) else getL g w i v)))"
 
 text \<open> To add all edges to the graph, set $i=|E|$. Recall that @{term "card (parcs g)"} $= 2*|E|$, 
 as every edge appears twice. 
@@ -1711,8 +1709,8 @@ text \<open> Exporting the algorithm into Haskell code results in a fully verifi
 strictly decreasing or strictly increasing trail. \<close>
 
 export_code getLongestTrail in Haskell module_name LongestTrail
-
-(*<*)context distinct_weighted_pair_graph
+(*<*)
+context distinct_weighted_pair_graph
 begin
 
 lemma aux_getL:
@@ -1976,7 +1974,7 @@ text \<open>\label{section:minLength}
 The algorithm introduced in Section \ref{section:computeLongestTrail} is already useful on its own. Additionally, it can be
 used to verify the lower bound on the minimum length of a strictly decreasing trail $P_d(w,G) \ge 2 \cdot \lfloor \frac{q}{n} \rfloor$.
 
-To this end, Lemma 1 from Section \ref{PaperProof} is translated into Isabelle as the lemma
+To this end, Lemma 1 from Section \ref{section:symbolicProof} is translated into Isabelle as the lemma
 @{text "minimal_increase_one_step"}. The proof is 
 similar to its counterpart, also using a case distinction. Lemma 2 is subsequently proved, here
 named @{text "minimal_increase_total"}. \<close>
@@ -2116,6 +2114,8 @@ theorem(in distinct_weighted_pair_graph) dec_trail_exists:
     using decTrail_subtrail by blast
 qed(*>*)
 
+text \<open>\<close>
+
 theorem(in distinct_weighted_pair_graph) inc_trail_exists: 
   shows "\<exists> es. incTrail G w es \<and> length es = q div n"
 (*<*)using dec_trail_exists 
@@ -2169,7 +2169,7 @@ qed
 (*>*)
 lemma(in distinct_weighted_pair_graph) dec_trail_exists_complete: 
   assumes "complete_digraph n G" 
-  shows "(\<exists> es. decTrail G w es \<and> length es = n-1)" 
+  shows "\<exists> es. decTrail G w es \<and> length es = n-1" 
 (*<*)proof-
   have "card (arcs G) = (n * (n-1))" 
   proof-
@@ -2190,20 +2190,18 @@ weight function separately, we use natural numbers as vertices. \<close>
 
 abbreviation ExampleGraph:: "nat pair_pre_digraph" where 
 "ExampleGraph \<equiv> (| 
-pverts = {1,2,3,(4::nat)}, 
-parcs = {(v\<^sub>1,v\<^sub>2). v\<^sub>1 \<in> {1,2,3,(4::nat)} \<and> v\<^sub>2 \<in> {1,2,3,(4::nat)} \<and> v\<^sub>1 \<noteq> v\<^sub>2} 
+  pverts = {1,2,3,(4::nat)}, 
+  parcs = {(v\<^sub>1,v\<^sub>2). v\<^sub>1 \<in> {1,2,3,(4::nat)} \<and> v\<^sub>2 \<in> {1,2,3,(4::nat)} \<and> v\<^sub>1 \<noteq> v\<^sub>2} 
 |)" 
 
 abbreviation ExampleGraphWeightFunction :: "(nat\<times>nat) weight_fun" where 
 "ExampleGraphWeightFunction \<equiv> (\<lambda>(v\<^sub>1,v\<^sub>2). 
-                               if (v\<^sub>1 = 1 \<and> v\<^sub>2 = 2) \<or> (v\<^sub>1 = 2 \<and> v\<^sub>2 = 1) then 1 else
-                              (if (v\<^sub>1 = 1 \<and> v\<^sub>2 = 3) \<or> (v\<^sub>1 = 3 \<and> v\<^sub>2 = 1) then 3 else
-                              (if (v\<^sub>1 = 1 \<and> v\<^sub>2 = 4) \<or> (v\<^sub>1 = 4 \<and> v\<^sub>2 = 1) then 6 else
-                              (if (v\<^sub>1 = 2 \<and> v\<^sub>2 = 3) \<or> (v\<^sub>1 = 3 \<and> v\<^sub>2 = 2) then 5 else 
-                              (if (v\<^sub>1 = 2 \<and> v\<^sub>2 = 4) \<or> (v\<^sub>1 = 4 \<and> v\<^sub>2 = 2) then 4 else
-                              (if (v\<^sub>1 = 3 \<and> v\<^sub>2 = 4) \<or> (v\<^sub>1 = 4 \<and> v\<^sub>2 = 3) then 2 else 
-                               0))))))" 
-
+  (if (v\<^sub>1 = 1 \<and> v\<^sub>2 = 2) \<or> (v\<^sub>1 = 2 \<and> v\<^sub>2 = 1) then 1 else
+  (if (v\<^sub>1 = 1 \<and> v\<^sub>2 = 3) \<or> (v\<^sub>1 = 3 \<and> v\<^sub>2 = 1) then 3 else
+  (if (v\<^sub>1 = 1 \<and> v\<^sub>2 = 4) \<or> (v\<^sub>1 = 4 \<and> v\<^sub>2 = 1) then 6 else
+  (if (v\<^sub>1 = 2 \<and> v\<^sub>2 = 3) \<or> (v\<^sub>1 = 3 \<and> v\<^sub>2 = 2) then 5 else 
+  (if (v\<^sub>1 = 2 \<and> v\<^sub>2 = 4) \<or> (v\<^sub>1 = 4 \<and> v\<^sub>2 = 2) then 4 else
+  (if (v\<^sub>1 = 3 \<and> v\<^sub>2 = 4) \<or> (v\<^sub>1 = 4 \<and> v\<^sub>2 = 3) then 2 else 0)))))))" 
 (*<*) 
 lemma codomain_ExampleGraphWeightFunction:
   assumes "(x,y) \<in> parcs ExampleGraph"
@@ -2347,12 +2345,19 @@ text \<open> Now it is an easy task to prove that there is a trail of length 3. 
 
 lemma ExampleGraph_decTrail:
   "\<exists> xs. decTrail ExampleGraph ExampleGraphWeightFunction xs \<and> length xs = 3"
-(*<*)  using example.distinct_weighted_pair_graph_axioms example.dec_trail_exists card_parcs_ExampleGraph 
+(*<*) using example.distinct_weighted_pair_graph_axioms example.dec_trail_exists card_parcs_ExampleGraph 
     card_parcs_ExampleGraph by auto (*>*)
 
 section \<open> Discussion and Related Work \<close>
 
 text \<open>
+Our theory @{text "Ordered_Trail"} builds on top of the @{text "Graph_Theory"} library presented in \cite{Graph_Theory-AFP}.
+However, this library does not formalize strictly ordered trails, nor the special weighted graphs we 
+introduced in the locale @{text "distinct-weighted-pair-graph"}. 
+Furthermore, our formalization extends \cite{Graph_Theory-AFP} with definitions on strictly decreasing and 
+increasing trails and provides many basic lemmas on them. Some of the main challenges in this context 
+were the reasoning on the surjectivity of the weight function as well the correctness proof of the algorithm.
+
 Our formalization can be easily extended and could therefore serve as a basis for further work in this field.
 The definitions @{term "incTrail"} and @{term "decTrail"} and the respective properties that are proven in 
 Section \ref{section:trails} are the key to many other variants of trail properties. 
