@@ -347,7 +347,7 @@ text \<open>\label{section:Formalization} \<close>
 subsection "Graph Theory in the Archive of Formal Proofs"
 
 text \<open>\label{section:GraphTheory} To increase the reusability of our library we build upon the @{text "Graph_Theory"}
-library by Noschinski \cite{Graph_Theory-AFP}. There, Graphs are represented as records consisting of vertices and edges that
+library by Noschinski \cite{Graph_Theory-AFP}. Graphs are represented as records consisting of vertices and edges that
 can be accessed using the selectors @{term "pverts"} and @{term "parcs"}. We recall the definition 
 of the type @{term pair_pre_digraph}:
 

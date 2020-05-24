@@ -104,9 +104,10 @@ one, allowing this way to use our formalization in Isabelle/HOL also to formaliz
 \begin{description}
 \item[(1)]
 We formalize strictly increasing trails and provide basic lemmas about their
-properties.
+properties. We improve results of \cite{graham1973increasing} by giving a precise bound on the increase of trail length.
 \item[(2)] We formalize strictly decreasing trails, in addition to the increasing trail setting of~\cite{graham1973increasing}. 
-We prove the duality between strictly increasing and strictly decreasing trails, that is, any such decreasing trail is an increasing one, and vice versa.
+We prove the duality between strictly increasing and strictly decreasing trails, that is, any such decreasing trail is an increasing one, and vice versa. 
+Thanks to these extensions, unlike \cite{graham1973increasing},  we give a constructive proof of the existence of strictly ordered trails (Lemma \ref{lemma:sum}). 
 \item[(3)] We design an algorithm computing longest ordered paths (Algorithm \ref{algo:FindLongestTrail}), and formally verify  its correctness in Isabelle/HOL.
 We extract our algorithm to Haskell program code using Isabelle's program extraction tool. Thus, we obtain a fully verified algorithm to compute the length
 of strictly-ordered trails in any given graph and weight distribution.
