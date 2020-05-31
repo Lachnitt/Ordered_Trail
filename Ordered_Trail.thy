@@ -15,7 +15,7 @@ an edge-weighted graph is an interesting graph theoretic problem~\cite{graham197
 with potential
 applications to scheduling and cost distribution in traffic planning and routing~\cite{byron}.
 In this paper, we formalize and automate the reasoning about
-strictly-ordered trail properties by developing an extendable flexible library in the proof assistant Isabelle/HOL~\cite{nipkow2002isabelle}.
+strictly increasing and strictly decreasing trail properties by developing an extendable flexible library in the proof assistant Isabelle/HOL~\cite{nipkow2002isabelle}.
 
 As a motivating example consider the following (undirected) graph $K_4$, where each edge is annotated 
 with a different integer-valued weight ranging from $1, \ldots, 6$:
@@ -45,8 +45,9 @@ with a different integer-valued weight ranging from $1, \ldots, 6$:
 \noindent When considering $K_4$, the question we address in this paper is whether $K_4$ has a 
 strictly decreasing trail of length $k\geq 1$. A trail is a sequence of distinct edges $(e_1,\ldots,e_k)$, $e_i \in E$ such that
 there exists a corresponding sequence of vertices $(v_0,...,v_k)$ where $e_i = v_{i-1}v_i$. 
-Moreover, our work provides a formally verified algorithm 
-computing such trails. Note that there is a decreasing trail in $K_4$ starting at vertex $v_3$, 
+A strictly-ordered trail is a trail where the edge weights of $(e_1,\ldots,e_k)$ are either strictly increasing or strictly decreasing.
+Our work provides a formally verified algorithm 
+computing such strictly-ordered trails. Note that there is a decreasing trail in $K_4$ starting at vertex $v_3$, 
 with trail length 3; namely $(v_3v_2; v_2v_4; v_4v_3)$ is such a trail, with each edge in the trail having 
 a higher weight than its consecutive edge in the trail. Similarly, $K_4$ has decreasing trails of 
 length 3 starting from $v_1$, $v_2$, and $v_4$ respectively. A natural question to ask,
@@ -63,10 +64,10 @@ Let us note that proving that a
  graph $G$ with $n$ vertices and $q$ edges has/does not have decreasing trails is possible for small 
 $n$, using automated reasoning engines such as Vampire~\cite{Vampire13} and Z3~\cite{de2008z3}. 
 One can restrict the weights to the integers $1,..,q$ and since $q \le {n \choose 2}$ there is a 
-finite number of possibilities for each n. 
+finite number of possibilities for each $n$. 
 Nevertheless, the limit of such an undertaking is
 reached soon. On our machine\footnote{standard laptop with
-1.7 GHz Dual-Core Intel Core i5 and  8 GB 1600 MHz memory} even for n = 7, both Vampire and Z3 fail 
+1.7 GHz Dual-Core Intel Core i5 and  8 GB 1600 MHz memory} even for $n$ = 7, both Vampire and Z3 fail 
 proving the existence of strictly decreasing trails, using a 1 hour time limit. This
 is due to the fact that every combination of edge weights and starting nodes is
 tested to be a solution. Thus, the provers are not able to contribute to the process of finding an 
@@ -108,7 +109,7 @@ properties. We improve results of \cite{graham1973increasing} by giving a precis
 \item[(2)] We formalize strictly decreasing trails, in addition to the increasing trail setting of~\cite{graham1973increasing}. 
 We prove the duality between strictly increasing and strictly decreasing trails, that is, any such decreasing trail is an increasing one, and vice versa. 
 Thanks to these extensions, unlike \cite{graham1973increasing},  we give a constructive proof of the existence of strictly ordered trails (Lemma \ref{lemma:sum}). 
-\item[(3)] We design an algorithm computing longest ordered paths (Algorithm \ref{algo:FindLongestTrail}), and formally verify  its correctness in Isabelle/HOL.
+\item[(3)] We design an algorithm computing longest ordered trails (Algorithm \ref{algo:FindLongestTrail}), and formally verify  its correctness in Isabelle/HOL.
 We extract our algorithm to Haskell program code using Isabelle's program extraction tool. Thus, we obtain a fully verified algorithm to compute the length
 of strictly-ordered trails in any given graph and weight distribution.
 \item[(4)] We
@@ -139,21 +140,22 @@ if $(v_1,v_2)\in E$ implies that also $(v_2,v_1)\in E$. A graph is {\em complete
 a graph $G'=(V',E')$ a {\em subgraph} of $G = (V,E) $ if $V' \subseteq V$ and $E' \subseteq E$.
 
 If a graph is equipped with a
- weight function $w: E \mapsto \mathbb{R}$ that maps edges to real numbers, it is called 
+ weight function $w: E \rightarrow \mathbb{R}$ that maps edges to real numbers, it is called 
  an {\em edge-weighted graph}. In the following, whenever a graph is mentioned it is implicitly assumed
-that this graph comes equipped with a weight function. A vertex labelling is a function $L: V \mapsto \mathbb{N}$.
+that this graph comes equipped with a weight function. A vertex labelling is a function $L: V \rightarrow \mathbb{N}$.
 
 A {\em trail of length k} in a graph $G = (V,E)$ is a sequence $(e_1,\ldots,e_k)$, $e_i \in E$, of distinct edges such that
  there exists a corresponding sequence of vertices $(v_0,...,v_k)$ where $e_i = v_{i-1}v_i$. 
 A {\em strictly decreasing trail} in an edge-weighted graph $G = (V,E)$ with weight function $w$
 is a trail such that $w (e_i) > w (e_{i+1})$. Likewise, a {\em strictly increasing trail} is a trail such that $w (e_i) < w (e_{i+1})$.
+A trail is {\em strictly-ordered} if it is strictly increasing or strictly decreasing.
 
 We will denote the length of a longest strictly increasing trail with $P_i(w,G)$. Likewise we will denote the length
 of a longest strictly decreasing trail with $P_d(w,G)$. In any undirected graph, it holds that $P_i(w,G) = P_d(w,G)$, 
 a result that we will formally verify in Section \ref{section:trails}. 
 
-Let $f_i(n) = \min P_i(w,K_n)$ denote the minimum length of an strictly increasing trail that must exist in 
-the complete graph with $n$ vertices. Likewise, $f_d(n) = \min P_d(w,K_n)$ in the case that we consider 
+Let $f_i(n) = \min_n P_i(w,K_n)$ denote the minimum length of an strictly increasing trail that must exist in 
+the complete graph with $n$ vertices. Likewise, $f_d(n) = \min_n P_d(w,K_n)$ in the case that we consider 
 strictly decreasing trails. \<close>
 
 section "Lower Bounds on Increasing and Decreasing Trails in Weighted Graphs"
@@ -174,7 +176,7 @@ We start by introducing the notion of a weighted subgraph and then we built on t
 \end{definition}
 
 \begin{definition}[Labelling Function]\label{def:Labelling}
-	For each $G^i=(V,E^i)$, $n = |V|$  we define $L^i:E^i\rightarrow \{1,\ldots,\frac{n(n-1)}{2}\}$ a labelling function such 
+	For each $G^i=(V,E^i)$, $n = |V|$  we define $L^i:V \{1,\ldots,\frac{n(n-1)}{2}\}$ a labelling function such 
 that $L^i(v)$ is the length of a longest strictly decreasing trail starting at vertex v using only edges in $E^i$.
 \end{definition}
 
@@ -215,7 +217,7 @@ illustrate these definitions. We need to prove the following property.
 		
 		$v_3-v_2-v_4-v3$
 		
-		Therefore, $L^5(v_3) = 3$\\ \ \\
+		Therefore, $L^5(v_3) = 3$.\\ \ \\
 
 		Decreasing trails from $v_1$ are:
 		
@@ -223,16 +225,14 @@ illustrate these definitions. We need to prove the following property.
 		
 		$v_1-v_3-v_4$
 		
-		Therefore, $L^5(v_1) = 2$
+		Therefore, $L^5(v_1) = 2$.
 	\end{multicols}
 	
   \caption{Graph $G^5$ with labelling function $L^5$}\label{example:G5}
 \end{figure}
 
 \begin{lemma}\label{lemma:sum}
-	Let $i < q$ and $G^i$ a labelled subgraph of G. Then, adding the edge labelled with $i+1$ to the 
-graph $G_i$ increases the sum of the lengths of strictly decreasing trails at least by 2, i.e.,
-	$\sum_{v\in V} L^{i+1}(v) \ge \sum_{v\in V} L^{i}(v)+2$.
+If $i < q$, then $\sum_{v\in V} L^{i+1}(v) \ge \sum_{v\in V} L^{i}(v)+2$.
 \end{lemma}
 \vspace{-1em}
 \begin{proof}
@@ -241,7 +241,7 @@ therefore the graph $G^{i+1}$ is $G^i$ with the additional edge $e$. As $w(e') <
  $L^{i+1}(v) = L^i(v)$ for all $v\in V$ with $u_1\neq v, u_2\neq v$. It also holds that $L^{i+1}(u_1) = \max(L^i(u_2)+1,L^i(u_1))$ 
 because either that longest trail from $u_1$ can be prolonged with edge $e$ ($i+1$ will be greater than the weight of the first edge 
 in this trail by construction of $L^{i+1}$) or there is already a longer trail starting from $u_1$ not using e. 
-We derive $L^{i+1}(u_2) = \max(L^i(u_1)+1,L^i(u_2))$ based on a similar reasoning. See Figure \ref{figure:cases} for a visualisation. 
+We derive $L^{i+1}(u_2) = \max(L^i(u_1)+1,L^i(u_2))$ based on a similar reasoning. See Figure \ref{figure:cases} for an illustration. 
 
 Note that $L^{i+1}(v) = L^i(v)$ for $v\in V \setminus \{u_1,u_2\}$, because no edge incident to these vertices was added and
 a trail starting from them cannot be prolonged since the new edge has bigger weight than any edge in such a 
@@ -251,12 +251,10 @@ If $L(u_1)=L(u_2)$, then $L^{i+1}(u_1) = L^i(u_1) + 1$ and $L^{i+1}(u_2) = L^i(u
 If $L(u_1)>L(u_2)$ then $L^{i+1}(u_2) = L^i(u_1) +1 \ge L^i(u_2)+2$, otherwise $L^{i+1}(u_1) = L^i(u_2) +1 \ge L^i(u_1)+2$. Thus, 
 
 \begin{flalign*}
-&\sum_{v\in V} L^{i+1}(v) \\
-= &\sum_{v\in (V-\{u_1,u_2\})} L^{i+1}(v)+L^{i+1}(u_1)+L^{i+1}(u_2)\\
-\ge & \sum_{v\in (V-\{u_1,u_2\})} L^{i+1}(v)+L^i(u_1)+L^i(u_2)+2\\
-= & \sum_{v\in V} L^{i}(v)+2.
-\end{flalign*}\\
-
+\sum_{v\in V} L^{i+1}(v) &~ = ~& \sum_{v\in (V-\{u_1,u_2\})} L^{i+1}(v)+L^{i+1}(u_1)+L^{i+1}(u_2)&&\\
+&~\ge~ & \sum_{v\in (V-\{u_1,u_2\})} L^{i+1}(v)+L^i(u_1)+L^i(u_2)+2&&\\
+&~=~ &  \sum_{v\in V} L^{i}(v)+2.&&
+\end{flalign*}\qed
 \end{proof}
 
 \begin{figure}[h]
@@ -308,7 +306,7 @@ both endpoints. Function $findMax$ returns the maximum value of the array $L$.
 \begin{lemma}$\sum_{v\in V} L^{q}(v) \ge 2q$. \end{lemma}
 
 \begin{proof}
-By induction, using the property $\sum_{v\in V} L^{i+1}(v) \ge \sum_{v\in V} L^{i}(v)+2$ from Lemma \ref{lemma:sum}. For the induction base note that $\sum_{v\in V} L^{0}(v) = 0$ 
+We proceed by induction, using the property $\sum_{v\in V} L^{i+1}(v) \ge \sum_{v\in V} L^{i}(v)+2$ from Lemma \ref{lemma:sum}. For the induction base note that $\sum_{v\in V} L^{0}(v) = 0$ 
 because $G^0$ does not contain any edges and thus no vertex has a strictly decreasing trail of length greater than 0. \qed \end{proof}
 
 \noindent We next prove the lower bound on the length of longest strictly decreasing trails.
@@ -324,23 +322,23 @@ exists a strictly decreasing trail of length $2\cdot\lfloor\frac{q}{n}\rfloor$.\
 	to Lemma 2 that postulates that the sum of the length of all longest strictly decreasing trails $\sum_{v\in V} L^{q}(v)$ is greater than $2\cdot q$.
 	Hence, there has to be at least one vertex with a strictly decreasing trail that is longer than $2\cdot\lfloor\frac{q}{n}\rfloor$ in $G^q$.
 	This trail contains a subtrail of length $2\cdot\lfloor\frac{q}{n}\rfloor$. Since $E^q=E$ it follows that $G^q=G$, which concludes 
-	the proof. 
+	the proof. \qed
 \end{proof} 
 
 \noindent Based on Theorem \ref{theorem:main}, we get the following results.
 
 \begin{corollary}\label{corollary:IncreasingIsDecreasing}
-It also holds that $P_i(w,G) \ge 2\cdot\lfloor\frac{q}{n}\rfloor$ since when reversing a strictly decreasing trail 
+It holds that $P_i(w,G) \ge 2\cdot\lfloor\frac{q}{n}\rfloor$ since when reversing a strictly decreasing trail 
 one obtains a strictly increasing one. In this case, define $L^i(v)$ as the 
 length of a longest strictly increasing trail ending at $v$ in $G^i$.\qed \end{corollary}
 
 \begin{corollary}
 Let G be as in Theorem \ref{theorem:main} and additionally assume that G is complete. Then, there exists a trail 
-of length at least $n-1$, i.e. $f_i(n) = f_d(n)  \ge n-1$.\qed
+of length at least $n-1$, i.e., $f_i(n) = f_d(n) \ge n-1$.\qed
 \end{corollary}
 
 In \cite{graham1973increasing} the authors present a non-constructive proof. As in Lemma \ref{lemma:sum} they argue that the 
-sum of the lengths of all increasing paths is at least 2. Thus, they overestimate the increase. We however, use the exact increase therefore 
+sum of the lengths of all increasing trails is at least 2. Thus, they overestimate the increase. We however, use the exact increase therefore 
 making the proof constructive and obtaining Algorithm \ref{algo:FindLongestTrail}.\<close>
 
 section "Formalization of Trail Properties in Isabelle/HOL"
@@ -1146,7 +1144,7 @@ abbreviation(in weighted_pair_graph) "q \<equiv> card (parcs G)"
 abbreviation(in weighted_pair_graph) "n \<equiv> card (pverts G)"
 abbreviation(in weighted_pair_graph) "W \<equiv> {1..q div 2}"
 
-text \<open>Note an important difference between Section \ref{PaperProof} and our formalization. Although 
+text \<open>Note an important difference between Section \ref{section:symbolicProof} and our formalization. Although 
 a @{locale "weighted_pair_graph"} is symmetric, the edge set contains both ``directions" of an edge, 
 i.e., $(v_1,v_2)$ and $(v_2,v_1)$ are both in @{term "parcs G"}. Thus, the maximum number of edges (in the 
 case that the graph is complete) is $n\cdot(n-1)$ and not $\frac{n\cdot(n-1)}{2}$. Another consequence is that
@@ -2370,12 +2368,12 @@ that
 $$
 f_d(n)= f_i(n) = 
 \begin{cases}
-n &  \text{if } n \in \{3,5\}\\
-n-1 & \text{otherwise}\\
-\end{cases},
+n &  \text{if } n \in \{3,5\},\\
+n-1 & \text{otherwise},\\
+\end{cases}
 $$
 
-that is for complete graphs with $n=3$ or $n=5$ vertices there always has to be a trail of length at least $n$ whereas 
+\noindent that is, for complete graphs with $n=3$ or $n=5$ vertices there always has to be a trail of length at least $n$ whereas 
 for any other number $n$ of vertices there only has to be a trail of length $n - 1$. Therefore, the lower bound that
 we showed in this paper is equal to the exact length with exception of two special cases.  
 We believe that formalizing this result would be a valuable extension to the theory @{text "Ordered_Trail"}.

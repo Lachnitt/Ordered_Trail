@@ -1,399 +1,10 @@
-(*<*)theory Ordered_Trail 
+theory Ordered_Trail 
   imports
     Graph_Theory.Bidirected_Digraph
     Graph_Theory.Weighted_Graph
     Graph_Theory.Kuratowski
     Graph_Theory.Arc_Walk
-begin(*>*)
-
-section "Introduction"
-
-text \<open> 
-
-The problem of finding a longest trail with strictly increasing or strictly decreasing weights in
-an edge-weighted graph is an interesting graph theoretic problem~\cite{graham1973increasing,calderbank1984increasing,yuster2001large,de2015increasing}, 
-with potential
-applications to scheduling and cost distribution in traffic planning and routing~\cite{byron}.
-In this paper, we formalize and automate the reasoning about
-strictly-ordered trail properties by developing an extendable flexible library in the proof assistant Isabelle/HOL~\cite{nipkow2002isabelle}.
-
-As a motivating example consider the following (undirected) graph $K_4$, where each edge is annotated 
-with a different integer-valued weight ranging from $1, \ldots, 6$:
-
-\begin{figure}
-\centering
-		\begin{tikzpicture}
-		\node[draw,circle] at (0, 0) (a) {$v_1$};
-		\node[draw,circle] at (5, 0) (b) {$v_2$};
-	
-		\node[draw,circle] at (0, -3) (c) {$v_3$};
-		\node[draw,circle] at (5, -3) (d) {$v_4$};
-		
-		% draw edges
-		\draw[] (a) -- (b)  node[above,midway] {$1$};
-		\draw[] (a) -- (c)  node[midway, left] {$3$};
-		\draw[] (a) -- (d)  node[near start, above] {$6$};
-	  
-    \draw[] (b) -- (c)  node[near start, above] {$5$};
-		\draw[] (b) -- (d)  node[near start, right] {$4$};
-		
-		\draw[] (c) -- (d)  node[midway, above] {$2$};
-		\end{tikzpicture}
-  \caption{Example graph $\protect K_4$}\label{example:K4}
-\end{figure}
-
-\noindent When considering $K_4$, the question we address in this paper is whether $K_4$ has a 
-strictly decreasing trail of length $k\geq 1$. A trail is a sequence of distinct edges $(e_1,\ldots,e_k)$, $e_i \in E$ such that
-there exists a corresponding sequence of vertices $(v_0,...,v_k)$ where $e_i = v_{i-1}v_i$. 
-Moreover, our work provides a formally verified algorithm 
-computing such trails. Note that there is a decreasing trail in $K_4$ starting at vertex $v_3$, 
-with trail length 3; namely $(v_3v_2; v_2v_4; v_4v_3)$ is such a trail, with each edge in the trail having 
-a higher weight than its consecutive edge in the trail. Similarly, $K_4$ has decreasing trails of 
-length 3 starting from $v_1$, $v_2$, and $v_4$ respectively. A natural question to ask,
-which we address in this paper, is whether it is possible to construct a graph such that the 
- constructed graph has 4 vertices and 5 edges, and no vertex is the starting node of a trail of 
-length 3? We answer this question negatively, in an even more general setting,  not restricted to 4 
-vertices and 5 edges. Similarly to the theoretical results of~\cite{graham1973increasing}, we show 
-that, given a graph $G$ with $n$ vertices and $q$ edges, there is always a strictly decreasing trail of length at least
-$2 \cdot \lfloor\frac{q}{n}\rfloor$. While such a graph theoretical result has already been announced 
-\cite{graham1973increasing}, in this paper we formalize the results in Isabelle/HOL and construct 
-a Isabelle/HOL-verified algorithm computing strictly decreasing trails of length $k$, whenever such trails exist.
-
-Let us note that proving that a
- graph $G$ with $n$ vertices and $q$ edges has/does not have decreasing trails is possible for small 
-$n$, using automated reasoning engines such as Vampire~\cite{Vampire13} and Z3~\cite{de2008z3}. 
-One can restrict the weights to the integers $1,..,q$ and since $q \le {n \choose 2}$ there is a 
-finite number of possibilities for each n. 
-Nevertheless, the limit of such an undertaking is
-reached soon. On our machine\footnote{standard laptop with
-1.7 GHz Dual-Core Intel Core i5 and  8 GB 1600 MHz memory} even for n = 7, both Vampire and Z3 fail 
-proving the existence of strictly decreasing trails, using a 1 hour time limit. This
-is due to the fact that every combination of edge weights and starting nodes is
-tested to be a solution. Thus, the provers are not able to contribute to the process of finding an 
-effective proof of the statement. Even for relatively small numbers $n$, our experiments show that 
-state-of-the-art automated  provers are not able to prove whether weighted graphs have a strictly decreasing trail 
-of a certain length.
-
-We also note that this limitation goes beyond automated provers. In the Isabelle proof assistant, 
-proving that a complete graph with 3 vertices, i.e. $K_3$,  will
-always contain a strictly decreasing trail of length 3 is quite exhaustive, as it requires reasoning about 3! = 6 possibilities
-for a distribution of a weight function $w$ and then manually constructing concrete trails:
-
-\begin{center}
-@{text "w(v\<^sub>1,v\<^sub>2) = 2 \<and> w(v\<^sub>2,v\<^sub>3) = 1 \<and> w(v\<^sub>3,v\<^sub>1) = 3"} 
-
-@{text "\<longrightarrow> incTrail K\<^sub>3 w [(v\<^sub>3,v\<^sub>2),(v\<^sub>2,v\<^sub>1),(v\<^sub>1,v\<^sub>3)]"}
-\end{center}
-
-Based on such limitations of automative and interactive provers, in this paper we aim at formalizing 
-and proving existence of trails of length $n$, where $n\geq 1$ is a symbolic constant. As such, 
-proving for example that graphs have trails of length $4$, for a concrete $n$,  become instances 
-of our approach. To this end, we build upon existing works in this area. In particular, the first 
-to raise the question of the minimum length of strictly increasing
-trails of arbitrary graphs  were Chv\'atal and Koml\'os~\cite{chvatal1970some}. Subsequently, 
-Graham and Kletman~\cite{graham1973increasing} proved that the lower bound of the length of increasing trails 
-is given by $2 \cdot \lfloor\frac{q}{n}\rfloor$, as also mentioned above. In our work, we formalize and verify 
-such results in Isabelle/HOL. Yet, our work is not a straightforward adaptation and formalization   
-of Graham and Kletman's proof~\cite{graham1973increasing}. Rather, we focus on decreasing trails instead of increasing trails 
-and give an algorithm computing longest decreasing trails of a given graph (Algorithm \ref{algo:FindLongestTrail}).  
-By formalizing Algorithm \ref{algo:FindLongestTrail} in Isabelle/HOL, we also formally verify the correctness 
-of the trails computed by our approach. Moreover, we prove that any strictly decreasing trail is also an strictly increasing 
-one, allowing this way to use our formalization in Isabelle/HOL also to formalize results of Graham and Kletman~\cite{graham1973increasing}.
-
-\noindent\paragraph{\bf Contributions.} This paper brings the following contributions.
-\begin{description}
-\item[(1)]
-We formalize strictly increasing trails and provide basic lemmas about their
-properties.
-\item[(2)] We formalize strictly decreasing trails, in addition to the increasing trail setting of~\cite{graham1973increasing}. 
-We prove the duality between strictly increasing and strictly decreasing trails, that is, any such decreasing trail is an increasing one, and vice versa.
-\item[(3)] We design an algorithm computing longest ordered paths (Algorithm \ref{algo:FindLongestTrail}), and formally verify  its correctness in Isabelle/HOL.
-We extract our algorithm to Haskell program code using Isabelle's program extraction tool. Thus, we obtain a fully verified algorithm to compute the length
-of strictly-ordered trails in any given graph and weight distribution.
-\item[(4)] We
-verify the lower bound on
-the minimum length of strictly decreasing trails of arbitrary graphs, and of complete graphs in particular.
-\item[(5)] We build upon the Graph-Theory library by Noschinski~\cite{Graph_Theory-AFP},  that is part of the
-Archive of Formal Proofs (AFP) and already includes many results on walks and
-general properties of graphs. We introduce the digital dataset {\it v} formalizing properties of graph trails. Our dataset  consists of
-$\sim$2000 lines of Isabelle code and it took about one month for one person to finish. As far as we know this is the first formalization of
-ordered trails in a proof assistant.
-\end{description}
-
-This paper was generated from Isabelle/HOL source code using Isabelle's document preparation tool 
-and is therefore fully verified. The source code is available
-online at \url{https://github.com/Lachnitt/Ordered_Trail}. The rest of the paper is organized as follows.
-Section 2 recalls basic terminology and properties from graph theory. 
-We prove lower bounds on strictly increasing/decreasing trails in Section 3. We describe our Isabelle/HOL 
-formalization in Isabelle/HOL in Section 4. We discuss further directions in Section 5 and conclude our paper with Section 6.
- \<close>
-
-section "Preliminaries" 
-text \<open> \label{section:Prelim}
-We briefly recapitulate the basic notions of graph theory. A {\em graph} $G = (V,E)$ consists of
-a set $V$ of {\em vertices} and a set $E \subseteq V \times V$ of {\em edges}. A graph is undirected 
-if $(v_1,v_2)\in E$ implies that also $(v_2,v_1)\in E$. A graph is {\em complete}
- if every pair of vertices is connected by an edge. A graph is {\em loopfree} or {\em simple} if there are no edges $(x,x)\in E$ and 
-{\em finite} if the number of vertices $|V|$ is finite. Finally, we call 
-a graph $G'=(V',E')$ a {\em subgraph} of $G = (V,E) $ if $V' \subseteq V$ and $E' \subseteq E$.
-
-If a graph is equipped with a
- weight function $w: E \mapsto \mathbb{R}$ that maps edges to real numbers, it is called 
- an {\em edge-weighted graph}. In the following, whenever a graph is mentioned it is implicitly assumed
-that this graph comes equipped with a weight function. A vertex labelling is a function $L: V \mapsto \mathbb{N}$.
-
-A {\em trail of length k} in a graph $G = (V,E)$ is a sequence $(e_1,\ldots,e_k)$, $e_i \in E$, of distinct edges such that
- there exists a corresponding sequence of vertices $(v_0,...,v_k)$ where $e_i = v_{i-1}v_i$. 
-A {\em strictly decreasing trail} in an edge-weighted graph $G = (V,E)$ with weight function $w$
-is a trail such that $w (e_i) > w (e_{i+1})$. Likewise, a {\em strictly increasing trail} is a trail such that $w (e_i) < w (e_{i+1})$.
-
-We will denote the length of a longest strictly increasing trail with $P_i(w,G)$. Likewise we will denote the length
-of a longest strictly decreasing trail with $P_d(w,G)$. In any undirected graph, it holds that $P_i(w,G) = P_d(w,G)$, 
-a result that we will formally verify in Section \ref{section:trails}. 
-
-Let $f_i(n) = \min P_i(w,K_n)$ denote the minimum length of an strictly increasing trail that must exist in 
-the complete graph with $n$ vertices. Likewise, $f_d(n) = \min P_d(w,K_n)$ in the case that we consider 
-strictly decreasing trails. \<close>
-
-section "Lower Bounds on Increasing and Decreasing Trails in Weighted Graphs"
-
-text \<open>\label{section:symbolicProof}
-The proof introduced in the following is based on similar ideas as in \cite{graham1973increasing}. 
-However, we diverge from \cite{graham1973increasing} in several aspects. Firstly, we consider strictly decreasing instead of strictly increasing trails,
-reducing the complexity of the automated proof (see Section \ref{section:Formalization}). 
-Moreover, we add tighter bounds than necessary to give a fully constructive proof in terms of an algorithm for computing
-the length of these trails (see Section \ref{section:localeSurjective}). We discuss this further at the end of the section.
-
-We start by introducing the notion of a weighted subgraph and then we built on that by specifying a family of labelling functions:
-
-\begin{definition}[Weighted Subgraph] \label{def:weightedSubgraph}
-	Let $G=(V,E)$ be a graph with weight function $w:E\rightarrow \{1,\ldots,q\}$ where $|E| = q$.
-	For each $i\in \{0,...,q\}$ define a weighted subgraph $G^i = (V,E^i)$ such that $e\in E^i$ iff $w(e)\in \{1,...,i\}$. 
-  That is, $G^i$ contains only edges labelled with weights $\le i$.
-\end{definition}
-
-\begin{definition}[Labelling Function]\label{def:Labelling}
-	For each $G^i=(V,E^i)$, $n = |V|$  we define $L^i:E^i\rightarrow \{1,\ldots,\frac{n(n-1)}{2}\}$ a labelling function such 
-that $L^i(v)$ is the length of a longest strictly decreasing trail starting at vertex v using only edges in $E^i$.
-\end{definition}
-
-\noindent In Figure \ref{example:G5} the example graph from Figure \ref{example:K4} is revisited to 
-illustrate these definitions. We need to prove the following property.
-
-\begin{figure}
-\centering
-
-	\begin{multicols}{2}[\columnsep2em] 
-
-	\begin{tikzpicture}
-	\node[draw,circle] at (0, 0)   (a) {$v_1$};
-	\node[draw,circle] at (5, 0)   (b) {$v_2$};
-	
-	\node[draw,circle] at (0, -3)  (c)     {$v_3$};
-	\node[draw,circle] at (5, -3)  (d)     {$v_4$};
-	
-	% draw edges
-	\draw[] (a) -- (b)  node[above,midway] {$1$};
-  \draw[] (a) -- (c)  node[midway, left] {$3$};
-	\draw[] (b) -- (d)  node[midway, right] {$4$};
-	
-	\draw[] (b) -- (c)  node[midway, above] {$5$};
-	\draw[] (c) -- (d)  node[midway, above] {$2$};
-	
-	\end{tikzpicture}\\
-		\columnbreak
-		\vspace{7cm}
-		\ \\
-		Decreasing trails from $v_3$ are: 
-		
-		$v_3-v_4$,  
-		
-		$v_3-v_1-v_2$, 
-		
-		$v_3-v_2-v_1$,
-		
-		$v_3-v_2-v_4-v3$
-		
-		Therefore, $L^5(v_3) = 3$\\ \ \\
-
-		Decreasing trails from $v_1$ are:
-		
-		$v_1-v_2$
-		
-		$v_1-v_3-v_4$
-		
-		Therefore, $L^5(v_1) = 2$
-	\end{multicols}
-	
-  \caption{Graph $G^5$ with labelling function $L^5$}\label{example:G5}
-\end{figure}
-
-\begin{lemma}\label{lemma:sum}
-	Let $i < q$ and $G^i$ a labelled subgraph of G. Then, adding the edge labelled with $i+1$ to the 
-graph $G_i$ increases the sum of the lengths of strictly decreasing trails at least by 2, i.e.,
-	$\sum_{v\in V} L^{i+1}(v) \ge \sum_{v\in V} L^{i}(v)+2$.
-\end{lemma}
-\vspace{-1em}
-\begin{proof}
-Let $e$ be the edge labelled with $i+1$ and denote its endpoints with $u_1$ and $u_2$. It holds that $E^i \cup \{e\} = E^{i+1}$, 
-therefore the graph $G^{i+1}$ is $G^i$ with the additional edge $e$. As $w(e') < w(e) $, for all $e' \in E^i$ we have 
- $L^{i+1}(v) = L^i(v)$ for all $v\in V$ with $u_1\neq v, u_2\neq v$. It also holds that $L^{i+1}(u_1) = \max(L^i(u_2)+1,L^i(u_1))$ 
-because either that longest trail from $u_1$ can be prolonged with edge $e$ ($i+1$ will be greater than the weight of the first edge 
-in this trail by construction of $L^{i+1}$) or there is already a longer trail starting from $u_1$ not using e. 
-We derive $L^{i+1}(u_2) = \max(L^i(u_1)+1,L^i(u_2))$ based on a similar reasoning. See Figure \ref{figure:cases} for a visualisation. 
-
-Note that $L^{i+1}(v) = L^i(v)$ for $v\in V \setminus \{u_1,u_2\}$, because no edge incident to these vertices was added and
-a trail starting from them cannot be prolonged since the new edge has bigger weight than any edge in such a 
-trail.
-
-If $L(u_1)=L(u_2)$, then $L^{i+1}(u_1) = L^i(u_1) + 1$ and $L^{i+1}(u_2) = L^i(u_2)+1$ and thus the sum increases exactly by 2. 
-If $L(u_1)>L(u_2)$ then $L^{i+1}(u_2) = L^i(u_1) +1 \ge L^i(u_2)+2$, otherwise $L^{i+1}(u_1) = L^i(u_2) +1 \ge L^i(u_1)+2$. Thus, 
-
-\begin{flalign*}
-&\sum_{v\in V} L^{i+1}(v) \\
-= &\sum_{v\in (V-\{u_1,u_2\})} L^{i+1}(v)+L^{i+1}(u_1)+L^{i+1}(u_2)\\
-\ge & \sum_{v\in (V-\{u_1,u_2\})} L^{i+1}(v)+L^i(u_1)+L^i(u_2)+2\\
-= & \sum_{v\in V} L^{i}(v)+2.
-\end{flalign*}\\
-
-\end{proof}
-
-\begin{figure}[h]
-	\centering
-	\begin{tikzpicture}
-	\node at (-4, 6)  {Situation before adding edge $e$: }; 
-	\node[draw,circle, label = $L^i(u_1)$] at (0, 6)   (a) {};
-	\node[draw,circle, label = $L^i(u_2)$] at (4, 6)   (b) {};
-	
-	\node at (-4.5, 4)  {Case 1: $L^i(u_1) = L^i(u_2)$: }; 
-	\node[draw,circle, label = $L^{i+1}(u_1)+1$] at (0, 4)   (c) {};
-	\node[draw,circle, label = $L^{i+1}(u_2)+1$] at (4, 4)   (d) {};			
-	\draw[] (c) -- (d)  node[below,midway] {$i+1$};
-	
-	\node at (-4.5, 2)  {Case 2: $L^i(u_1) > L^i(u_2)$:  }; 
-	\node[draw,circle, label = $L^{i+1}(u_2)+1$] at (0, 2)   (c) {};
-	\node[draw,circle, label = $L^{i+1}(u_2)$] at (4, 2)   (d) {};			
-	\draw[] (c) -- (d)  node[below,midway] {$i+1$};
-	
-	\node at (-4.5, 0)  {Case 3: $L^i(u_1) < L^i(u_2)$:}; 
-	\node[draw,circle, label = $L^{i+1}(u_1)$] at (0, 0)   (c) {};
-	\node[draw,circle, label = $L^{i+1}(u_1)+1$] at (4, 0)   (d) {};			
-	\draw[] (c) -- (d)  node[below,midway] {$i+1$};
-	\end{tikzpicture}
-	\caption{Case distinction when adding edge $e$ in Lemma \ref{lemma:sum}}\label{figure:cases}
-\end{figure}
-			
-
-\noindent Note that the proof of Lemma \ref{lemma:sum} is constructive, yielding the Algorithm \ref{algo:FindLongestTrail} for computing
-longest strictly decreasing trails. Function $findEndpoints$ searches for an edge in a graph $G$ by its weight $i$ and returns
-both endpoints. Function $findMax$ returns the maximum value of the array $L$. 
-
-\begin{algorithm}[H]
-	\SetAlgoLined
-	
-	\For{$v\in V$}{$L(v):=0$}
-	\For{$i=1; i<|E|; i++$}{
-		$(u,v) = findEndpoints(G,i)$\;
-		$temp = L(u)$\;
-		$L(u) = \max(L(v)+1,L(u))$ \;
-		$L(v) = \max(temp+1,L(v))$ \;	
-	}
-
-	return findMax(L)\;
-
-\caption{Find Longest Strictly Decreasing Trail}\label{algo:FindLongestTrail}
-\end{algorithm}
-
-\begin{lemma}$\sum_{v\in V} L^{q}(v) \ge 2q$. \end{lemma}
-
-\begin{proof}
-By induction, using the property $\sum_{v\in V} L^{i+1}(v) \ge \sum_{v\in V} L^{i}(v)+2$ from Lemma \ref{lemma:sum}. For the induction base note that $\sum_{v\in V} L^{0}(v) = 0$ 
-because $G^0$ does not contain any edges and thus no vertex has a strictly decreasing trail of length greater than 0. \qed \end{proof}
-
-\noindent We next prove the lower bound on the length of longest strictly decreasing trails.
-
-\begin{theorem}Let $G = (V,E)$ be an undirected edge-weighted graph such that $|V|=n$ and $|E| = q$. Let  
-$w:E\rightarrow \{1,\ldots,q\}$ be a weight function assuming different weights are mapped to to different edges. 
-Then, $P_d(w,G) \ge 2\cdot\lfloor\frac{q}{n}\rfloor$ i.e., there 
-exists a strictly decreasing trail of length $2\cdot\lfloor\frac{q}{n}\rfloor$.\label{theorem:main}\end{theorem}
-
-\begin{proof}Assume that no vertex is a starting point of a trail of length at least $2\cdot\lfloor\frac{q}{n}\rfloor$, that is
-	$L^{q}(v) < 2\cdot\lfloor\frac{q}{n}\rfloor,$ for all $v \in V$. 
-	Then, $\sum_{v\in V} L^{q}(v) < 2\cdot\lfloor\frac{q}{n}\rfloor n \le 2\cdot q$. But this is a contradiction 
-	to Lemma 2 that postulates that the sum of the length of all longest strictly decreasing trails $\sum_{v\in V} L^{q}(v)$ is greater than $2\cdot q$.
-	Hence, there has to be at least one vertex with a strictly decreasing trail that is longer than $2\cdot\lfloor\frac{q}{n}\rfloor$ in $G^q$.
-	This trail contains a subtrail of length $2\cdot\lfloor\frac{q}{n}\rfloor$. Since $E^q=E$ it follows that $G^q=G$, which concludes 
-	the proof. 
-\end{proof} 
-
-\noindent Based on Theorem \ref{theorem:main}, we get the following results.
-
-\begin{corollary}\label{corollary:IncreasingIsDecreasing}
-It also holds that $P_i(w,G) \ge 2\cdot\lfloor\frac{q}{n}\rfloor$ since when reversing a strictly decreasing trail 
-one obtains a strictly increasing one. In this case, define $L^i(v)$ as the 
-length of a longest strictly increasing trail ending at $v$ in $G^i$.\qed \end{corollary}
-
-\begin{corollary}
-Let G be as in Theorem \ref{theorem:main} and additionally assume that G is complete. Then, there exists a trail 
-of length at least $n-1$, i.e. $f_i(n) = f_d(n)  \ge n-1$.\qed
-\end{corollary}
-
-In \cite{graham1973increasing} the authors present a non-constructive proof. As in Lemma \ref{lemma:sum} they argue that the 
-sum of the lengths of all increasing paths is at least 2. Thus, they overestimate the increase. We however, use the exact increase therefore 
-making the proof constructive and obtaining Algorithm \ref{algo:FindLongestTrail}.\<close>
-
-section "Formalization of Trail Properties in Isabelle/HOL"
-text \<open>\label{section:Formalization} \<close>
-subsection "Graph Theory in the Archive of Formal Proofs"
-
-text \<open>\label{section:GraphTheory} To increase the reusability of our library we build upon the @{text "Graph_Theory"}
-library by Noschinski \cite{Graph_Theory-AFP}. Graphs are represented as records consisting of vertices and edges that
-can be accessed using the selectors @{term "pverts"} and @{term "parcs"}. We recall the definition 
-of the type @{term pair_pre_digraph}:
-
- @{text [display = true] "record 'a pair_pre_digraph = pverts :: \"'a set\" parcs :: \"'a rel\""}
-
-Now restrictions upon the two sets and new features can be introduced using locales. 
-Locales are Isabelle's way to deal with parameterized theories~\cite{ballarin2010tutorial}. Consider
-for example @{locale pair_wf_digraph}.
-The endpoints of an edge can be accessed using the functions @{text fst} and @{text snd}. Therefore, conditions
-@{text "arc_fst_in_verts"} and @{text "arc_snd_in_verts"} assert that both endpoints of an edge are
-vertices. Using so-called sublocales a variety of other graphs are defined.  
-
-@{text [display = true] "locale pair_wf_digraph = pair_pre_digraph +
-  assumes arc_fst_in_verts: \"\<And>e. e \<in> parcs G \<Longrightarrow> fst e \<in> pverts G\"
-  assumes arc_snd_in_verts: \"\<And>e. e \<in> parcs G \<Longrightarrow> snd e \<in> pverts G\""}
-
-An object of type @{text "'b awalk"} is defined in @{text "Graph_Theory.Arc_Walk"} as a list of edges. 
-Additionally, the definition @{text "awalk"} imposes that both endpoints of a walk are vertices of 
-the graph, all elements of the walk are edges and two subsequent edges share a common vertex. \vspace{1em}
-
-\noindent@{text "type_synonym 'b awalk = \"'b list\""}
-
-@{text [display = true] "definition awalk :: \"'a \<Rightarrow> 'b awalk \<Rightarrow> 'a \<Rightarrow> bool\"
-\"awalk u p v \<equiv> u \<in> verts G \<and> set p \<subseteq> arcs G \<and> cas u p v\" "}
-
-\noindent We also reuse the type synonym @{text "weight_fun"} introduced in \mbox{@{text "Weighted_Graph"}}. \vspace{1em}
-
-@{text "type_synonym 'b weight_fun = \"'b \<Rightarrow> real\""}  \vspace{1em}
-
-Finally, there is an useful definition capturing the notion of a complete graph, namely @{text "complete_digraph"}. \<close>
-
-subsection "Increasing and Decreasing Trails in Weighted Graphs"
-
-text \<open>\label{section:trails} In our work we extend the graph theory framework from Section \ref{section:GraphTheory} 
-with new features enabling reasoning about ordered trails. To this end,
- a trail is defined as a list of edges. We will only consider strictly increasing trails 
-on graphs without parallel edges. For this we require the graph 
-to be of type @{term "pair_pre_digraph"}, as introduced in Section \ref{section:GraphTheory}. 
-
-Two different definitions
-are given in our formalization. Function @{text "incTrail"} can be used without specifying the first and last vertex of the trail
-whereas @{text "incTrail2"} uses more of @{term "Graph_Theory's"} predefined features. Moreover, making use of  monotonicity
-\mbox{@{text "incTrail"}} only requires to check if one edge's weight is smaller than its successors' while @{text "incTrail2"}
-checks if the weight is smaller than the one of all subsequent edges in the sequence, i.e. if the list 
-is sorted. The {\em equivalence
-between the two notions} is shown in the following.\<close>
+begin
 
 fun incTrail :: "'a pair_pre_digraph \<Rightarrow> ('a \<times>'a) weight_fun \<Rightarrow> ('a \<times>'a) list \<Rightarrow> bool" where
 "incTrail g w [] = True" |
@@ -401,27 +12,22 @@ fun incTrail :: "'a pair_pre_digraph \<Rightarrow> ('a \<times>'a) weight_fun \<
 "incTrail g w (e\<^sub>1#e\<^sub>2#es) = (if w e\<^sub>1 < w e\<^sub>2 \<and> e\<^sub>1 \<in> parcs g \<and> snd e\<^sub>1 = fst e\<^sub>2 
                                     then incTrail g w (e\<^sub>2#es) else False)"
 
-definition(in pair_pre_digraph) incTrail2 where
-"incTrail2 w es u v \<equiv> sorted_wrt (\<lambda> e\<^sub>1 e\<^sub>2. w e\<^sub>1 < w e\<^sub>2) es \<and> (es = [] \<or> awalk u es v)"
-(*definition(in pair_pre_digraph) incTrail2b where (* Use this instead? *)
-"incTrail2b w es u v \<equiv> (\<forall> es\<^sub>1 e\<^sub>1 e\<^sub>2 es\<^sub>2. es = es\<^sub>1 @ [e\<^sub>1,e\<^sub>2] @ es\<^sub>2 \<longrightarrow> w e\<^sub>1 < w e\<^sub>2) \<and> (es = [] \<or> awalk u es v)"*)
 fun decTrail :: "'a pair_pre_digraph \<Rightarrow> ('a \<times>'a) weight_fun \<Rightarrow> ('a \<times>'a) list \<Rightarrow> bool" where
 "decTrail g w [] = True" |
 "decTrail g w [e\<^sub>1] = (e\<^sub>1 \<in> parcs g)" |
 "decTrail g w (e\<^sub>1#e\<^sub>2#es) = (if w e\<^sub>1 > w e\<^sub>2 \<and> e\<^sub>1 \<in> parcs g \<and> snd e\<^sub>1 = fst e\<^sub>2 
                                     then decTrail g w (e\<^sub>2#es) else False)"
 
+definition(in pair_pre_digraph) incTrail2 where
+"incTrail2 w es u v \<equiv> sorted_wrt (\<lambda> e\<^sub>1 e\<^sub>2. w e\<^sub>1 < w e\<^sub>2) es \<and> (es = [] \<or> awalk u es v)"
+
 definition(in pair_pre_digraph) decTrail2 where 
 "decTrail2 w es u v \<equiv> sorted_wrt (\<lambda> e\<^sub>1 e\<^sub>2. w e\<^sub>1 > w e\<^sub>2) es \<and> (es = [] \<or> awalk u es v)"
-
-text \<open> Defining trails as lists in Isabelle has many advantages including using predefined list operators, 
-e.g., drop. Thus, we can show one result that will be constantly needed in the following, that is, that
-{\em any subtrail of an ordered trail is an ordered trail itself}.\<close>
 
 lemma incTrail_subtrail:
   assumes "incTrail g w es"
   shows "incTrail g w (drop k es)" 
-(*<*)proof (induction k)
+proof (induction k)
   show "incTrail g w (drop 0 es)" using assms by simp
 next 
   fix k
@@ -439,9 +45,7 @@ next
     then show ?thesis 
       by (metis IH drop_Suc incTrail.simps(3) list.sel(3) tl_drop)
   qed
-qed(*>*)
-
-text \<open> \<close>
+qed
 
 lemma decTrail_subtrail: 
   assumes "decTrail g w es"
@@ -876,9 +480,6 @@ next
   qed
 qed(*>*)
 
-text \<open> In Isabelle we then show the equivalence between the two definitions @{term "decTrail"} and @{term "decTrail2"} of strictly decreasing trails.
-Similarly, we also show the equivalence between the definition @{term "incTrail"} and @{term "incTrail2"} of strictly increasing trails.\<close>
-
 lemma(in pair_wf_digraph) decTrail_is_dec_walk:
   shows "decTrail G w es \<longleftrightarrow> decTrail2 w es (fst (hd es)) (snd (last es))" 
 (*<*)proof
@@ -926,8 +527,6 @@ next
   assume "decTrail2 w es (fst (hd es)) (snd (last es))"
   then show "decTrail G w es" using decTrail2_is_decTrail by auto
 qed(*>*)
-
-text \<open> \<close>
 
 lemma(in pair_wf_digraph) incTrail_is_inc_walk:
   shows "incTrail G w es \<longleftrightarrow> incTrail2 w es (fst (hd es)) (snd (last es))" 
@@ -1088,13 +687,6 @@ next
   qed
 qed(*>*)
 
-
-text \<open> Any strictly decreasing trail $(e_1,\ldots,e_n)$ can also be seen as a strictly increasing trail $(e_n,...,e_1)$
-if the graph considered is undirected. To this end, we make use of the locale @{term "pair_sym_digraph"}
-that captures the idea of symmetric arcs. However, it is also necessary to assume that the weight 
-function assigns the same weight to edge $(v_i,v_j)$ as to $(v_j,v_i)$. This assumption is therefore
-added to @{term "decTrail_eq_rev_incTrail"} and @{term "incTrail_eq_rev_decTrail"}. \<close>
-
 lemma(in pair_sym_digraph) decTrail_eq_rev_incTrail:
   assumes "\<forall> v\<^sub>1 v\<^sub>2. w (v\<^sub>1,v\<^sub>2) = w(v\<^sub>2,v\<^sub>1)" 
   shows "decTrail G w es \<longleftrightarrow> incTrail G w (rev (map (\<lambda>(v\<^sub>1,v\<^sub>2). (v\<^sub>2,v\<^sub>1)) es))"
@@ -1118,38 +710,25 @@ lemma(in pair_sym_digraph) incTrail_eq_rev_decTrail:
     by auto
 qed(*>*)
 
+
 subsection "Weighted Graphs"
-
-text \<open> \label{section:localeSurjective} We add the locale @{text "weighted_pair_graph"} 
-on top of the locale @{locale "pair_graph"} introduced in @{text "Graph_Theory"}. A  @{locale "pair_graph"} is a 
-finite, loop free and symmetric graph. We do not restrict the types of vertices and edges but impose 
-the condition that they have to be a linear order.
-
- Furthermore, all weights have to be integers between 0 and $\lfloor\frac{q}{2}\rfloor$ where 0 is 
-used as a special value to indicate that there is no edge at that position. Since the 
-range of the weight function is in the reals, the set of natural numbers
-\mbox{@{text "{1,..,card (parcs G) div 2}"}} has to be casted into a set of reals. This is realized by taking the image
-of the function @{text real} that casts a natural number to a real.  \<close>
 
 locale weighted_pair_graph = pair_graph "(G:: ('a::linorder) pair_pre_digraph)" for G +
   fixes w :: "('a\<times>'a) weight_fun"
   assumes dom: "e \<in> parcs G \<longrightarrow> w e \<in> real ` {1..card (parcs G) div 2}" 
       and vert_ge: "card (pverts G) \<ge> 1" 
-(*<*)
-context weighted_pair_graph 
-begin
-(*>*)
-text \<open> We introduce some useful abbreviations, according to the ones in Section \ref{section:Prelim}  \<close>
+
+locale distinct_weighted_pair_graph = weighted_pair_graph + 
+  assumes zero: "\<forall> v\<^sub>1 v\<^sub>2. (v\<^sub>1,v\<^sub>2) \<notin> parcs G \<longleftrightarrow> w (v\<^sub>1,v\<^sub>2) = 0"
+      and distinct: "\<forall> (v\<^sub>1,v\<^sub>2) \<in> parcs G. \<forall> (u\<^sub>1,u\<^sub>2) \<in> parcs G. 
+      ((v\<^sub>1 = u\<^sub>2 \<and> v\<^sub>2 = u\<^sub>1) \<or> (v\<^sub>1 = u\<^sub>1 \<and> v\<^sub>2 = u\<^sub>2)) \<longleftrightarrow> w (v\<^sub>1,v\<^sub>2) = w (u\<^sub>1,u\<^sub>2)" 
 
 abbreviation(in weighted_pair_graph) "q \<equiv> card (parcs G)"
 abbreviation(in weighted_pair_graph) "n \<equiv> card (pverts G)"
 abbreviation(in weighted_pair_graph) "W \<equiv> {1..q div 2}"
 
-text \<open>Note an important difference between Section \ref{PaperProof} and our formalization. Although 
-a @{locale "weighted_pair_graph"} is symmetric, the edge set contains both ``directions" of an edge, 
-i.e., $(v_1,v_2)$ and $(v_2,v_1)$ are both in @{term "parcs G"}. Thus, the maximum number of edges (in the 
-case that the graph is complete) is $n\cdot(n-1)$ and not $\frac{n\cdot(n-1)}{2}$. Another consequence is that
-the number $q$ of edges is always even. \<close>
+context weighted_pair_graph 
+begin
 
 lemma (in weighted_pair_graph) max_arcs: 
   shows "card (parcs G) \<le> n*(n-1)"
@@ -1266,8 +845,8 @@ next
     qed
   qed
 qed(*>*)
-text \<open>\<close>
-lemma (in weighted_pair_graph) even_arcs: 
+
+lemma (in weighted_pair_graph) even_arcs:
   shows "even q"
 (*<*)proof-
   have "card (parcs G) = q" by simp
@@ -1278,27 +857,7 @@ lemma (in weighted_pair_graph) even_arcs:
 qed
 
 end (*context weighted_pair_graph*)
-(*>*)
-text \<open> The below sublocale @{text "distinct_weighted_pair_graph"} refines
-@{text "weighted_pair_graph"}. The condition 
-@{text "zero"} fixes the meaning of 0.
-The weight function is defined on the set of all vertices but since self loops are not allowed; 
-we use 0 as a special value to indicate the unavailability of the edge. 
-The second condition @{text "distinct"} enforces that no two edges can have the same weight. There
-are some exceptions however captured in the statement @{text "(v\<^sub>1 = u\<^sub>2 \<and> v\<^sub>2 = u\<^sub>1) \<or> (v\<^sub>1 = u\<^sub>1 \<and> v\<^sub>2 = u\<^sub>2)"}.
-Firstly, $(v_1,v_2)$ should have the same weight as $(v_2,v_1)$. Secondly, $w(v_1,v_2)$ has the
-same value as $w(v_1,v_2)$. Note that both edges being self loops resulting in them both having 
-weight 0 is prohibited by condition @{text "zero"}.
-Our decision to separate these two conditions from the ones in @{text "weighted_pair_graph"}
-instead of making one locale of its own is two-fold: On the one hand, there are scenarios where 
-distinctiveness is not wished for. On the other hand, 0 might not be available as a special value.
-\<close>
 
-locale distinct_weighted_pair_graph = weighted_pair_graph + 
-  assumes zero: "\<forall> v\<^sub>1 v\<^sub>2. (v\<^sub>1,v\<^sub>2) \<notin> parcs G \<longleftrightarrow> w (v\<^sub>1,v\<^sub>2) = 0"
-      and distinct: "\<forall> (v\<^sub>1,v\<^sub>2) \<in> parcs G. \<forall> (u\<^sub>1,u\<^sub>2) \<in> parcs G. 
-      ((v\<^sub>1 = u\<^sub>2 \<and> v\<^sub>2 = u\<^sub>1) \<or> (v\<^sub>1 = u\<^sub>1 \<and> v\<^sub>2 = u\<^sub>2)) \<longleftrightarrow> w (v\<^sub>1,v\<^sub>2) = w (u\<^sub>1,u\<^sub>2)" 
-(*<*)
 context distinct_weighted_pair_graph
 begin
 
@@ -1460,17 +1019,6 @@ lemma surjective_iff_injective_gen_le:
   assumes "finite S" and "finite T" and "card T \<le> card S" and "f ` S \<subseteq> T" and "inj_on f S"
   shows "(\<forall>y \<in> T. \<exists>x \<in> S. f x = y)"
   by (meson antisym assms card_inj_on_le surjective_iff_injective_gen)
-(*>*)
-text \<open> One important step in our formalization is to show that the weight function is surjective. However, having two 
-elements of the domain (edges) being mapped to the same element of the codomain (weight) makes 
-the proof complicated. We therefore first prove that the weight function is surjective on a restricted
-set of edges. Here we use the fact that there is a linear order on vertices by only considering edges
-were the first endpoint is bigger than the second. 
-
-Then, the surjectivity of $w$ is relatively simple to show. Note that we could also have assumed surjectivity in 
-@{locale distinct_weighted_pair_graph} and shown that distinctiveness follows from it. However,
-distinctiveness is the more natural assumption that is more likely to appear in any application
-of ordered trails. \<close>
 
 lemma(in distinct_weighted_pair_graph) restricted_weight_fun_surjective:  
   "\<forall>k \<in> W. \<exists>(v\<^sub>1,v\<^sub>2) \<in> {(p1,p2). (p1,p2) \<in> parcs G \<and> p2 < p1}. w (v\<^sub>1,v\<^sub>2) = k"
@@ -1522,7 +1070,7 @@ next
   qed
   ultimately show ?thesis using surjective_iff_injective_gen_le[of "{(p1,p2). (p1,p2) \<in> (parcs G) \<and> p2 < p1}" "real ` W" w] by auto 
 qed(*>*)
-text \<open>\<close>
+
 lemma(in distinct_weighted_pair_graph) weight_fun_surjective:
   shows "\<forall>k \<in> W. \<exists>(v\<^sub>1,v\<^sub>2) \<in> parcs G. w (v\<^sub>1,v\<^sub>2) = k" 
 (*<*) using restricted_weight_fun_surjective 
@@ -1560,13 +1108,10 @@ lemma set_to_list_mono:
 
 subsection \<open> Computing a Longest Ordered Trail \<close>
 
-text \<open>\label{section:computeLongestTrail}We next formally verify Algorithm \ref{algo:FindLongestTrail} and compute longest ordered trails. To this end, 
-we introduce the function @{text "findEdge"} to find an edge in a list of edges by its weight. \<close>
-
 fun findEdge :: "('a\<times>'a) weight_fun \<Rightarrow> ('a\<times>'a) list \<Rightarrow> real \<Rightarrow> ('a\<times>'a)" where
 "findEdge f [] k = undefined" |
 "findEdge f (e#es) k = (if f e = k then e else findEdge f es k)" 
-(*<*)
+
 context distinct_weighted_pair_graph
 begin
 
@@ -1617,9 +1162,6 @@ next
     qed
   qed
 qed
-(*>*)
-text \<open> Function @{text findEdge} will correctly return the edge whose weight is $k$. We do not care in which order the endpoints
-are found, i.e. whether $(v_1,v_2)$ or $(v_2,v_1)$ is returned.  \<close>
 
 lemma(in distinct_weighted_pair_graph) findEdge_success:
   assumes "k \<in> W" and "w (v\<^sub>1,v\<^sub>2) = k" and "(parcs G) \<noteq> {}" 
@@ -2369,12 +1911,12 @@ that
 $$
 f_d(n)= f_i(n) = 
 \begin{cases}
-n &  \text{if } n \in \{3,5\}\\
-n-1 & \text{otherwise}\\
-\end{cases},
+n &  \text{if } n \in \{3,5\},\\
+n-1 & \text{otherwise},\\
+\end{cases}
 $$
 
-that is for complete graphs with $n=3$ or $n=5$ vertices there always has to be a trail of length at least $n$ whereas 
+\noindent that is, for complete graphs with $n=3$ or $n=5$ vertices there always has to be a trail of length at least $n$ whereas 
 for any other number $n$ of vertices there only has to be a trail of length $n - 1$. Therefore, the lower bound that
 we showed in this paper is equal to the exact length with exception of two special cases.  
 We believe that formalizing this result would be a valuable extension to the theory @{text "Ordered_Trail"}.

@@ -16,7 +16,7 @@ Bucic, M., Kwan, M., Pokrovskiy, A., Sudakov, B., Tran, T., Wagner, A.Z.:
 \bibitem{calderbank1984increasing}
 Calderbank, A.R., Chung, F.R., Sturtevant, D.G.: Increasing sequences with
   nonzero block sums and increasing paths in edge-ordered graphs. Discrete
-  mathematics  \textbf{50},  15--28 (1984)
+  Mathematics  \textbf{50},  15--28 (1984)
 
 \bibitem{chvatal1970some}
 Chavtal, V., Komlos, J.: Some combinatorial theorems on monocity. In: Notices
@@ -42,7 +42,7 @@ Graham, R., Kleitman, D.: Increasing paths in edge ordered graphs. Periodica
   Mathematica Hungarica  \textbf{3}(1-2),  141--148 (1973)
 
 \bibitem{Vampire13}
-Kov{\'{a}}cs, L., Voronkov, A.: First-order theorem proving and vampire. In:
+Kov{\'{a}}cs, L., Voronkov, A.: First-order theorem proving and {V}ampire. In:
   Proc. of CAV. pp. 1--35 (2013)
 
 \bibitem{milans2015monotone}
